@@ -8,8 +8,8 @@ parameters:
 doctrine:
     dbal:
         # configure these for your database server
-        driver: 'pdo_mysql'
-        server_version: '5.0.12'
+        driver: 'pdo_sqlite'
+        server_version: '3.22.0'
         charset: utf8mb4
         default_table_options:
             charset: utf8mb4
