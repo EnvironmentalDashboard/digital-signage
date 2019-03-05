@@ -6,12 +6,6 @@ use App\Entity;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-
-use Symfony\Component\Form\FormBuilderInterface;
-
 use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -29,19 +23,15 @@ class CarouselEdit extends AbstractController
     {
         $label = $request->request->get('label');
 
-        /**
-         * Create carousel
-         */
+        // Create carousel
         $carousel = new Entity\Carousel;
         $carousel->setLabel($label);
 
         $entityManager->persist($carousel);
         $entityManager->flush();
 
-        /**
-         * Response
-         */
-        return JsonResponse([
+        // Response
+        return new JsonResponse([
             'carousel' => [
                 'id' => $carousel->getId(),
                 'label' => $carousel->getLabel()
@@ -54,55 +44,51 @@ class CarouselEdit extends AbstractController
      */
     public function delete($id, EntityManagerInterface $entityManager)
     {
-        /**
-         * Delete carousel
-         */
-        $carousel = new Entity\Carousel;
-        $carousel->setId($id);
+        $repository = $entityManager->getRepository(Entity\Carousel::class);
+
+        // Delete carousel
+        $carousel = $repository->findOneBy(['id' => $id]);
 
         $entityManager->remove($carousel);
         $entityManager->flush();
 
-        return JsonResponse(true);
+        return new JsonResponse(true);
     }
 
     /**
-     * @Route("/foo", name="foo", methods={"GET"})
+     * @Route("/carousel/{id}/frames/save", name="carousel_save_frames", methods={"POST"})
      */
-    public function foo(Request $request)
+    public function saveFrames(Request $request, EntityManagerInterface $entityManager, $id)
     {
-        return new Response('
-            <form action="/carousel/create" method="post"><input type="text" name="label"><input type="submit" name="send"></form>
-        ');
-    }
+        $repository = $entityManager->getRepository(Entity\Carousel::class);
 
-    /**
-     * @Route("/carousel/{id}/frames/save", name="saveFrames", methods={"POST"})
-     */
-    public function saveFrames(Request $request, $id)
-    {
-        $formBuilder = $this->createFormBuilder([]);
+        // Fetch current frames
+        $carousel = $repository->findOneBy(['id' => $id]);
+        $oldFrames = $carousel->getFrames();
 
-        $form = $formBuilder
-            ->add('frames', CollectionType::class, [
-                'entry_type' => Entity\Frame::class,
-                'entry_options' => [
-                    'url' => 'url',
-                    'duration' => 'duration'
-                ]
-            ])
-            ->getForm();
+        // Delete current frames
+        foreach ($carousel->getFrames() as $frameToRemove) {
+            $carousel->removeFrame($frameToRemove);
+        }
 
-        //$form->submit($request->request->all());
-        $form->handleRequest($request);
+        // Add new frames
+        $frames = [];
 
-        return new JsonResponse([($form->isSubmitted() ? "yes" : "no"), $form->getData()]);
-    }
+        $urls = $request->request->get('frame_url');
+        $durations = $request->request->get('frame_duration');
 
-    /**
-     * @Route("/carousel/{id}/frames/", name="carousel_save_frames")
-     */
-    public function getFrames(Request $request, $id)
-    {
+        foreach ($urls as $key => $value) {
+            $carousel->addFrame(
+                (new Entity\Frame())
+                    ->setUrl($urls[$key])
+                    ->setDuration($durations[$key])
+            );
+
+            $entityManager->persist($carousel);
+        }
+        
+        $entityManager->flush();
+
+        return new JsonResponse(true);
     }
 }

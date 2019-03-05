@@ -26,7 +26,7 @@ class Carousel extends AbstractType
     private $label;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Frame", mappedBy="carousel", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Frame", mappedBy="carousel", orphanRemoval=true, cascade={"persist"})
      */
     private $frames;
 
@@ -81,5 +81,10 @@ class Carousel extends AbstractType
         }
 
         return $this;
+    }
+
+    public function getLength()
+    {
+        return count($this->frames);
     }
 }
