@@ -1,0 +1,72 @@
+<table class="table">
+    <thead>
+        <tr>
+        <th scope="col" style="border-top:none">#</th>
+        <th scope="col" style="border-top:none">Label</th>
+        <th scope="col" style="border-top:none">Frames</th>
+        <th scope="col" style="border-top:none">&nbsp;</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for carousel in carousels %}
+        <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>{{carousel.label}}</td>
+        <td>{{carousel.length}}</td>
+        <td class="form-inline">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#carousel-{{carousel.id}}-createFormModal">Edit</button>
+
+            <form action="{{ path('carousel_delete', {'id': carousel.id}) }}"
+                method="post">
+                <input type="submit" class="btn btn-danger" value="Delete">
+            </form>
+        </td>
+        </tr>
+    {% endfor %}
+
+
+    </tbody>
+
+</table>
+
+{% for carousel in carousels %}
+<div class="modal fade" id="carousel-{{carousel.id}}-createFormModal" tabindex="-1" role="dialog" aria-labelledby="carousel-{{carousel.id}}-createFormModal-Label"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form action="{{ path('carousel_save_frames', {'id': carousel.id}) }}" method="post">
+
+    {% if carousel.frames is empty %}
+
+        <div class="modal-header">
+            <h5 class="modal-title" id="carousel-{{carousel.id}}-createFormModal-Label">No frames</h5>
+        </div>
+
+    {% endif %}
+
+    <div id="carousel-{{carousel.id}}-frame-edit">
+    {% for frame in carousel.frames %}
+    
+        {% include 'frame-edit.html.twig' %}
+
+    {% endfor %}
+    </div>
+
+    <div class="modal-body">
+        <div class="form-group">
+            <input type="button" class="btn btn-primary carousel-add-new-frame" data-carousel-for="{{carousel.id}}" value="Add frame">
+        </div>
+    </div>
+
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-primary" id="save-frame" value="Save changes">
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}

@@ -1,0 +1,16 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="carousel-{{carousel.id}}-createFormModal-Label">Frame #{{loop.index}}</h5>
+</div>
+<div class="modal-body">
+    <div class="form-group">
+        <label for="create_frame_url_{{frame.id}}">URL</label>
+        <input type="url" class="form-control" id="create_frame_url_{{frame.id}}" name="frame_url[]" value="{{frame.url}}" placeholder="URL">
+    </div>
+
+    <div class="form-group">
+        <label for="create_frame_duration_{{frame.id}}">Duration</label>
+        <input type="number" class="form-control" id="create_frame_duration_{{frame.id}}" value="{{frame.duration}}" name="frame_duration[]"
+            aria-describedby="duration_help">
+        <small id="duration_help" class="form-text text-muted">In milliseconds</small>
+    </div>
+</div>

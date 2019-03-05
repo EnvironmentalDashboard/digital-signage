@@ -6,10 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Form\AbstractType;
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CarouselRepository")
  */
-class Carousel
+class Carousel extends AbstractType
 {
     /**
      * @ORM\Id()
@@ -24,7 +26,7 @@ class Carousel
     private $label;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Frame", mappedBy="carousel", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Frame", mappedBy="carousel", orphanRemoval=true, cascade={"persist"})
      */
     private $frames;
 
@@ -79,5 +81,10 @@ class Carousel
         }
 
         return $this;
+    }
+
+    public function getLength()
+    {
+        return count($this->frames);
     }
 }
