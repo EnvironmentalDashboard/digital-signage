@@ -17,7 +17,7 @@
     // Update carousel list & modals
     $.post($(this).attr('action'), $(this).serialize()).done(function() {
       $.ajax({
-          url: "{{ path("carousel_list_all") }}",
+          url: "{{ path("carousel-list-all") }}",
           type: "GET",
           success: function(data) {
             $("#nav-all-carousels").html(data);
@@ -306,7 +306,7 @@
 
             </div>
             <div class="tab-pane fade" id="nav-create-carousel" role="tabpanel" aria-labelledby="nav-create-carousel-tab">
-              <form id="create-carousel-form" action="{{ path('carousel_create') }}" method="POST" class="mt-3">
+              <form id="create-carousel-form" action="{{ path('carousel-create') }}" method="POST" class="mt-3">
                 <div class="form-group row">
                   <label for="carousel-label" class="col-sm-2 col-form-label">Label</label>
                   <div class="col-sm-10">

@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class Carousel extends AbstractController
 {
     /**
-     * @Route("/carousel/all", name="carousel_list_all", methods={"GET"})
+     * carousel-list-all
      */
     public function listAll(Request $request, EntityManagerInterface $entityManager)
     {

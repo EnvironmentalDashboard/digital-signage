@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class CarouselEdit extends AbstractController
 {
     /**
-     * @Route("/carousel/create", name="carousel_create")
+     * carousel-create
      */
     public function create(Request $request, EntityManagerInterface $entityManager)
     {
@@ -40,7 +40,7 @@ class CarouselEdit extends AbstractController
     }
 
     /**
-     * @Route("/carousel/{id}/delete", name="carousel_delete")
+     * carousel-delete
      */
     public function delete($id, EntityManagerInterface $entityManager)
     {
@@ -56,7 +56,7 @@ class CarouselEdit extends AbstractController
     }
 
     /**
-     * @Route("/carousel/{id}/frames/save", name="carousel_save_frames", methods={"POST"})
+     * carousel-save-frames
      */
     public function saveFrames(Request $request, EntityManagerInterface $entityManager, $id)
     {

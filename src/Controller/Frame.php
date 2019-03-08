@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class Frame extends AbstractController
 {
     /**
-     * @Route("/carousel/{id}/frame/all", name="frame_list_by_carousel", methods={"GET"})
+     * frame-list-by-carousel
      */
     public function listByCarousel(Request $request, $id, EntityManagerInterface $entityManager)
     {
