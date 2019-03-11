@@ -21,7 +21,7 @@ class CarouselEdit extends AbstractController
      */
     public function create(Request $request, EntityManagerInterface $entityManager)
     {
-        $label = $request->request->get('label');
+        $label = $request->request->get('carousel-label');
 
         // Create carousel
         $carousel = new Entity\Carousel;

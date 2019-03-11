@@ -10,47 +10,113 @@
 {% block javascript %}
 {{ parent() }}
 <script>
-  // Submit event to fire when forms are submitted
-  var submitEvent = function(e) {
+  // Submit event to fire when carousel form submitted
+  var createCarousel = function(e) {
     e.preventDefault();
 
     // Update carousel list & modals
     $.post($(this).attr('action'), $(this).serialize()).done(function() {
       $.ajax({
-          url: "{{ path("carousel-list-all") }}",
+          url: "{{ path("carousel-table") }}",
           type: "GET",
           success: function(data) {
             $("#nav-all-carousels").html(data);
 
             // Re-apply submit event to new forms
-            $('form[method=POST]').on('submit', submitEvent);
+            $('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
           }
       });
     });
   };
 
-  // Apply submit event to all forms
-  $('form[method=POST]').on('submit', submitEvent);
+  // Submit event to fire when display form submitted
+  var createDisplay = function(e) {
+    e.preventDefault();
+
+    // Update display list & modals
+    $.post($(this).attr('action'), $(this).serialize()).done(function() {
+      {# $.ajax({
+          url: "{{ path("display-table") }}",
+          type: "GET",
+          success: function(data) {
+            $("#nav-all-displays").html(data);
+
+            // Re-apply submit event to new forms
+            $('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
+          }
+      }); #}
+    });
+  };
+
+  $('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
+  $('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
 
   // Add new frame
   $(".carousel-add-new-frame").each(function(){
     $(this).on('click', function(e) {
       var carousel = $(this).data('carousel-for');
-
       $("#carousel-" + carousel + "-frame-edit").append("New frame...");
     });
   });
 
+  // Add new presentation
+  $(".display-add-new-pres").each(function(){
+    $(this).on('click', function(e) {
+      e.preventDefault();
+      var display = $(this).data('display-for');
+      var clone = $('#new-pres').clone();
+      $("#display-" + display + "-presentation-edit").append(clone);
+    });
+  });
+
+{# https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API,
+   https://mdn.github.io/dom-examples/drag-and-drop/copy-move-DataTransfer.html #}
+function dragstart_handler(ev) {
+ console.log("dragStart");
+ // Change the source element's background color to signify drag has started
+ ev.currentTarget.style.border = "dashed";
+ // Add the id of the drag source element to the drag data payload so
+ // it is available when the drop event is fired
+ ev.dataTransfer.setData("text", ev.target.id);
+ // Tell the browser both copy and move are possible
+ ev.effectAllowed = "copyMove";
+}
+function dragover_handler(ev) {
+ console.log("dragOver");
+ // Change the target element's border to signify a drag over event
+ // has occurred
+ ev.currentTarget.style.background = "lightblue";
+ ev.preventDefault();
+}
+function drop_handler(ev) {
+  console.log("Drop");
+  ev.preventDefault();
+  // Get the id of drag source element (that was added to the drag data
+  // payload by the dragstart event handler)
+  var id = ev.dataTransfer.getData("text");
+  if (ev.target.id == "drop-zone") {
+   var nodeCopy = document.getElementById(id).cloneNode(true);
+   nodeCopy.id = "newId";
+   ev.target.appendChild(nodeCopy);
+  }
+}
+function dragend_handler(ev) {
+  console.log("dragEnd");
+  // Restore source's border
+  ev.target.style.border = "solid black";
+  // Remove all of the drag data
+  ev.dataTransfer.clearData();
+}
 
 
   var num_new_entities = {
     'pres': 0,
     'buttons': 0
   };
-  $('#save-pres').on('click', function (e) {
+  {# $('#save-pres').on('click', function (e) {
     e.preventDefault();
     add_entity('pres', $(this), $('#pres-list'), $('#create-display-form'));
-  });
+  }); #}
   $('#save-button').on('click', function (e) {
     e.preventDefault();
     add_entity('buttons', $(this), $('#button-list'), $('#create-controller-form'));
@@ -131,63 +197,6 @@
     </div>
   </div>
 </div>
-<!-- modal -->
-<div class="modal fade" id="createPresModal" tabindex="-1" role="dialog" aria-labelledby="createPresModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content">
-      <form>
-        <div class="modal-header">
-          <h5 class="modal-title" id="createPresModalLabel">Add Presentation</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="pres_template_id">Select template</label>
-            <select class="form-control" id="pres_template_id" name="pres_template_id">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <p>Drag carousels onto template:</p>
-            <div class="row">
-              <div class="col-sm-6">
-                <div style="height: 300px;width: 100%;background: slategray;"></div>
-              </div>
-              <div class="col-sm-6">
-                <ul class="list-group list-group-flush">
-                  <li class="list-group-item">Carousel 1</li>
-                  <li class="list-group-item">Carousel 2</li>
-                  <li class="list-group-item">Carousel 3</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="create_pres_duration">Duration</label>
-            <input type="number" class="form-control" id="create_pres_duration" aria-describedby="pres_duration_help"
-              name="create_pres_duration">
-            <small id="pres_duration_help" class="form-text text-muted">In seconds</small>
-          </div>
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="skip" name="skip">
-            <label class="form-check-label" for="skip">Skip in main loop</label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="save-pres">Save changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
 
 
 <div class="container">
@@ -219,7 +228,8 @@
           </nav>
           <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-all-displays" role="tabpanel" aria-labelledby="nav-all-displays-tab">
-              <table class="table">
+              {{ render(controller('App\\Controller\\Display::table')) }}
+              {# <table class="table">
                 <thead>
                   <tr>
                     <th scope="col" style="border-top:none">#</th>
@@ -236,48 +246,19 @@
                     <td>4</td>
                     <td>9</td>
                     <td>
-                      <button class="btn btn-primary">Edit</button>
-                      <button class="btn btn-danger">Delete</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2</th>
-                    <td>Carousel b</td>
-                    <td>2</td>
-                    <td>4</td>
-                    <td>
-                      <button class="btn btn-primary">Edit</button>
-                      <button class="btn btn-danger">Delete</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">3</th>
-                    <td>Carousel c</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td>
-                      <button class="btn btn-primary">Edit</button>
+                      <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#createPresModal">Edit</button>
                       <button class="btn btn-danger">Delete</button>
                     </td>
                   </tr>
                 </tbody>
-              </table>
+              </table> #}
             </div>
             <div class="tab-pane fade" id="nav-create-display" role="tabpanel" aria-labelledby="nav-create-display-tab">
-              <form id="create-display-form" action="" method="POST" class="mt-3" data-action="create-display">
+              <form id="create-display-form" action="{{ path('display-create') }}" method="POST" class="mt-3">
                 <div class="form-group row">
                   <label for="display-label" class="col-sm-2 col-form-label">Label</label>
                   <div class="col-sm-10">
                     <input type="text" class="form-control" id="display-label" name="display-label" placeholder="Label">
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <p class="col-sm-2 col-form-label">Presentations</p>
-                  <div class="col-sm-10">
-                    <ul class="list-group list-group-flush" id="pres-list">
-                    </ul>
-                    <button type="button" class="btn btn-light mt-2 btn-sm" data-toggle="modal" data-target="#createPresModal">Add
-                      presentation</button>
                   </div>
                 </div>
                 <div class="form-group row">
@@ -302,7 +283,7 @@
           <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-all-carousels" role="tabpanel" aria-labelledby="nav-all-carousels-tab">
               
-            {{ render(controller('App\\Controller\\Carousel::listAll')) }}
+            {{ render(controller('App\\Controller\\Carousel::table')) }}
 
             </div>
             <div class="tab-pane fade" id="nav-create-carousel" role="tabpanel" aria-labelledby="nav-create-carousel-tab">
@@ -310,7 +291,7 @@
                 <div class="form-group row">
                   <label for="carousel-label" class="col-sm-2 col-form-label">Label</label>
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" id="carousel-label" name="label" placeholder="Label">
+                    <input type="text" class="form-control" id="carousel-label" name="carousel-label" placeholder="Label">
                   </div>
                 </div>
                 <div class="form-group row">

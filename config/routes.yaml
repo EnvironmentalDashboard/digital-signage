@@ -1,17 +1,33 @@
 index:
   path: /
   controller: App\Controller\Landing::index
+  methods: GET
 
-carousel-list-all:
-  path: /carousel/all
-  controller: App\Controller\Carousel::listAll
+display-create:
+  path: /display/create
+  controller: App\Controller\DisplayEdit::create
+  methods: POST
+display-delete:
+  path: /display/delete
+  controller: App\Controller\DisplayEdit::delete
+  methods: POST
+display-save-presentations:
+  path: /display/{id}/presentations/save
+  controller: App\Controller\DisplayEdit::savePresentations
+  methods: POST
+
+carousel-table:
+  path: /carousel/table
+  controller: App\Controller\Carousel::table
   methods: GET
 carousel-create:
   path: /carousel/create
   controller: App\Controller\CarouselEdit::create
+  methods: POST
 carousel-delete:
   path: /carousel/{id}/delete
   controller: App\Controller\CarouselEdit::delete
+  methods: POST
 carousel-save-frames:
   path: /carousel/{id}/frames/save
   controller: App\Controller\CarouselEdit::saveFrames

@@ -17,14 +17,22 @@ use Doctrine\ORM\EntityManagerInterface;
 class Carousel extends AbstractController
 {
     /**
-     * carousel-list-all
+     * carousel-table
      */
-    public function listAll(Request $request, EntityManagerInterface $entityManager)
+    public function list(Request $request, EntityManagerInterface $entityManager)
     {
         $repository = $entityManager->getRepository(Entity\Carousel::class);
-        
         $entities = $repository->findAll();
-
         return $this->render('carousel-list.html.twig', ['carousels' => $entities]);
+    }
+
+    /**
+     * carousel-table-all
+     */
+    public function table(Request $request, EntityManagerInterface $entityManager)
+    {
+        $repository = $entityManager->getRepository(Entity\Carousel::class);
+        $entities = $repository->findAll();
+        return $this->render('carousel-table.html.twig', ['carousels' => $entities]);
     }
 }
