@@ -27,4 +27,14 @@ class Display extends AbstractController
 
         return $this->render('display-table.html.twig', ['displays' => $entities]);
     }
+
+    /**
+     * display-templates
+     */
+    public function template(Request $request, EntityManagerInterface $entityManager, $name)
+    {
+        // TODO: grab $id template as string from db
+        $str = "display-templates/{fullscreen}.html.twig";
+        return $this->render($str);
+    }
 }

@@ -19,7 +19,7 @@
     {# TODO: hidden input for arrangment of carousels #}
     <div class="row">
       <div class="col-sm-6">
-        <div style="height: 300px;width: 100%;background: slategray;" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="drop-zone"></div>
+        <div style="height: 300px;width: 100%;background: var(--gray);" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="drop-zone"></div>
       </div>
       <div class="col-sm-6">
       {{ render(controller('App\\Controller\\Carousel::list')) }}

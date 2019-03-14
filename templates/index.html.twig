@@ -54,6 +54,7 @@
   // Add new frame
   $(".carousel-add-new-frame").each(function(){
     $(this).on('click', function(e) {
+      // TODO: implement
       var carousel = $(this).data('carousel-for');
       $("#carousel-" + carousel + "-frame-edit").append("New frame...");
     });
@@ -69,12 +70,19 @@
     });
   });
 
+  $(".template-select-dropdown").each(function(){
+    $(this).on('change', function(e) {
+      e.preventDefault();
+      var controls = $(this).data('controls');
+      {# $('#' + controls). #}
+    });
+  });
+
 {# https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API,
    https://mdn.github.io/dom-examples/drag-and-drop/copy-move-DataTransfer.html #}
 function dragstart_handler(ev) {
- console.log("dragStart");
  // Change the source element's background color to signify drag has started
- ev.currentTarget.style.border = "dashed";
+ ev.currentTarget.style.background = "var(--light)";
  // Add the id of the drag source element to the drag data payload so
  // it is available when the drop event is fired
  ev.dataTransfer.setData("text", ev.target.id);
@@ -82,64 +90,31 @@ function dragstart_handler(ev) {
  ev.effectAllowed = "copyMove";
 }
 function dragover_handler(ev) {
- console.log("dragOver");
  // Change the target element's border to signify a drag over event
  // has occurred
- ev.currentTarget.style.background = "lightblue";
+ {# ev.currentTarget.style.background = "var(--light)"; #}
  ev.preventDefault();
 }
 function drop_handler(ev) {
-  console.log("Drop");
   ev.preventDefault();
   // Get the id of drag source element (that was added to the drag data
   // payload by the dragstart event handler)
   var id = ev.dataTransfer.getData("text");
-  if (ev.target.id == "drop-zone") {
+  if (ev.target.classList[0] == "drop-zone") {
    var nodeCopy = document.getElementById(id).cloneNode(true);
-   nodeCopy.id = "newId";
+   nodeCopy.id = Date.now();
+   nodeCopy.style.height = "100%";
    ev.target.appendChild(nodeCopy);
   }
 }
 function dragend_handler(ev) {
-  console.log("dragEnd");
   // Restore source's border
-  ev.target.style.border = "solid black";
+  ev.target.style.border = "none";
   // Remove all of the drag data
   ev.dataTransfer.clearData();
 }
 
 
-  var num_new_entities = {
-    'pres': 0,
-    'buttons': 0
-  };
-  {# $('#save-pres').on('click', function (e) {
-    e.preventDefault();
-    add_entity('pres', $(this), $('#pres-list'), $('#create-display-form'));
-  }); #}
-  $('#save-button').on('click', function (e) {
-    e.preventDefault();
-    add_entity('buttons', $(this), $('#button-list'), $('#create-controller-form'));
-  });
-
-  function add_entity(entity_name, submit_btn, display_list, real_form) {
-    var form = submit_btn.closest('form');
-    var data = form.serializeArray();
-    real_form.append("<input type='hidden' name='" + entity_name + num_new_entities[entity_name] + "' value='" + form.serialize() +
-      "' />");
-    var li = "<li class='list-group-item'>";
-    for (var i = 0; i < data.length; i++) {
-      if (i === 0) {
-        li += data[i].value;
-      } else {
-        li += ' - ' + data[i].value;
-      }
-    }
-    display_list.append(li + "</li>");
-    form.find('input[type!=hidden]').val('');
-    num_new_entities[entity_name]++;
-    submit_btn.closest('.modal').modal('hide');
-  }
 </script>
 {% endblock %}
 
