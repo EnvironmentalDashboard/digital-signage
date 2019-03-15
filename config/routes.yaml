@@ -15,7 +15,7 @@ display-save-presentations:
   path: /display/{id}/presentations/save
   controller: App\Controller\DisplayEdit::savePresentations
   methods: POST
-display-templates:
+display-template:
   path: /display/template/{name}
   controller: App\Controller\Display::template
   methods: GET

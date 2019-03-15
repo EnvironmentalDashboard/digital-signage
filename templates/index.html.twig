@@ -70,11 +70,17 @@
     });
   });
 
+  {% spaceless %}
+  var templates = [ '{{ render(controller('App\\Controller\\Display::template',{'name': 'fullscreen'})) }}',
+                    '{{ render(controller('App\\Controller\\Display::template', {'name': 'marquee'})) }}' ];
+  {% endspaceless %}
+
   $(".template-select-dropdown").each(function(){
     $(this).on('change', function(e) {
       e.preventDefault();
       var controls = $(this).data('controls');
-      {# $('#' + controls). #}
+      var selected = $(this).find(":selected").val();
+      $(controls).html(templates[selected]);
     });
   });
 
@@ -100,12 +106,13 @@ function drop_handler(ev) {
   // Get the id of drag source element (that was added to the drag data
   // payload by the dragstart event handler)
   var id = ev.dataTransfer.getData("text");
-  if (ev.target.classList[0] == "drop-zone") {
-   var nodeCopy = document.getElementById(id).cloneNode(true);
-   nodeCopy.id = Date.now();
-   nodeCopy.style.height = "100%";
-   ev.target.appendChild(nodeCopy);
-  }
+  var nodeCopy = document.getElementById(id).cloneNode(true);
+  nodeCopy.id = Date.now();
+  nodeCopy.style.height = "100%";
+  nodeCopy.draggable = false;
+  nodeCopy.ondragstart = '';
+  nodeCopy.ondragend = '';
+  ev.target.appendChild(nodeCopy);
 }
 function dragend_handler(ev) {
   // Restore source's border
