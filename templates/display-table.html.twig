@@ -1,3 +1,6 @@
+{% if displays is empty %}
+  <p class="text-muted text-center">You have no configured displays or carousels. Please create a carousel before creating a display.</p>
+{% else %}
 <table class="table">
     <thead>
         <tr>
@@ -28,6 +31,7 @@
     </tbody>
 
 </table>
+{% endif %}
 
 {% for display in displays %}
 <div class="modal fade" id="display-{{display.id}}-createFormModal" tabindex="-1" role="dialog" aria-labelledby="display-{{display.id}}-createFormModal-Label"

@@ -1,3 +1,6 @@
+{% if carousels is empty %}
+    <p class="text-muted text-center">You have no configured carousels.</p>
+{% else %}
 <table class="table">
     <thead>
         <tr>
@@ -29,6 +32,7 @@
     </tbody>
 
 </table>
+{% endif %}
 
 {% for carousel in carousels %}
 <div class="modal fade" id="carousel-{{carousel.id}}-createFormModal" tabindex="-1" role="dialog" aria-labelledby="carousel-{{carousel.id}}-createFormModal-Label"
