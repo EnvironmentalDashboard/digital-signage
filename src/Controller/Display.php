@@ -16,6 +16,15 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class Display extends AbstractController
 {
+
+    /**
+     * display-url
+     */
+    public function present($id, Request $request, EntityManagerInterface $entityManager)
+    {
+        return null;
+    }
+
     /**
      * display-table
      */

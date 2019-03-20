@@ -6,6 +6,7 @@
         <tr>
         <th scope="col" style="border-top:none">#</th>
         <th scope="col" style="border-top:none">Label</th>
+        <th scope="col" style="border-top:none">URL</th>
         <th scope="col" style="border-top:none">&nbsp;</th>
         </tr>
     </thead>
@@ -16,11 +17,11 @@
         <tr>
         <th scope="row">{{loop.index}}</th>
         <td>{{display.label}}</td>
+        <td><a href="#">https://environmentaldashboard.org/digital-signage/display/{{ display.id }}/present</a></td>
         <td class="form-inline">
-            <button class="btn btn-primary" data-toggle="modal" data-target="#display-{{display.id}}-createFormModal">Edit</button>
+            <button class="btn btn-primary mr-2" data-toggle="modal" data-target="#display-{{display.id}}-createFormModal">Edit</button>
 
-            <form action="{{ path('display-delete', {'id': display.id}) }}"
-                method="post">
+            <form action="{{ path('display-delete', {'id': display.id}) }}" method="POST">
                 <input type="submit" class="btn btn-danger" value="Delete">
             </form>
         </td>
@@ -51,9 +52,9 @@
           <div class="modal-body" id="new-pres">
             <div class="form-group">
               <label for="pres_template_for_{{display.id}}">Select template</label>
-              <select class="form-control template-select-dropdown" id="pres_template_for_{{display.id}}" name="pres_template" data-controls="#drop-zone-{{display.id}}">
-                <option value="0">Fullscreen</option>
-                <option value="1">Fullscreen with marquee</option>
+              <select class="form-control template-select-dropdown" id="pres_template_for_{{display.id}}" name="pres_template[]" data-controls="#drop-zone-{{display.id}}">
+                <option value="1">Fullscreen</option>
+                <option value="2">Fullscreen with marquee</option>
               </select>
             </div>
             <div class="form-group">
@@ -73,10 +74,10 @@
               <label for="pres_duration_for_{{display.id}}">Duration</label>
               <input type="number" class="form-control" id="pres_duration_for_{{display.id}}" aria-describedby="pres_duration_help"
                 name="pres_duration[]">
-              <small id="pres_duration_help" class="form-text text-muted">In milliseconds</small>
+              <small id="pres_duration_help" class="form-text text-muted">In seconds</small>
             </div>
             <div class="form-group form-check">
-              <input type="checkbox" class="form-check-input" id="skip_{{display.id}}" name="skip[]">
+              <input type="checkbox" class="form-check-input" id="skip_{{display.id}}" name="skip[]" value="off">
               <label class="form-check-label" for="skip_{{display.id}}">Skip in main loop</label>
             </div>
           </div>

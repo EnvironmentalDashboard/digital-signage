@@ -80,7 +80,7 @@
       e.preventDefault();
       var controls = $(this).data('controls');
       var selected = $(this).find(":selected").val();
-      $(controls).html(templates[selected]);
+      $(controls).html(templates[selected-1]);
     });
   });
 

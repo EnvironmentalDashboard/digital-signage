@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity;
+use App\Factory;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -58,7 +59,8 @@ class DisplayEdit extends AbstractController
     /**
      * display-save-presentations
      */
-    public function savePresentations(Request $request, EntityManagerInterface $entityManager, $id)
+    public function savePresentations(Request $request, EntityManagerInterface $entityManager,
+        Factory\TemplateFactory $templateFactory, $id)
     {
         $repository = $entityManager->getRepository(Entity\Display::class);
 
@@ -79,19 +81,35 @@ class DisplayEdit extends AbstractController
         $durations = $request->request->get('pres_duration');
 
         foreach ($templates as $key => $value) {
-            $template = new Entity\Template();
-            // $template->setId($templates[$key]);
-            $display->addPresentation(
-                (new Entity\Presentation())
-                    ->setTemplate($template)
-                    ->setDuration($durations[$key])
-            );
+            $parentId = $templates[$key];
+            $duration = $durations[$key];
 
+            /**
+             * @type Entity\Template
+             */
+            $template = $templateFactory->fromParent($parentId);
+
+            $entityManager->persist($template);
+
+            $presentation = new Entity\Presentation();
+
+            $presentation->setTemplate($template);
+            $presentation->setDuration((int) $duration);
+            $presentation->setLabel('should we even have labels?');
+            $presentation->setSkip(false);
+            
+            $display->addPresentation($presentation);
+
+            $entityManager->persist($presentation);
             $entityManager->persist($display);
         }
         
         $entityManager->flush();
 
         return new JsonResponse(true);
+    }
+
+    private function templateTwig($id) {
+        return 'test';
     }
 }

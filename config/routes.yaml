@@ -8,13 +8,17 @@ display-create:
   controller: App\Controller\DisplayEdit::create
   methods: POST
 display-delete:
-  path: /display/delete
+  path: /display/{id}/delete
   controller: App\Controller\DisplayEdit::delete
   methods: POST
 display-save-presentations:
   path: /display/{id}/presentations/save
   controller: App\Controller\DisplayEdit::savePresentations
   methods: POST
+display-url:
+  path: /display/{id}/present
+  controller: App\Controller\Display::present
+  methods: GET
 display-template:
   path: /display/template/{name}
   controller: App\Controller\Display::template
