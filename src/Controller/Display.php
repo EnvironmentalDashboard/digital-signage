@@ -22,23 +22,20 @@ class Display extends AbstractController
      */
     public function present($id, Request $request, EntityManagerInterface $entityManager)
     {
+        $cycle = [];
         $displayRepository = $entityManager->getRepository(Entity\Display::class);
-        $mapRepository = $entityManager->getRepository(Entity\CarouselPresentationMap::class);
-        
         $display = $displayRepository->find($id);
 
-        foreach ($display->getPresentations() as $presentation) {
-            $template =  $presentation->getTemplate();
-            $carousels = $presentation->getCarouselPresentationMaps();
-            $carousels = $carousels->unwrap();
-            var_dump($presentation);
-            var_dump($carousels);
-            die;
+        foreach ($display->getPresentations() as $i => $presentation) {
+            $template = $presentation->getTemplate();
+            $map = $presentation->getCarouselPresentationMaps();
+            $cycle[$i] = ['template' => $template, 'carousels' => []];
+            foreach ($map as $relation) {
+                $cycle[$i]['carousels'][] = $relation->getCarousel();
+            }
         }
-        die;
-        // $repository->findOneBy(['display_id' => $id]);
 
-        return null;
+        return $this->render('present.html.twig', ['cycle' => $cycle]);
     }
 
     /**
