@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -42,6 +44,16 @@ class Presentation
      * @ORM\Column(type="integer")
      */
     private $duration;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\CarouselPresentationMap", mappedBy="presentation", orphanRemoval=true)
+     */
+    private $carouselPresentationMaps;
+
+    public function __construct()
+    {
+        $this->carouselPresentationMaps = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -104,6 +116,37 @@ class Presentation
     public function setDuration(int $duration): self
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CarouselPresentationMap[]
+     */
+    public function getCarouselPresentationMaps(): Collection
+    {
+        return $this->carouselPresentationMaps;
+    }
+
+    public function addCarouselPresentationMap(CarouselPresentationMap $carouselPresentationMap): self
+    {
+        if (!$this->carouselPresentationMaps->contains($carouselPresentationMap)) {
+            $this->carouselPresentationMaps[] = $carouselPresentationMap;
+            $carouselPresentationMap->setPresentation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCarouselPresentationMap(CarouselPresentationMap $carouselPresentationMap): self
+    {
+        if ($this->carouselPresentationMaps->contains($carouselPresentationMap)) {
+            $this->carouselPresentationMaps->removeElement($carouselPresentationMap);
+            // set the owning side to null (unless already changed)
+            if ($carouselPresentationMap->getPresentation() === $this) {
+                $carouselPresentationMap->setPresentation(null);
+            }
+        }
 
         return $this;
     }

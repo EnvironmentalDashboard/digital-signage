@@ -30,9 +30,15 @@ class Carousel extends AbstractType
      */
     private $frames;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\CarouselPresentationMap", mappedBy="carousel", orphanRemoval=true)
+     */
+    private $carouselPresentationMaps;
+
     public function __construct()
     {
         $this->frames = new ArrayCollection();
+        $this->carouselPresentationMaps = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,5 +92,36 @@ class Carousel extends AbstractType
     public function getLength()
     {
         return count($this->frames);
+    }
+
+    /**
+     * @return Collection|CarouselPresentationMap[]
+     */
+    public function getCarouselPresentationMaps(): Collection
+    {
+        return $this->carouselPresentationMaps;
+    }
+
+    public function addCarouselPresentationMap(CarouselPresentationMap $carouselPresentationMap): self
+    {
+        if (!$this->carouselPresentationMaps->contains($carouselPresentationMap)) {
+            $this->carouselPresentationMaps[] = $carouselPresentationMap;
+            $carouselPresentationMap->setCarousel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCarouselPresentationMap(CarouselPresentationMap $carouselPresentationMap): self
+    {
+        if ($this->carouselPresentationMaps->contains($carouselPresentationMap)) {
+            $this->carouselPresentationMaps->removeElement($carouselPresentationMap);
+            // set the owning side to null (unless already changed)
+            if ($carouselPresentationMap->getCarousel() === $this) {
+                $carouselPresentationMap->setCarousel(null);
+            }
+        }
+
+        return $this;
     }
 }
