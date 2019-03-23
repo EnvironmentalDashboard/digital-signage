@@ -22,6 +22,22 @@ class Display extends AbstractController
      */
     public function present($id, Request $request, EntityManagerInterface $entityManager)
     {
+        $displayRepository = $entityManager->getRepository(Entity\Display::class);
+        $mapRepository = $entityManager->getRepository(Entity\CarouselPresentationMap::class);
+        
+        $display = $displayRepository->find($id);
+
+        foreach ($display->getPresentations() as $presentation) {
+            $template =  $presentation->getTemplate();
+            $carousels = $presentation->getCarouselPresentationMaps();
+            $carousels = $carousels->unwrap();
+            var_dump($presentation);
+            var_dump($carousels);
+            die;
+        }
+        die;
+        // $repository->findOneBy(['display_id' => $id]);
+
         return null;
     }
 
