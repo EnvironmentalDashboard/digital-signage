@@ -16,13 +16,8 @@
 </head>
 
 <body>
-  {% for stop in cycle %}
-  {{ stop.template.twig }}
-  {% for carousel in stop.carousels %}
-  {% for frame in carousel.frames %}
-  {{ frame.url }}
-  {% endfor %}
-  {% endfor %}
+  {% for presentation in cycle %}
+  {{ presentation|raw }}
   {% endfor %}
   <script></script>
 </body>
