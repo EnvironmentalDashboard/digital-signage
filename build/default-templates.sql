@@ -1,0 +1,2 @@
+INSERT INTO "template" ("id","twig") VALUES (1,'<div class="carousel" style="height:100vh;width:100vw">{{ url1|raw }}</div> '),
+ (2,'<div class="carousel" style="height:100vh;width:100vw">{{ url1|raw }}</div><div class="carousel" style="height:100vh;width:100vw;display:none">{{ url2|raw }}</div>');
