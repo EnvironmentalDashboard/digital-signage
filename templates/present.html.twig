@@ -26,11 +26,26 @@
 
 <body>
   {% for presentation in cycle %}
-    <div class="presentation"{% if loop.index != 1 %} style="display:none"{% endif %}>
-    {{ presentation|raw }}
+    <div id="pres{{presentation.id}}" class="presentation"{% if loop.index != 1 %} style="display:none"{% endif %}>
+    {{ presentation.markup|raw }}
     </div>
   {% endfor %}
-  <script></script>
+  <script>
+    var pres_durations = {{ pres_durations|json_encode|raw }};
+    var pres_ids = Object.keys(pres_durations);
+    var cur_pres = 0, last_pres = pres_ids.length-1;
+    function next_pres() {
+      if (cur_pres === last_pres) {
+        cur_pres = 0;
+      }
+      document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'none';
+      cur_pres++;
+      document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'initial';
+      setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000);
+    }
+    setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000);
+    
+  </script>
 </body>
 
 </html>

@@ -23,6 +23,7 @@ class Display extends AbstractController
     public function present($id, Request $request, EntityManagerInterface $entityManager)
     {
         $cycle = [];
+        $pres_durations = [];
         $displayRepository = $entityManager->getRepository(Entity\Display::class);
         $display = $displayRepository->find($id);
 
@@ -30,6 +31,7 @@ class Display extends AbstractController
             $twig = $presentation->getTemplate()->getTwig();
             $template = $this->get('twig')->createTemplate($twig);
             $pres_carousels = [];
+            $pres_durations[$presentation->getId()] = $presentation->getDuration();
 
             $map = $presentation->getCarouselPresentationMaps();
             foreach ($map as $relation) {
@@ -42,10 +44,10 @@ class Display extends AbstractController
                 $pres_carousels[$key] = implode('', $iframes);
             }
             $rendered = $template->render($pres_carousels);
-            $cycle[] = $rendered;
+            $cycle[] = ['id' => $presentation->getId(), 'markup' => $rendered];
         }
 
-        return $this->render('present.html.twig', ['cycle' => $cycle]);
+        return $this->render('present.html.twig', ['cycle' => $cycle, 'pres_durations' => $pres_durations]);
     }
 
     /**
