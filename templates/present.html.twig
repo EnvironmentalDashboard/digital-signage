@@ -4,13 +4,6 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=9ByOqqx0o3">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=9ByOqqx0o3">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=9ByOqqx0o3">
-  <link rel="manifest" href="/manifest.json?v=9ByOqqx0o3">
-  <link rel="mask-icon" href="/safari-pinned-tab.svg?v=9ByOqqx0o3" color="#00a300">
-  <link rel="shortcut icon" href="/favicon.ico?v=9ByOqqx0o3">
-  <meta name="theme-color" content="#000000">
   <title>Environmental Dashboard Digital Display</title>
   <style>
     body {
@@ -34,17 +27,66 @@
     var pres_durations = {{ pres_durations|json_encode|raw }};
     var pres_ids = Object.keys(pres_durations);
     var cur_pres = 0, last_pres = pres_ids.length-1;
+    var active_timers = [];
     function next_pres() {
       if (cur_pres === last_pres) {
         cur_pres = 0;
       }
       document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'none';
-      cur_pres++;
-      document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'initial';
+      document.getElementById('pres' + pres_ids[++cur_pres]).style.display = 'initial';
+      var i;
+      for (i = 0; i < active_timers.length; i++) { // stop rotating carousels
+        active_timers[i] = null;
+      }
+      // rotate frames in carousels
+      var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
+      for (i = 0; i < carousels.length; i++) {
+        animate_carousel(carousels[i].children);
+      }
       setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000);
     }
-    setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000);
-    
+    function animate_carousel(frames) {
+      if (frames.length > 1) { // if there are multiple frames to swap between
+
+        var total_time = 0; // total duration of the cycle of presentations
+        for (var j = 0; j < frames.length; j++) {
+          var dur = frames[j].getAttribute('data-duration') * 1000;
+          total_time += dur;
+        }
+        
+        var start_in = 0; // offset when each frame starts by duration of the frames that come before it
+        for (var k = 0; k < frames.length; k++) {
+          if (k > 0) {
+            var last_frame = frames[k-1];
+            start_in += last_frame.getAttribute('data-duration') * 1000;
+          }
+          if (k === frames.length-1) {
+            var next_frame = frames[0];
+          } else {
+            var next_frame = frames[k+1];
+          }
+          set_timers(frames[k], next_frame, total_time, start_in);
+        }
+
+      }
+    }
+    function set_timers(cur_frame, next_frame, total_time, start_in) {
+      var offset = setTimeout(function() {
+        var every = setInterval(function() {
+          cur_frame.style.display = 'none';
+          next_frame.style.display = 'initial';
+        }, total_time);
+        active_timers.push(every);
+      }, start_in);
+      active_timers.push(offset);
+    }
+    setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000); // begin cycling through presentations
+    // begin rotating frames in carousels
+    var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
+    for (var i = 0; i < carousels.length; i++) {
+      animate_carousel(carousels[i].children);
+    }
+
   </script>
 </body>
 
