@@ -74,15 +74,14 @@ class DisplayEdit extends AbstractController
             $display->removePresentation($presentationToRemove);
         }
 
-        // Add new presentations
-        $presentations = [];
-
         $templates = $request->request->get('pres_template');
         $durations = $request->request->get('pres_duration');
+        $skips = $request->request->get('skip');
 
         foreach ($templates as $key => $value) {
             $parentId = $templates[$key];
             $duration = $durations[$key];
+            $skip = ($skips[$key] === 'on') ? true : false;
 
             /**
              * @type Entity\Template
@@ -95,8 +94,8 @@ class DisplayEdit extends AbstractController
 
             $presentation->setTemplate($template);
             $presentation->setDuration((int) $duration);
-            $presentation->setLabel('should we even have labels?');
-            $presentation->setSkip(false);
+            $presentation->setLabel("Presentation #{$presentation->getId()} for display #{$id}");
+            $presentation->setSkip($skip);
             
             $display->addPresentation($presentation);
 

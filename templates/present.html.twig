@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Environmental Dashboard Digital Display</title>
   <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
     body {
       margin: 0px;
       padding: 0px;
@@ -47,25 +51,26 @@
     }
     function animate_carousel(frames) {
       if (frames.length > 1) { // if there are multiple frames to swap between
-
+        
+        var i;
         var total_time = 0; // total duration of the cycle of presentations
-        for (var j = 0; j < frames.length; j++) {
-          var dur = frames[j].getAttribute('data-duration') * 1000;
+        for (i = 0; i < frames.length; i++) {
+          var dur = frames[i].getAttribute('data-duration') * 1000;
           total_time += dur;
         }
         
         var start_in = 0; // offset when each frame starts by duration of the frames that come before it
-        for (var k = 0; k < frames.length; k++) {
-          if (k > 0) {
-            var last_frame = frames[k-1];
+        for (i = 0; i < frames.length; i++) {
+          if (i > 0) {
+            var last_frame = frames[i-1];
             start_in += last_frame.getAttribute('data-duration') * 1000;
           }
-          if (k === frames.length-1) {
+          if (i === frames.length-1) {
             var next_frame = frames[0];
           } else {
-            var next_frame = frames[k+1];
+            var next_frame = frames[i+1];
           }
-          set_timers(frames[k], next_frame, total_time, start_in);
+          set_timers(frames[i], next_frame, total_time, start_in);
         }
 
       }
@@ -80,7 +85,8 @@
       }, start_in);
       active_timers.push(offset);
     }
-    setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000); // begin cycling through presentations
+    // begin cycling through presentations
+    setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000);
     // begin rotating frames in carousels
     var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
     for (var i = 0; i < carousels.length; i++) {

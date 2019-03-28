@@ -1,13 +1,13 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="display-{{display.id}}-createFormModal-Label">Presentation #{{loop.index}}</h5>
+  <h5 class="modal-title" id="presentation-{{presentation.id}}-createFormModal-Label">Presentation #{{loop.index}}</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 <div class="modal-body" {% if loop.index == 1 %}id="new-pres"{% endif %}>
   <div class="form-group">
-    <label for="pres_template_for_{{display.id}}">Select template</label>
-    <select class="form-control" id="pres_template_for_{{display.id}}" name="pres_template[]">
+    <label for="pres_template_for_{{presentation.id}}">Select template</label>
+    <select class="form-control template-select-dropdown" id="pres_template_for_{{presentation.id}}" name="pres_template[]" data-controls="#drop-zone-{{presentation.id}}">
       <option value="1">Fullscreen</option>
       <option value="2">Fullscreen with marquee</option>
     </select>
@@ -17,7 +17,12 @@
     {# TODO: hidden input for arrangment of carousels #}
     <div class="row">
       <div class="col-sm-6">
-        <div style="height: 300px;width: 100%;background: var(--gray);" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="drop-zone"></div>
+        <div style="height: 300px;width: 100%;" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="drop-zone-{{presentation.id}}">
+          {# {{ include(template_from_string(presentation.template.twig, )) }} #}
+          {% for carousel in carousels[presentation.id] %}
+            {{ carousel|raw }}
+          {% endfor %}
+        </div>
       </div>
       <div class="col-sm-6">
       {{ render(controller('App\\Controller\\Carousel::list')) }}
@@ -25,13 +30,13 @@
     </div>
   </div>
   <div class="form-group">
-    <label for="pres_duration_for_{{display.id}}">Duration</label>
-    <input type="number" class="form-control" id="pres_duration_for_{{display.id}}" aria-describedby="pres_duration_help"
+    <label for="pres_duration_for_{{presentation.id}}">Duration</label>
+    <input type="number" class="form-control" id="pres_duration_for_{{presentation.id}}" aria-describedby="pres_duration_help"
       name="pres_duration[]">
     <small id="pres_duration_help" class="form-text text-muted">In milliseconds</small>
   </div>
   <div class="form-group form-check">
-    <input type="checkbox" class="form-check-input" id="skip_{{display.id}}" name="skip[]">
-    <label class="form-check-label" for="skip_{{display.id}}">Skip in main loop</label>
+    <input type="checkbox" class="form-check-input" id="skip_{{presentation.id}}" name="skip[]">
+    <label class="form-check-label" for="skip_{{presentation.id}}">Skip in main loop</label>
   </div>
 </div>

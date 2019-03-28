@@ -64,7 +64,7 @@
   $(".display-add-new-pres").each(function(){
     $(this).on('click', function(e) {
       e.preventDefault();
-      var display = $(this).data('display-for');
+      var display = $(this).data('display');
       var clone = $('#new-pres').clone();
       $("#display-" + display + "-presentation-edit").append(clone);
     });
@@ -80,6 +80,7 @@
       e.preventDefault();
       var controls = $(this).data('controls');
       var selected = $(this).find(":selected").val();
+      console.log(controls);
       $(controls).html(templates[selected-1]);
     });
   });
@@ -106,13 +107,9 @@ function drop_handler(ev) {
   // Get the id of drag source element (that was added to the drag data
   // payload by the dragstart event handler)
   var id = ev.dataTransfer.getData("text");
-  var nodeCopy = document.getElementById(id).cloneNode(true);
-  nodeCopy.id = Date.now();
-  nodeCopy.style.height = "100%";
-  nodeCopy.draggable = false;
-  nodeCopy.ondragstart = '';
-  nodeCopy.ondragend = '';
-  ev.target.appendChild(nodeCopy);
+  var text = document.getElementById(id).innerHTML;
+  ev.target.innerHTML = text;
+  // TODO: still need to record changes in hidden input
 }
 function dragend_handler(ev) {
   // Restore source's border

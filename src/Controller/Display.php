@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity;
+use App\Factory;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -54,22 +55,63 @@ class Display extends AbstractController
     /**
      * display-table
      */
-    public function table(Request $request, EntityManagerInterface $entityManager)
+    public function table(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory)
     {
         $repository = $entityManager->getRepository(Entity\Display::class);
-        
+        $rendered = [];
         $entities = $repository->findAll();
+        foreach ($entities as $display) {
+            $presentations = $display->getPresentations();
+            // compile twig templates
+            foreach ($presentations as $presentation) {
+                $template_params = [];
+                $twig = $presentation->getTemplate()->getTwig();
+                $template = $this->get('twig')->createTemplate($twig);
+                $map = $presentation->getCarouselPresentationMaps();
+                foreach ($map as $i => $relation) {
+                    $key = $relation->getTemplateKey();
+                    $frames = $relation->getCarousel()->getFrames()->getValues();
+                    $urls = [];
+                    foreach ($frames as $frame) {
+                        $urls[] = $frame->getUrl();
+                    }
+                    $template_params[$key] = implode(', ', $urls);
+                }
+                $rendered[$presentation->getId()][] = $template->render($template_params);
+            }
+            // setup blank presentation that can be edited for displays with no presentations
+            if (count($presentations) === 0) {
+                $template = $templateFactory->fromParent(1); // pick a default template
+                $twig = $template->getTwig();
+                $template = $this->get('twig')->createTemplate($twig);
+                $rendered["d{$display->getId()}"][] = $template->render(['url1' => 'drag carousel here']);
+            }
+        }
 
-        return $this->render('display-table.html.twig', ['displays' => $entities]);
+        return $this->render('display-table.html.twig', ['displays' => $entities, 'carousels' => $rendered]);
     }
 
     /**
      * display-templates
      */
-    public function template(Request $request, EntityManagerInterface $entityManager, $name)
+    public function template(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory, $name)
     {
-        // TODO: grab $id template as string from db
-        $str = "display-templates/{$name}.html.twig";
-        return $this->render($str);
+        switch ($name) {
+            case 'fullscreen':
+                $template_id = 1;
+                break;
+            
+            case 'marquee':
+                $template_id = 2;
+                break;
+            
+            default:
+                $template_id = 1;
+                break;
+        }
+        $template = $templateFactory->fromParent($template_id);
+        $twig = $template->getTwig();
+        $template = $this->get('twig')->createTemplate($twig);
+        return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here']));
     }
 }

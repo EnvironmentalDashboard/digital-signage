@@ -40,50 +40,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <form action="{{ path('display-save-presentations', {'id': display.id}) }}" method="POST">
-        {% if display.presentations is empty %}
-          <div class="modal-header">
-            <h5 class="modal-title" id="createPresModalLabel" id="display-{{display.id}}-createFormModal-Label">No Presentation</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          
-
-          <div class="modal-body" id="new-pres">
-            <div class="form-group">
-              <label for="pres_template_for_{{display.id}}">Select template</label>
-              <select class="form-control template-select-dropdown" id="pres_template_for_{{display.id}}" name="pres_template[]" data-controls="#drop-zone-{{display.id}}">
-                <option value="1">Fullscreen</option>
-                <option value="2">Fullscreen with marquee</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <p>Drag carousels onto template:</p>
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="drop-zone" id="drop-zone-{{display.id}}" style="height: 300px;width: 100%;" ondrop="drop_handler(event);" ondragover="dragover_handler(event);">
-                    {{ render(controller('App\\Controller\\Display::template', {'name': 'fullscreen'})) }}
-                  </div>
-                </div>
-                <div class="col-sm-6">
-                {{ render(controller('App\\Controller\\Carousel::list')) }}
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="pres_duration_for_{{display.id}}">Duration</label>
-              <input type="number" class="form-control" id="pres_duration_for_{{display.id}}" aria-describedby="pres_duration_help"
-                name="pres_duration[]">
-              <small id="pres_duration_help" class="form-text text-muted">In seconds</small>
-            </div>
-            <div class="form-group form-check">
-              <input type="checkbox" class="form-check-input" id="skip_{{display.id}}" name="skip[]" value="off">
-              <label class="form-check-label" for="skip_{{display.id}}">Skip in main loop</label>
-            </div>
-          </div>
-
-
-        {% endif %}
+        
         <div id="display-{{display.id}}-presentation-edit">
         {% for presentation in display.presentations %}
         
@@ -93,7 +50,7 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <button class="btn btn-primary display-add-new-pres" data-display-for="{{display.id}}">Add presentation</button>
+            <button class="btn btn-primary display-add-new-pres" data-display="{{display.id}}">Add presentation</button>
           </div>
         </div>
         
