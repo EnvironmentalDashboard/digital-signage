@@ -5,17 +5,21 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use App\Service\Websocket;
+use Ratchet\App;
 use Ratchet\Server\IoServer;
+use Ratchet\Http\HttpServer;
+use Ratchet\WebSocket\WsServer;
+
+use App\Service\WsManager;
 
 class WebsocketCommand extends Command
 {
     // the name of the command (the part after "bin/console")
 		protected static $defaultName = 'ws-server:start';
-		private $ws;
+		private $manager;
 
-		public function __construct(Websocket $ws) {
-			$this->ws = $ws;
+		public function __construct(WsManager $manager) {
+			$this->manager = $manager;
 			parent::__construct();
 		}
 
@@ -34,10 +38,11 @@ class WebsocketCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 			$output->writeln('Starting...');
-			$server = IoServer::factory(
-					new Websocket(),
-					8080
-			);
-			$server->run();
+			// $app = IoServer::factory(new HttpServer(new WsServer(new WsManager())), 8080);
+			$app = new App("localhost", 8080, '0.0.0.0');
+			$app->route('/remote-controller/{id}', $this->manager, ['*']);
+			$app->route('/display/{id}', $this->manager, ['*']);
+			$app->run();
+
     }
 }
