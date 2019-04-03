@@ -30,7 +30,6 @@
   <script>
     var pres_durations = {{ pres_durations|json_encode|raw }};
 		var pres_ids = Object.keys(pres_durations);
-		var cur_pres_pos = Object.keys(pres_ids);
     var cur_pres = 0, last_pres = pres_ids.length-1;
     var active_timers = [];
     function next_pres() {
@@ -97,23 +96,31 @@
       animate_carousel(carousels[i].children);
 		}
 		// open websocket conn to recieve commands from remote controllers
-		var conn = new WebSocket('ws://localhost:8080/display/1');
+		var conn = new WebSocket('ws://localhost:8080/display/{{ app.request.get('id') }}');
 		conn.onmessage = function(e) {
-			// todo: check origin/sanitize input for security
-			console.log('ws data', e.data);
-			var i;
-			var frame = document.getElementById('frame' + e.data);
+			var frame_id = parseInt(e.data);
+			if (e.origin !== 'ws://localhost:8080' || frame_id < 1) {
+				return;
+			}
+			var frame = document.getElementById('frame' + frame_id);
 			var carousel = frame.parentNode;
 			var pres = carousel.parentNode;
 			var all_frames = carousel.children;
+			var i;
 			for (i = 0; i < all_frames.length; i++) {
 				all_frames[i].style.display = 'none';
 			}
 			frame.style.display = 'initial';
 			if (pres.style.display !== 'none') { // not already active pres
+				var pres_id = pres.getAttribute('id').substring(4); // cut off 'pres'
 				document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'none';
 				pres.style.display = 'initial';
-				cur_pres = cur_pres_pos.find(key => pres_ids[key] === e.data);
+				for (i = 0; i < pres_ids.length; i++) {
+					if (pres_ids[i] == pres_id) {
+						cur_pres = i;
+						break;
+					}
+				}
 				console.log('cur_pres', cur_pres);
 			}
 			clear_timers();

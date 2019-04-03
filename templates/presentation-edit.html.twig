@@ -14,10 +14,10 @@
   </div>
   <div class="form-group">
     <p>Drag carousels onto template:</p>
-    {# TODO: hidden input for arrangment of carousels #}
+    <input type="hidden" name="frame-arrangement[]" value="{}" id="frame-arrangement-{{presentation.id}}">
     <div class="row">
       <div class="col-sm-6">
-        <div style="height: 300px;width: 100%;" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="drop-zone-{{presentation.id}}">
+        <div style="height: 300px;width: 100%;" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="drop-zone-{{presentation.id}}" data-pres="{{presentation.id}}">
           {# {{ include(template_from_string(presentation.template.twig, )) }} #}
           {% for carousel in carousels[presentation.id] %}
             {{ carousel|raw }}
