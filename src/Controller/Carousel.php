@@ -32,7 +32,16 @@ class Carousel extends AbstractController
     public function table(Request $request, EntityManagerInterface $entityManager)
     {
         $repository = $entityManager->getRepository(Entity\Carousel::class);
-        $entities = $repository->findAll();
+		$entities = $repository->findAll();
+		foreach ($entities as $carousel) {
+			if (count($carousel->getFrames()) === 0) {
+				$tmp = new Entity\Frame;
+				$tmp->setUrl('http://example.com');
+				$tmp->setDuration(0);
+				$tmp->setCarousel($carousel);
+				$carousel->addFrame($tmp);
+			}
+		}
         return $this->render('carousel-table.html.twig', ['carousels' => $entities]);
     }
 }

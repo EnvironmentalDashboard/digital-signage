@@ -4,7 +4,7 @@
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-<div class="modal-body" {% if loop.index == 1 %}id="new-pres"{% endif %}>
+<div class="modal-body" {% if loop.index == 1 %}id="new-pres{{display.id}}"{% endif %}>
   <div class="form-group">
     <label for="pres_template_for_{{presentation.id}}">Select template</label>
     <select class="form-control template-select-dropdown" id="pres_template_for_{{presentation.id}}" name="pres_template[]" data-controls="#drop-zone-{{presentation.id}}">
@@ -18,10 +18,13 @@
     <div class="row">
       <div class="col-sm-6">
         <div style="height: 300px;width: 100%;" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="drop-zone-{{presentation.id}}" data-pres="{{presentation.id}}">
-          {# {{ include(template_from_string(presentation.template.twig, )) }} #}
+					{% if presentation.id is empty %}
+						{{ carousels['tmp']|raw }}
+					{% else %}
           {% for carousel in carousels[presentation.id] %}
             {{ carousel|raw }}
-          {% endfor %}
+					{% endfor %}
+					{% endif %}
         </div>
       </div>
       <div class="col-sm-6">
@@ -33,7 +36,7 @@
     <label for="pres_duration_for_{{presentation.id}}">Duration</label>
     <input type="number" class="form-control" id="pres_duration_for_{{presentation.id}}" aria-describedby="pres_duration_help"
       name="pres_duration[]">
-    <small id="pres_duration_help" class="form-text text-muted">In milliseconds</small>
+    <small id="pres_duration_help" class="form-text text-muted">In seconds</small>
   </div>
   <div class="form-group form-check">
     <input type="checkbox" class="form-check-input" id="skip_{{presentation.id}}" name="skip[]">

@@ -54,9 +54,9 @@
   // Add new frame
   $(".carousel-add-new-frame").each(function(){
     $(this).on('click', function(e) {
-      // TODO: implement
-      var carousel = $(this).data('carousel-for');
-      $("#carousel-" + carousel + "-frame-edit").append("New frame...");
+			var carousel = $(this).data('carousel-for');
+			var clone = $('#new-frame' + carousel).clone();
+      $("#carousel-" + carousel + "-frame-edit").append(clone);
     });
   });
 
@@ -65,7 +65,7 @@
     $(this).on('click', function(e) {
       e.preventDefault();
       var display = $(this).data('display');
-      var clone = $('#new-pres').clone();
+      var clone = $('#new-pres' + display).clone();
       $("#display-" + display + "-presentation-edit").append(clone);
     });
   });

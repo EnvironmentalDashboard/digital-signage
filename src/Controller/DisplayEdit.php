@@ -66,7 +66,6 @@ class DisplayEdit extends AbstractController
 		$carousel_repo = $entityManager->getRepository(Entity\Carousel::class);
 
         // Fetch current presentations
-		// $display = $display_repo->findOneBy(['id' => $id]);
 		$display = $display_repo->find($id);
         $oldPresentations = $display->getPresentations();
 
@@ -82,8 +81,8 @@ class DisplayEdit extends AbstractController
 		$skips = $request->request->get('skip');
 		// they're all the same length ^^^
 		for ($i = 0; $i < count($templates); $i++) { 
-            $parentId = $templates[$i];
-			$duration = $durations[$i];
+            $parentId = (int) $templates[$i];
+			$duration = round($durations[$i] * 1000);
 			$frame_arrangement = json_decode($frame_arrangements[$i], true);
             $skip = ($skips[$i] === 'on') ? true : false;
 
@@ -97,8 +96,8 @@ class DisplayEdit extends AbstractController
             $presentation = new Entity\Presentation();
 
             $presentation->setTemplate($template);
-            $presentation->setDuration((int) $duration);
-            $presentation->setLabel("Presentation #{$presentation->getId()} for display #{$id}");
+            $presentation->setDuration($duration);
+            $presentation->setLabel("Presentation for display #{$id}");
             $presentation->setSkip($skip);
             
 			$display->addPresentation($presentation);

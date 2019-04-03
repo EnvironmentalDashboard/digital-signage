@@ -78,10 +78,17 @@ class Display extends AbstractController
             }
             // setup blank presentation that can be edited for displays with no presentations
             if (count($presentations) === 0) {
-                $template = $templateFactory->fromParent(1); // pick a default template
-                $twig = $template->getTwig();
-                $template = $this->get('twig')->createTemplate($twig);
-                $rendered["d{$display->getId()}"][] = $template->render(['url1' => 'drag carousel here']);
+				$template = $templateFactory->fromParent(1); // pick a default template
+				$tmp = new Entity\Presentation;
+				$tmp->setTemplate($template);
+				$tmp->setDisplay($display);
+				$tmp->setLabel('Temporary placeholder presentation');
+				$display->addPresentation($tmp);
+                if (empty($rendered['tmp'])) {
+					$twig = $template->getTwig();
+					$twig_template = $this->get('twig')->createTemplate($twig);
+					$rendered['tmp'] = $twig_template->render(['url1' => 'drag carousel here']);
+				}
             }
         }
 
@@ -109,6 +116,6 @@ class Display extends AbstractController
         $template = $templateFactory->fromParent($template_id);
         $twig = $template->getTwig();
         $template = $this->get('twig')->createTemplate($twig);
-        return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here']));
+        return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here'])); // need to include all possible twig keys
     }
 }

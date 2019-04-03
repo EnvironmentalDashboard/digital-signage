@@ -1,16 +1,21 @@
+{% if frame.id == '' %}
+{% set frame_id = "newframe" ~ carousel.id %}
+{% else %}
+{% set frame_id = frame.id %}
+{% endif %}
 <div class="modal-header">
     <h5 class="modal-title" id="carousel-{{carousel.id}}-createFormModal-Label">Frame #{{loop.index}}</h5>
 </div>
-<div class="modal-body">
+<div class="modal-body" {% if loop.index == 1 %}id="new-frame{{carousel.id}}"{% endif %}>
     <div class="form-group">
-        <label for="create_frame_url_{{frame.id}}">URL</label>
-        <input type="url" class="form-control" id="create_frame_url_{{frame.id}}" name="frame_url[]" value="{{frame.url}}" placeholder="URL">
+        <label for="create_frame_url_{{frame_id}}">URL</label>
+        <input type="url" class="form-control" id="create_frame_url_{{frame_id}}" name="frame_url[]" value="{{frame.url}}" placeholder="URL">
     </div>
 
     <div class="form-group">
-        <label for="create_frame_duration_{{frame.id}}">Duration</label>
-        <input type="number" class="form-control" id="create_frame_duration_{{frame.id}}" value="{{frame.duration}}" name="frame_duration[]"
+        <label for="create_frame_duration_{{frame_id}}">Duration</label>
+        <input type="number" class="form-control" id="create_frame_duration_{{frame_id}}" value="{{frame.duration}}" name="frame_duration[]"
             aria-describedby="duration_help">
-        <small id="duration_help" class="form-text text-muted">In milliseconds</small>
+        <small id="duration_help" class="form-text text-muted">In seconds</small>
     </div>
 </div>
