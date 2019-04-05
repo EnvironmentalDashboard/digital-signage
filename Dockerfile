@@ -10,5 +10,5 @@ ENV DEBIAN_FRONTEND=noninteractive \
 ADD . /var/www/html
 WORKDIR /var/www/html
 RUN ./build/init.sh
-EXPOSE 80
-CMD /usr/sbin/apache2ctl -D FOREGROUND
+EXPOSE 80 8080
+CMD service apache2 start && php bin/console ws-server:start
