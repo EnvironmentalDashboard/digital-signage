@@ -77,7 +77,7 @@ class WsManager implements MessageComponentInterface
 
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
-        echo $e->getTraceAsString();
+        echo __FILE__ . ":{$e->getLine()}\n";
         echo $e->getMessage();
         $conn->close();
     }

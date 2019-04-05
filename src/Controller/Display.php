@@ -38,7 +38,7 @@ class Display extends AbstractController
                 $iframes = [];
                 foreach ($carousel->getFrames() as $i => $frame) {
                     $hidden = ($i === 0) ? '' : 'display:hidden';
-                    $iframes[] = "<iframe sandbox='allow-scripts allow-same-origin allow-pointer-lock' src='{$frame->getUrl()}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
+                    $iframes[] = "<iframe src='{$frame->getUrl()}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
                 }
                 $pres_carousels[$key] = implode('', $iframes);
             }

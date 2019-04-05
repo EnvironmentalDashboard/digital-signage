@@ -31,28 +31,30 @@
     var pres_durations = {{ pres_durations|json_encode|raw }};
 		var pres_ids = Object.keys(pres_durations);
     var cur_pres = 0, last_pres = pres_ids.length-1;
-    var active_timers = [];
+    var active_intervals = [], active_timeouts = [];
     function next_pres() {
-      if (cur_pres === last_pres) {
-        cur_pres = 0;
-      }
       document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'none';
-      document.getElementById('pres' + pres_ids[++cur_pres]).style.display = 'initial';
+			if (cur_pres === last_pres) {
+				cur_pres = 0;
+			} else {
+				cur_pres++;
+			}
+			document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'initial';
       clear_timers();
       // rotate frames in carousels
       var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
       for (var i = 0; i < carousels.length; i++) {
         animate_carousel(carousels[i].children);
       }
-      setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000);
+      setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
     }
     function animate_carousel(frames) {
       if (frames.length > 1) { // if there are multiple frames to swap between
-        
         var i;
         var total_time = 0; // total duration of the cycle of presentations
         for (i = 0; i < frames.length; i++) {
-          var dur = frames[i].getAttribute('data-duration') * 1000;
+					frames[i].src = frames[i].src;
+          var dur = parseInt(frames[i].getAttribute('data-duration'));
           total_time += dur;
         }
         
@@ -60,7 +62,7 @@
         for (i = 0; i < frames.length; i++) {
           if (i > 0) {
             var last_frame = frames[i-1];
-            start_in += last_frame.getAttribute('data-duration') * 1000;
+            start_in += parseInt(last_frame.getAttribute('data-duration'));
           }
           if (i === frames.length-1) {
             var next_frame = frames[0];
@@ -78,18 +80,22 @@
           cur_frame.style.display = 'none';
           next_frame.style.display = 'initial';
         }, total_time);
-        active_timers.push(every);
+        active_intervals.push(every);
       }, start_in);
-      active_timers.push(offset);
+      active_timeouts.push(offset);
     }
     function clear_timers() {
-      for (var i = 0; i < active_timers.length; i++) { // stop rotating carousels
-        active_timers[i] = null;
+			var i;
+      for (i = 0; i < active_intervals.length; i++) {
+        clearInterval(active_intervals[i]);
       }
+			for (i = 0; i < active_timeouts.length; i++) {
+				clearTimeout(active_timeouts[i]);
+			}
 		}
 
     // begin cycling through presentations
-    setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000);
+    setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
     // begin rotating frames in carousels
     var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
     for (var i = 0; i < carousels.length; i++) {
@@ -111,7 +117,7 @@
 				all_frames[i].style.display = 'none';
 			}
 			frame.style.display = 'initial';
-			if (pres.style.display !== 'none') { // not already active pres
+			if (pres.style.display === 'none') { // not already active pres
 				var pres_id = pres.getAttribute('id').substring(4); // cut off 'pres'
 				document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'none';
 				pres.style.display = 'initial';
@@ -121,14 +127,13 @@
 						break;
 					}
 				}
-				console.log('cur_pres', cur_pres);
 			}
 			clear_timers();
 			var carousels = pres.children;
       for (i = 0; i < carousels.length; i++) {
         animate_carousel(carousels[i].children);
       }
-      setTimeout(next_pres, pres_durations[pres_ids[cur_pres]] * 1000);
+      setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
 		};
 
   </script>
