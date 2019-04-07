@@ -55,26 +55,31 @@ class Display extends AbstractController
     public function table(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory)
     {
         $repository = $entityManager->getRepository(Entity\Display::class);
-        $rendered = [];
+		$rendered = [];
+		$frame_arrangements = [];
         $entities = $repository->findAll();
         foreach ($entities as $display) {
             $presentations = $display->getPresentations();
             // compile twig templates
             foreach ($presentations as $presentation) {
+				$pres_id = $presentation->getId();
+				$frame_arrangements[$pres_id] = [];
                 $template_params = [];
                 $twig = $presentation->getTemplate()->getTwig();
                 $template = $this->get('twig')->createTemplate($twig);
                 $map = $presentation->getCarouselPresentationMaps();
                 foreach ($map as $i => $relation) {
                     $key = $relation->getTemplateKey();
-                    $frames = $relation->getCarousel()->getFrames()->getValues();
+					$carousel = $relation->getCarousel();
+                    $frames = $carousel->getFrames()->getValues();
+					$frame_arrangements[$pres_id][$key] = $carousel->getId();
                     $urls = [];
                     foreach ($frames as $frame) {
                         $urls[] = $frame->getUrl();
                     }
                     $template_params[$key] = implode(', ', $urls);
                 }
-                $rendered[$presentation->getId()][] = $template->render($template_params);
+                $rendered[$pres_id][] = $template->render($template_params);
             }
             // setup blank presentation that can be edited for displays with no presentations
             if (count($presentations) === 0) {
@@ -92,7 +97,9 @@ class Display extends AbstractController
             }
         }
 
-        return $this->render('display-table.html.twig', ['displays' => $entities, 'carousels' => $rendered]);
+		return $this->render('display-table.html.twig', ['displays' => $entities,
+														'carousels' => $rendered,
+														'frame_arrangements' => $frame_arrangements]);
     }
 
     /**

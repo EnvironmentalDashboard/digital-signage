@@ -102,10 +102,10 @@
       animate_carousel(carousels[i].children);
 		}
 		// open websocket conn to recieve commands from remote controllers
-		var conn = new WebSocket('ws://localhost:8080/display/{{ app.request.get('id') }}');
+		var conn = new WebSocket('ws://localhost:5001/display/{{ app.request.get('id') }}');
 		conn.onmessage = function(e) {
 			var frame_id = parseInt(e.data);
-			if (e.origin !== 'ws://localhost:8080' || frame_id < 1) {
+			if (e.origin !== 'ws://localhost:5001' || frame_id < 1) {
 				return;
 			}
 			var frame = document.getElementById('frame' + frame_id);

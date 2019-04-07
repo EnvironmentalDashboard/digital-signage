@@ -70,7 +70,9 @@ class DisplayEdit extends AbstractController
         $oldPresentations = $display->getPresentations();
 
         // Delete current presentations
-        // TODO: possibly refactor? may lead to worse table fragmentation
+		// possibly refactor? may lead to worse table fragmentation;
+		// could pass id of presentations through form hidden input
+		// then only update existing ones & create new ones
         foreach ($oldPresentations as $presentationToRemove) {
             $display->removePresentation($presentationToRemove);
         }

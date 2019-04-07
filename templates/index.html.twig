@@ -56,6 +56,8 @@
     $(this).on('click', function(e) {
 			var carousel = $(this).data('carousel-for');
 			var clone = $('#new-frame' + carousel).clone();
+			randomize_ids(clone);
+			clone[0].firstElementChild.innerHTML = 'New frame';
       $("#carousel-" + carousel + "-frame-edit").append(clone);
     });
   });
@@ -65,7 +67,17 @@
     $(this).on('click', function(e) {
       e.preventDefault();
       var display = $(this).data('display');
-      var clone = $('#new-pres' + display).clone();
+			var clone = $('#new-pres' + display).clone();
+			randomize_ids(clone);
+			clone[0].firstElementChild.innerHTML = 'New presentation';
+			var drop_zone = clone.find('.drop-zone'), select_drop_zone = clone.find('select'), input = clone.find('input[name="frame-arrangement"]');
+			var new_pres_id = guidGenerator();
+			var new_dropzone_id = guidGenerator();
+			select_drop_zone.attr('data-controls', '#' + new_dropzone_id)
+			drop_zone.attr('data-pres', new_pres_id);
+			drop_zone.attr('id', new_dropzone_id);
+			input.attr('id', 'frame-arrangement-' + new_pres_id);
+			console.log(clone.html());
       $("#display-" + display + "-presentation-edit").append(clone);
     });
   });
@@ -76,14 +88,14 @@
   {% endspaceless %}
 
   $(".template-select-dropdown").each(function(){
-    $(this).on('change', function(e) {
-      e.preventDefault();
-      var controls = $(this).data('controls');
-      var selected = $(this).find(":selected").val();
-      console.log(controls);
-      $(controls).html(templates[selected-1]);
-    });
-  });
+    $(this).on('change', dropdown_template);
+	});
+	function dropdown_template(e) {
+		e.preventDefault();
+		var controls = $(this).data('controls');
+		var selected = $(this).find(":selected").val();
+		$(controls).html(templates[selected - 1]);
+	}
 
 {# https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API,
    https://mdn.github.io/dom-examples/drag-and-drop/copy-move-DataTransfer.html #}
@@ -122,8 +134,31 @@ function dragend_handler(ev) {
   // Remove all of the drag data
   ev.dataTransfer.clearData();
 }
-
-
+function randomize_ids(container_div) {
+	var modal_body = container_div[0];
+	var children = modal_body.children;
+	for (var i = 0; i < children.length; i++) {
+		var descendants = children[i].children;
+		var cur_id = guidGenerator();
+		for (var j = 0; j < descendants.length; j++) {
+			if (descendants[j].tagName === 'LABEL') {
+				descendants[j].setAttribute('for', cur_id);
+			} else if (descendants[j].tagName === 'INPUT') {
+				descendants[j].setAttribute('id', cur_id);
+			} else if (descendants[j].tagName === 'SELECT') {
+				descendants[j].setAttribute('id', cur_id);
+				$(descendants[j]).on('change', dropdown_template);
+			}
+		}
+		
+	}
+}
+function guidGenerator() {
+	var S4 = function () {
+		return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+	};
+	return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+}
 </script>
 {% endblock %}
 

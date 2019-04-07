@@ -11,7 +11,7 @@
 	<button onclick="clicked(1)">Show CV slides</button>
 	<button onclick="clicked(2)">Show chart</button>
   <script>
-			var conn = new WebSocket('ws://localhost:8080/remote-controller/1');
+			var conn = new WebSocket('ws://localhost:5001/remote-controller/1');
 			// conn.onmessage = function(e) { console.log(e.data); };
 			// conn.onopen = function(e) { conn.send('1') };
 function clicked(button_id) {
