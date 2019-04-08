@@ -3,6 +3,10 @@ index:
   controller: App\Controller\Landing::index
   methods: GET
 
+display-table:
+  path: /display/table
+  controller: App\Controller\Display::table
+  methods: GET
 display-create:
   path: /display/create
   controller: App\Controller\DisplayEdit::create
