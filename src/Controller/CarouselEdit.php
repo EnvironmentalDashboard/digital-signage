@@ -81,7 +81,7 @@ class CarouselEdit extends AbstractController
             $carousel->addFrame(
                 (new Entity\Frame())
                     ->setUrl($urls[$key])
-                    ->setDuration($durations[$key])
+                    ->setDuration(round($durations[$key] * 1000))
             );
 
             $entityManager->persist($carousel);

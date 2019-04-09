@@ -13,7 +13,9 @@
   // Submit event to fire when carousel form submitted
   var createCarousel = function(e) {
     e.preventDefault();
-
+		var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
+		input.addClass('is-valid');
+		submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class= "sr-only">Loading...</span></div>');
     // Update carousel list & modals
     $.post($(this).attr('action'), $(this).serialize()).done(function() {
       $.ajax({
@@ -21,14 +23,15 @@
 				type: "GET",
 				success: function(data) {
 					$("#nav-all-carousels").html(data);
-					// Re-apply submit event to new forms
-					$('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
-					var new_entity = $('#nav-all-carousels li:last-child a');
-					new_entity.tab('show');
-					new_entity.addClass('bg-primary');
-					setTimeout(function () {
-						new_entity.removeClass('bg-primary');
-					}, 3000);
+					$('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel); // Re-apply submit event to new forms
+					input.removeClass('is-valid');
+					input.val('');
+					submit.html('Create carousel');
+					$('#nav-all-carousels-tab').tab('show');
+					var new_row = $('#nav-all-carousels > table > tbody > tr:last-child');
+					new_row.addClass('table-primary');
+					console.log(new_row);
+					setTimeout(function () { new_row.removeClass('table-primary'); }, 1500);
 				}
       });
     });
@@ -38,7 +41,6 @@
   var createDisplay = function(e) {
     e.preventDefault();
 		var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
-		console.log(input, submit);
 		input.addClass('is-valid');
 		submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class= "sr-only">Loading...</span></div>');
     // Update display list & modals
@@ -53,9 +55,9 @@
 					input.val('');
 					submit.html('Create display');
 					$('#nav-all-displays-tab').tab('show');
-					var new_row = $('#nav-all-displays > tbody > tr:last-child');
-					new_row.addClass('bg-primary');
-					setTimeout(function() { new_row.removeClass('bg-primary'); }, 3000);
+					var new_row = $('#nav-all-displays > table > tbody > tr:last-child');
+					new_row.addClass('table-primary');
+					setTimeout(function() { new_row.removeClass('table-primary'); }, 1500);
           }
       });
     });
