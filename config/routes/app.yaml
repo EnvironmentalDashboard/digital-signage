@@ -1,0 +1,52 @@
+index:
+  path: /
+  controller: App\Controller\Landing::index
+  methods: GET
+
+display-table:
+  path: /display/table
+  controller: App\Controller\Display::table
+  methods: GET
+display-create:
+  path: /display/create
+  controller: App\Controller\DisplayEdit::create
+  methods: POST
+display-delete:
+  path: /display/{id}/delete
+  controller: App\Controller\DisplayEdit::delete
+  methods: POST
+display-save-presentations:
+  path: /display/{id}/presentations/save
+  controller: App\Controller\DisplayEdit::savePresentations
+  methods: POST
+display-url:
+  path: /display/{id}/present
+  controller: App\Controller\Display::present
+  methods: GET
+display-template:
+  path: /display/template/{name}
+  controller: App\Controller\Display::template
+  methods: GET
+  requirements:
+    name: "fullscreen|marquee"
+
+carousel-table:
+  path: /carousel/table
+  controller: App\Controller\Carousel::table
+  methods: GET
+carousel-create:
+  path: /carousel/create
+  controller: App\Controller\CarouselEdit::create
+  methods: POST
+carousel-delete:
+  path: /carousel/{id}/delete
+  controller: App\Controller\CarouselEdit::delete
+  methods: POST
+carousel-save-frames:
+  path: /carousel/{id}/frames/save
+  controller: App\Controller\CarouselEdit::saveFrames
+  methods: POST
+frame-list-by-carousel:
+  path: /carousel/{id}/frame/all
+  controller: App\Controller\Frame::listByCarousel
+  methods: GET
