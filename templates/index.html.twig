@@ -30,7 +30,6 @@
 					$('#nav-all-carousels-tab').tab('show');
 					var new_row = $('#nav-all-carousels > table > tbody > tr:last-child');
 					new_row.addClass('table-primary');
-					console.log(new_row);
 					setTimeout(function () { new_row.removeClass('table-primary'); }, 1500);
 				}
       });
@@ -85,14 +84,14 @@
 			var clone = $('#new-pres' + display).clone();
 			randomize_ids(clone);
 			clone[0].firstElementChild.innerHTML = 'New presentation';
-			var drop_zone = clone.find('.drop-zone'), select_drop_zone = clone.find('select'), input = clone.find('input[name="frame-arrangement"]');
+			var drop_zone = clone.find('.drop-zone'), select_drop_zone = clone.find('select'), input = clone.find('.hidden-frame-arrangement');
 			var new_pres_id = guidGenerator();
 			var new_dropzone_id = guidGenerator();
-			select_drop_zone.attr('data-controls', '#' + new_dropzone_id)
+			select_drop_zone.attr('data-controls', '#' + new_dropzone_id);
 			drop_zone.attr('data-pres', new_pres_id);
 			drop_zone.attr('id', new_dropzone_id);
 			input.attr('id', 'frame-arrangement-' + new_pres_id);
-			console.log(clone.html());
+			// console.log(clone.html());
       $("#display-" + display + "-presentation-edit").append(clone);
     });
   });
@@ -139,6 +138,7 @@ function drop_handler(ev) {
 	var twig_key = ev.target.getAttribute('data-twig');
 	var carousel_id = id.substring(8); // cut off 'carousel'
 	var input = document.getElementById('frame-arrangement-' + ev.target.parentNode.getAttribute('data-pres'));
+	console.log("LOOK HERE", 'frame-arrangement-' + ev.target.parentNode.getAttribute('data-pres'));
 	var cur_elems = JSON.parse(input.value);
 	cur_elems[twig_key] = carousel_id;
 	input.value = JSON.stringify(cur_elems);

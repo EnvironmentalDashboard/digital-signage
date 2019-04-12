@@ -59,63 +59,58 @@ class DisplayEdit extends AbstractController
     /**
      * display-save-presentations
      */
-    public function savePresentations(Request $request, EntityManagerInterface $entityManager,
-        Factory\TemplateFactory $templateFactory, $id)
-    {
-		$display_repo = $entityManager->getRepository(Entity\Display::class);
-		$carousel_repo = $entityManager->getRepository(Entity\Carousel::class);
+    public function savePresentations(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Factory\TemplateFactory $templateFactory,
+        $id
+    ) {
+        $displayRepo = $entityManager->getRepository(Entity\Display::class);
+        $carouselRepo = $entityManager->getRepository(Entity\Carousel::class);
+        $presentationRepo = $entityManager->getRepository(Entity\Presentation::class);
 
-        // Fetch current presentations
-		$display = $display_repo->find($id);
-        $oldPresentations = $display->getPresentations();
-
-        // Delete current presentations
-		// possibly refactor? may lead to worse table fragmentation;
-		// could pass id of presentations through form hidden input
-		// then only update existing ones & create new ones
-        foreach ($oldPresentations as $presentationToRemove) {
-            $display->removePresentation($presentationToRemove);
-        }
+        $display = $displayRepo->find($id);
 
         $templates = $request->request->get('pres_template');
-		$durations = $request->request->get('pres_duration');
-		$frame_arrangements = $request->request->get('frame-arrangement');
-		$skips = $request->request->get('skip');
+        $durations = $request->request->get('pres_duration');
+        $frameArrangements = $request->request->get('frame-arrangement');
+        $skips = $request->request->get('skip');
+        $ids = $request->request->get('id');
 		// they're all the same length ^^^
-		for ($i = 0; $i < count($templates); $i++) { 
+        for ($i = 0; $i < count($templates); $i++) {
             $parentId = (int) $templates[$i];
-			$duration = round($durations[$i] * 1000);
-			$frame_arrangement = json_decode($frame_arrangements[$i], true);
+            $duration = round($durations[$i] * 1000);
+            $frameArrangement = json_decode($frameArrangements[$i], true);
             $skip = ($skips[$i] === 'on') ? true : false;
 
-            /**
-             * @type Entity\Template
-             */
             $template = $templateFactory->fromParent($parentId);
-			// todo: set custom twig
+            // todo: set custom twig
             $entityManager->persist($template);
 
-            $presentation = new Entity\Presentation();
+            $presentationExists = is_numeric($ids[$i]);
+            $presentation = ($presentationExists) ? $presentationRepo->find($ids[$i]) : new Entity\Presentation();
 
             $presentation->setTemplate($template);
             $presentation->setDuration($duration);
             $presentation->setLabel("Presentation for display #{$id}");
             $presentation->setSkip($skip);
             
-			$display->addPresentation($presentation);
+            if (!$presentationExists) {
+                $display->addPresentation($presentation);
+            }
 
             $entityManager->persist($presentation);
 			$entityManager->persist($display);
-
-			foreach ($frame_arrangement as $twig_key => $carousel_id) {
-				$map = new Entity\CarouselPresentationMap();
-				$map->setPresentation($presentation);
-				// this seems inefficient- is there not a way to create map row w/o fetching carousel from db?
-				$carousel = $carousel_repo->find($carousel_id);
-				$map->setCarousel($carousel);
-				$map->setTemplateKey($twig_key);
-				$entityManager->persist($map);
-			}
+			
+            foreach ($frameArrangement as $twig_key => $carousel_id) {
+                $map = new Entity\CarouselPresentationMap();
+                $map->setPresentation($presentation);
+                // this seems inefficient- is there not a way to create map row w/o fetching carousel from db?
+                $carousel = $carouselRepo->find($carousel_id);
+                $map->setCarousel($carousel);
+                $map->setTemplateKey($twig_key);
+                $entityManager->persist($map);
+            }
         }
         
         $entityManager->flush();
@@ -123,7 +118,8 @@ class DisplayEdit extends AbstractController
         return new JsonResponse(true);
     }
 
-    private function templateTwig($id) {
+    private function templateTwig($id)
+    {
         return 'test';
     }
 }
