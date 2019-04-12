@@ -60,32 +60,32 @@ class CarouselEdit extends AbstractController
      */
     public function saveFrames(Request $request, EntityManagerInterface $entityManager, $id)
     {
-        $repository = $entityManager->getRepository(Entity\Carousel::class);
+        $carouselRepo = $entityManager->getRepository(Entity\Carousel::class);
+        $frameRepo = $entityManager->getRepository(Entity\Frame::class);
 
-        // Fetch current frames
-        $carousel = $repository->findOneBy(['id' => $id]);
-        $oldFrames = $carousel->getFrames();
-
-        // Delete current frames
-        foreach ($carousel->getFrames() as $frameToRemove) {
-            $carousel->removeFrame($frameToRemove);
-        }
-
-        // Add new frames
-        $frames = [];
+        $carousel = $carouselRepo->find($id);
 
         $urls = $request->request->get('frame_url');
         $durations = $request->request->get('frame_duration');
+        $ids = $request->request->get('id');
 
         foreach ($urls as $key => $value) {
-            $carousel->addFrame(
+			$frameExists = is_numeric($ids[$key]);
+            $frame = ($frameExists) ?
+				$frameRepo->find($ids[$key])
+					->setUrl($urls[$key])
+                    ->setDuration(round($durations[$key] * 1000)) :
                 (new Entity\Frame())
                     ->setUrl($urls[$key])
-                    ->setDuration(round($durations[$key] * 1000))
-            );
-
-            $entityManager->persist($carousel);
-        }
+					->setDuration(round($durations[$key] * 1000));
+					
+            if (!$frameExists) {
+				$carousel->addFrame($frame);
+			}
+            $entityManager->persist($frame);
+		}
+		
+		$entityManager->persist($carousel);
         
         $entityManager->flush();
 

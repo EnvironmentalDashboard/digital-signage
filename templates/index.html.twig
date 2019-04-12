@@ -72,6 +72,7 @@
 			var clone = $('#new-frame' + carousel).clone();
 			randomize_ids(clone);
 			clone[0].firstElementChild.innerHTML = 'New frame';
+			clone.find("input[type='hidden']").val('newframe' + carousel);
       $("#carousel-" + carousel + "-frame-edit").append(clone);
     });
   });
