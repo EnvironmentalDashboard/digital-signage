@@ -83,14 +83,15 @@ class DisplayEdit extends AbstractController
             $frameArrangement = json_decode($frameArrangements[$i], true);
             $skip = ($skips[$i] === '1') ? true : false;
 
-            $template = $templateFactory->fromParent($parentId);
-            // todo: set custom twig
-            $entityManager->persist($template);
-
             $presentationExists = is_numeric($ids[$i]);
-            $presentation = ($presentationExists) ? $presentationRepo->find($ids[$i]) : new Entity\Presentation();
-
-            $presentation->setTemplate($template);
+			$presentation = ($presentationExists) ? $presentationRepo->find($ids[$i]) : new Entity\Presentation();
+			
+			if ($parentId !== -1) { // not custom template
+				$template = $templateFactory->fromParent($parentId);
+				// todo: set custom twig
+				$entityManager->persist($template);
+				$presentation->setTemplate($template);
+			}
             $presentation->setDuration($duration);
             $presentation->setLabel("Presentation for display #{$id}");
             $presentation->setSkip($skip);
@@ -115,7 +116,7 @@ class DisplayEdit extends AbstractController
         
         $entityManager->flush();
 
-        return new JsonResponse(true);
+        return new JsonResponse($_POST);
     }
 
     private function templateTwig($id)

@@ -85,13 +85,18 @@
 			var clone = $('#new-pres' + display).clone();
 			randomize_ids(clone);
 			clone[0].firstElementChild.innerHTML = 'New presentation';
-			var drop_zone = clone.find('.drop-zone'), select_drop_zone = clone.find('select'), input = clone.find('.hidden-frame-arrangement');
+			var drop_zone = clone.find('.drop-zone'), select_drop_zone = clone.find('select'), fa_input = clone.find('.hidden-frame-arrangement'), id_input = clone.find('.hidden-id');
 			var new_pres_id = guidGenerator();
 			var new_dropzone_id = guidGenerator();
 			select_drop_zone.attr('data-controls', '#' + new_dropzone_id);
 			drop_zone.attr('data-pres', new_pres_id);
 			drop_zone.attr('id', new_dropzone_id);
-			input.attr('id', 'frame-arrangement-' + new_pres_id);
+			fa_input.attr('id', 'frame-arrangement-' + new_pres_id);
+			id_input.val('new');
+			var custom_option = select_drop_zone.children().last();
+			if (custom_option.text() === 'Custom') {
+				custom_option.remove();
+			}
 			// console.log(clone.html());
       $("#display-" + display + "-presentation-edit").append(clone);
     });
@@ -139,7 +144,6 @@ function drop_handler(ev) {
 	var twig_key = ev.target.getAttribute('data-twig');
 	var carousel_id = id.substring(8); // cut off 'carousel'
 	var input = document.getElementById('frame-arrangement-' + ev.target.parentNode.getAttribute('data-pres'));
-	console.log("LOOK HERE", 'frame-arrangement-' + ev.target.parentNode.getAttribute('data-pres'));
 	var cur_elems = JSON.parse(input.value);
 	cur_elems[twig_key] = carousel_id;
 	input.value = JSON.stringify(cur_elems);

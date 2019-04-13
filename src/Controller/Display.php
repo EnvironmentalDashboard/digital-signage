@@ -71,13 +71,8 @@ class Display extends AbstractController
                 foreach ($map as $i => $relation) {
                     $key = $relation->getTemplateKey();
 					$carousel = $relation->getCarousel();
-                    $frames = $carousel->getFrames()->getValues();
 					$frame_arrangements[$pres_id][$key] = $carousel->getId();
-                    $urls = [];
-                    foreach ($frames as $frame) {
-                        $urls[] = $frame->getUrl();
-                    }
-                    $template_params[$key] = implode(', ', $urls);
+                    $template_params[$key] = $carousel->getLabel();
                 }
                 $rendered[$pres_id][] = $template->render($template_params);
             }

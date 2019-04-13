@@ -17,8 +17,8 @@
         <tr>
         <th scope="row">{{loop.index}}</th>
         <td>{{display.label}}</td>
-        <td><a href="https://environmentaldashboard.org/digital-signage/display/{{ display.id }}/present" target="_blank">https://environmentaldashboard.org/digital-signage/display/{{ display.id }}/present</a></td>
-        <td class="form-inline">
+        <td><a href="{{ url('index') }}display/{{ display.id }}/present" target="_blank">{{ url('index') }}display/{{ display.id }}/present</a></td>
+        <td class="form-inline" style="min-width:160px;">
             <button class="btn btn-primary mr-2" data-toggle="modal" data-target="#display-{{display.id}}-createFormModal">Edit</button>
 
             <form action="{{ path('display-delete', {'id': display.id}) }}" method="POST">

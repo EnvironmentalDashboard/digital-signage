@@ -11,10 +11,13 @@
     <label for="pres_template_for_{{presentation_id}}">Select template</label>
     <select class="form-control template-select-dropdown" id="pres_template_for_{{presentation_id}}" name="pres_template[]" data-controls="#drop-zone-{{presentation_id}}">
       <option value="1">Fullscreen</option>
-      <option value="2">Fullscreen with marquee</option>
+			<option value="2">Fullscreen with marquee</option>
+			{% if is_new == false %}
+			<option selected value="-1">Custom</option>
+			{% endif %}
     </select>
 	</div>
-	<input type="hidden" name="id[]" value="{{presentation_id}}">
+	<input type="hidden" name="id[]" value="{{presentation_id}}" class="hidden-id">
   <div class="form-group">
 		<p>Drag carousels onto template:</p>
     <input type="hidden" name="frame-arrangement[]" value='{% if is_new %}{}{% else %}{{ frame_arrangements[presentation_id]|json_encode|raw }}{% endif %}' id="frame-arrangement-{{presentation_id}}" class="hidden-frame-arrangement">
@@ -41,7 +44,7 @@
     <small id="pres_duration_help" class="form-text text-muted">In seconds</small>
   </div>
   <div class="form-group form-check">
-		{# https://stackoverflow.com/a/25764926 #}
+		{# https://stackoverflow.com/a/25764926 -- THERE MUST BE NO WHITESPACE BTWN INPUTS #}
 		<input type="hidden" name="skip[]" {% if presentation.skip %}value="1"{% else %}value="0"{% endif %}><input type="checkbox" class="form-check-input" id="skip_{{presentation_id}}" {% if presentation.skip %}checked{% endif %} onclick="this.previousSibling.value=1-this.previousSibling.value">
     <label class="form-check-label" for="skip_{{presentation_id}}">Skip in main loop</label>
   </div>
