@@ -81,7 +81,7 @@ class DisplayEdit extends AbstractController
             $parentId = (int) $templates[$i];
             $duration = round($durations[$i] * 1000);
             $frameArrangement = json_decode($frameArrangements[$i], true);
-            $skip = ($skips[$i] === 'on') ? true : false;
+            $skip = ($skips[$i] === '1') ? true : false;
 
             $template = $templateFactory->fromParent($parentId);
             // todo: set custom twig

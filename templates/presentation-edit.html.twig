@@ -41,7 +41,8 @@
     <small id="pres_duration_help" class="form-text text-muted">In seconds</small>
   </div>
   <div class="form-group form-check">
-    <input type="checkbox"{% if presentation.skip %} checked {% endif %}class="form-check-input" id="skip_{{presentation_id}}" name="skip[]">
+		{# https://stackoverflow.com/a/25764926 #}
+		<input type="hidden" name="skip[]" {% if presentation.skip %}value="1"{% else %}value="0"{% endif %}><input type="checkbox" class="form-check-input" id="skip_{{presentation_id}}" {% if presentation.skip %}checked{% endif %} onclick="this.previousSibling.value=1-this.previousSibling.value">
     <label class="form-check-label" for="skip_{{presentation_id}}">Skip in main loop</label>
   </div>
 </div>
