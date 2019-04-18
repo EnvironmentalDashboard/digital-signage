@@ -1,3 +1,4 @@
+/config/secrets.yaml
 .DS_Store
 ###> symfony/framework-bundle ###
 /.env.local

@@ -50,3 +50,8 @@ frame-list-by-carousel:
   path: /carousel/{id}/frame/all
   controller: App\Controller\Frame::listByCarousel
   methods: GET
+
+youtube-video-length:
+  path: /youtube/{videoId}/length
+  controller: App\Controller\Youtube::length
+  methods: GET
