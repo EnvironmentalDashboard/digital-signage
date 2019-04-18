@@ -116,7 +116,7 @@ class DisplayEdit extends AbstractController
         
         $entityManager->flush();
 
-        return new JsonResponse($_POST);
+        return new JsonResponse(true);
     }
 
     private function templateTwig($id)
