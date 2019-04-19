@@ -37,8 +37,9 @@ class Display extends AbstractController
                 $carousel = $relation->getCarousel();
                 $iframes = [];
                 foreach ($carousel->getFrames() as $i => $frame) {
-                    $hidden = ($i === 0) ? '' : 'display:hidden';
-                    $iframes[] = "<iframe src='{$frame->getUrl()}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
+					$hidden = ($i === 0) ? '' : 'display:hidden';
+					$url = $this->specialUrls($frame->getUrl());
+                    $iframes[] = "<iframe src='{$url}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
                 }
                 $pres_carousels[$key] = implode('', $iframes);
             }
@@ -119,5 +120,14 @@ class Display extends AbstractController
         $twig = $template->getTwig();
         $template = $this->get('twig')->createTemplate($twig);
         return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here'])); // need to include all possible twig keys
-    }
+	}
+	
+	private function specialUrls($url) {
+		$parts = parse_url($url);
+		if ($parts['host'] === 'www.youtube.com') {
+			parse_str($parts['query'], $get_array);
+			return "https://www.youtube.com/embed/{$get_array['v']}";
+		}
+		return $url;
+	}
 }

@@ -70,15 +70,37 @@
             var next_frame = frames[i+1];
           }
           set_timers(frames[i], next_frame, total_time, start_in);
+					var youtube_id = getYoutubeId(frames[i].src);
+					if (youtube_id !== false) {
+						var new_src = updateQueryStringParameter(frames[i].src, 'autoplay', '1');
+						new_src = updateQueryStringParameter(new_src, 'mute', '1'); // see https://stackoverflow.com/a/50272974 for why mute=1
+						frames[i].src = new_src;
+						var finished = setTimeout(function () {
+							frames[i].src = updateQueryStringParameter(frames[i].src, 'autoplay', '0');
+						}, frames[i].getAttribute('data-duration'));
+						active_timeouts.push(finished);
+					}
         }
 
       }
     }
+
     function set_timers(cur_frame, next_frame, total_time, start_in) {
       var offset = setTimeout(function() {
         var every = setInterval(function() {
           cur_frame.style.display = 'none';
           next_frame.style.display = 'initial';
+					// need to add ?autoplay=1&mute=1 to youtube url to play
+					var youtube_id = getYoutubeId(next_frame.src);
+					if (youtube_id !== false) {
+						var new_src = updateQueryStringParameter(next_frame.src, 'autoplay', '1');
+						new_src = updateQueryStringParameter(new_src, 'mute', '1');
+						next_frame.src = new_src;
+						var finished = setTimeout(function() {
+							next_frame.src = updateQueryStringParameter(next_frame.src, 'autoplay', '0');
+						}, next_frame.getAttribute('data-duration'));
+						active_timeouts.push(finished);
+					}
         }, total_time);
         active_intervals.push(every);
       }, start_in);
@@ -135,6 +157,28 @@
       }
       setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
 		};
+
+		function getYoutubeId(url) {
+			if (url != undefined || url != '') {
+				var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
+				var match = url.match(regExp);
+				if (match && match[2].length == 11) {
+					return match[2];
+				}
+			}
+			return false;
+		}
+
+		function updateQueryStringParameter(uri, key, value) {
+			var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+			var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+			if (uri.match(re)) {
+				return uri.replace(re, '$1' + key + "=" + value + '$2');
+			}
+			else {
+				return uri + separator + key + "=" + value;
+			}
+		}
 
   </script>
 </body>
