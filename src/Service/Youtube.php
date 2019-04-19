@@ -7,11 +7,12 @@ use \Exception;
 
 class Youtube
 {
-	private $key;
+    private $key;
 
-    public function __construct() {
-		$this->key = Yaml::parseFile('/var/www/html/config/secrets.yaml')['youtubeApiKey'];
-	}
+    public function __construct()
+    {
+        $this->key = Yaml::parseFile('/var/www/html/config/secrets.yaml')['youtubeApiKey'];
+    }
 
     public function videoLength($videoId)
     {
@@ -21,12 +22,16 @@ class Youtube
         }
         $obj = json_decode($data);
         $pt = $obj->items[0]->contentDetails->duration;
-		$pt = substr($pt, 2);
-		$parts = explode('M', $pt);
-		if (is_numeric($parts[0])) { // e.g. PT21M21S
-			return (int) ($parts[0] * 60) + rtrim($parts[1], 'S');
-		} else { // e.g. PT10S
-			return (int) rtrim($parts[0], 'S');
-		}
+        return $this->ISO8601ToSeconds($pt);
+    }
+    
+    private function ISO8601ToSeconds(string $ISO8601)
+    {
+        $interval = new \DateInterval($ISO8601);
+
+        return ($interval->d * 24 * 60 * 60) +
+        ($interval->h * 60 * 60) +
+        ($interval->i * 60) +
+        $interval->s;
     }
 }
