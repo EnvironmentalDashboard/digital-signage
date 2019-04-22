@@ -19,7 +19,20 @@ class GoogleSlides extends AbstractController
      */
     public function save(Request $request, EntityManagerInterface $entityManager, $presentationId)
     {
-		$entity = (new Entity\GoogleSlides())->setPresentationId($presentationId)->setData($request->query->get('durations'));
+		$filtered = [];
+		foreach ($request->query->get('durations') as $key => $value) {
+			preg_match("/duration:[\s]?(\d*)/i", $value, $matches);
+			if ($matches) {
+				$value = round($matches[1] * 1000);
+				if ($value < 0 || $value > 1000000) {
+					$value = 3000;
+				}
+			} else {
+				$value = 3000;
+			}
+			$filtered[$key] = $value;
+		}
+		$entity = (new Entity\GoogleSlides())->setPresentationId($presentationId)->setData($filtered);
 		$entityManager->persist($entity);
         $entityManager->flush();
         return new JsonResponse(true);

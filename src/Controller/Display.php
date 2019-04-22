@@ -37,7 +37,7 @@ class Display extends AbstractController
                 $carousel = $relation->getCarousel();
                 $iframes = [];
                 foreach ($carousel->getFrames() as $i => $frame) {
-					$iframes[] = $this->iframeMarkup($i, $frame);
+					$iframes[] = $this->iframeMarkup($i, $frame, $entityManager);
                 }
                 $pres_carousels[$key] = implode('', $iframes);
             }
@@ -120,7 +120,7 @@ class Display extends AbstractController
         return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here'])); // need to include all possible twig keys
 	}
 	
-	private function iframeMarkup($i, $frame) {
+	private function iframeMarkup($i, $frame, $entityManager) {
 		$hidden = ($i === 0) ? '' : 'display:hidden';
 		$url = $frame->getUrl();
 		$parts = parse_url($url);
@@ -130,13 +130,16 @@ class Display extends AbstractController
 				return "<iframe src='https://www.youtube.com/embed/{$get_array['v']}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
 			case 'docs.google.com':
 				preg_match('#/presentation/d/(.*?)/edit#', $parts['path'], $matches);
+				if (empty($matches)) {
+					break;
+				}
 				$presId = $matches[1];
 				$repository = $entityManager->getRepository(Entity\GoogleSlides::class);
-				$googleSlides = $repository->findBy(['presentationId' => $presId]);
+				$googleSlides = $repository->findOneBy(['presentationId' => $presId]); // TODO: make presentationId column unique
 				$iframes = [];
 				foreach ($googleSlides->getData() as $key => $value) {
-					$value = $value * 1000;
-					$iframes[] = "<iframe src='https://docs.google.com/presentation/d/e/{$presId}/pub?start=false&loop=false&delayms=60000#slide={$key}' id='frame{$frame->getId()}' data-duration='{$value}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
+					$key = $key + 1;
+					$iframes[] = "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview#slide={$key}' id='frame{$frame->getId()}-{$key}' data-duration='{$value}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
 				}
 				return implode('', $iframes);
 		}
