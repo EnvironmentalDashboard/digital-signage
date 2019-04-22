@@ -55,3 +55,7 @@ youtube-video-length:
   path: /youtube/{videoId}/length
   controller: App\Controller\Youtube::length
   methods: GET
+google-slides-save:
+  path: /google-slides/{presentationId}/save
+  controller: App\Controller\GoogleSlides::save
+  methods: GET
