@@ -37,9 +37,7 @@ class Display extends AbstractController
                 $carousel = $relation->getCarousel();
                 $iframes = [];
                 foreach ($carousel->getFrames() as $i => $frame) {
-					$hidden = ($i === 0) ? '' : 'display:hidden';
-					$url = $this->specialUrls($frame->getUrl());
-                    $iframes[] = "<iframe src='{$url}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
+					$iframes[] = $this->iframeMarkup($i, $frame);
                 }
                 $pres_carousels[$key] = implode('', $iframes);
             }
@@ -122,12 +120,26 @@ class Display extends AbstractController
         return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here'])); // need to include all possible twig keys
 	}
 	
-	private function specialUrls($url) {
+	private function iframeMarkup($i, $frame) {
+		$hidden = ($i === 0) ? '' : 'display:hidden';
+		$url = $frame->getUrl();
 		$parts = parse_url($url);
-		if ($parts['host'] === 'www.youtube.com') {
-			parse_str($parts['query'], $get_array);
-			return "https://www.youtube.com/embed/{$get_array['v']}";
+		switch ($parts['host']) {
+			case 'www.youtube.com':
+				parse_str($parts['query'], $get_array);
+				return "<iframe src='https://www.youtube.com/embed/{$get_array['v']}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
+			case 'docs.google.com':
+				preg_match('#/presentation/d/(.*?)/edit#', $parts['path'], $matches);
+				$presId = $matches[1];
+				$repository = $entityManager->getRepository(Entity\GoogleSlides::class);
+				$googleSlides = $repository->findBy(['presentationId' => $presId]);
+				$iframes = [];
+				foreach ($googleSlides->getData() as $key => $value) {
+					$value = $value * 1000;
+					$iframes[] = "<iframe src='https://docs.google.com/presentation/d/e/{$presId}/pub?start=false&loop=false&delayms=60000#slide={$key}' id='frame{$frame->getId()}' data-duration='{$value}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
+				}
+				return implode('', $iframes);
 		}
-		return $url;
+		return "<iframe src='{$url}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
 	}
 }
