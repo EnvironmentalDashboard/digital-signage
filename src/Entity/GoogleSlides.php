@@ -17,7 +17,7 @@ class GoogleSlides
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=44)
+     * @ORM\Column(type="string", length=44, unique=true)
      */
     private $presentationId;
 
