@@ -2,74 +2,120 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Environmental Dashboard Digital Display</title>
-  <style>
-    html, body {
-      height: 100%;
-      width: 100%;
-    }
-    body {
-      margin: 0px;
-      padding: 0px;
-    }
-    .presentation {
-      height: 100%;
-      width: 100%;
-    }
-  </style>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>Environmental Dashboard Digital Display</title>
+	<style>
+		html,
+		body {
+			height: 100%;
+			width: 100%;
+		}
+		body {
+			margin: 0px;
+			padding: 0px;
+		}
+		iframe {
+			width: 100%;
+			height: 100%;
+			position: absolute; /* this is key for the fadeOut/fadeIn animations; also .carousel needs position:relative */
+			top: 0;
+			left: 0;
+			right: 0;
+			border: none;
+		}
+		.presentation {
+			height: 100%;
+			width: 100%;
+		}
+		@keyframes fadeIn {
+			0% {
+				display: none;
+				opacity: 0;
+			}
+			1% {
+				display: initial;
+				opacity: 0;
+			}
+			100% {
+				display: initial;
+				opacity: 1;
+			}
+		}
+		@keyframes fadeOut {
+			0% {
+				display: initial;
+				opacity: 1;
+			}
+			99% {
+				display: initial;
+				opacity: 0;
+			}
+			100% {
+				display: none;
+				opacity: 0;
+			}
+		}
+		.fade-in {
+			-webkit-animation: fadeIn 1s linear 0s 1 normal forwards;
+			animation: fadeIn 1s linear 0s 1 normal forwards;
+		}
+		.fade-out {
+			-webkit-animation: fadeOut 1s linear 0s 1 normal forwards;
+			animation: fadeOut 1s linear 0s 1 normal forwards;
+		}
+	</style>
 </head>
 
 <body>
-  {% for presentation in cycle %}
-    <div id="pres{{presentation.id}}" class="presentation"{% if loop.index != 1 %} style="display:none"{% endif %}>
-    {{ presentation.markup|raw }}
-    </div>
-  {% endfor %}
-  <script>
-    var pres_durations = {{ pres_durations|json_encode|raw }};
+	{% for presentation in cycle %}
+	<div id="pres{{presentation.id}}" class="presentation" {% if loop.index != 1 %} style="display:none" {% endif %}>
+		{{ presentation.markup|raw }}
+	</div>
+	{% endfor %}
+	<script>
+		var pres_durations = {{ pres_durations|json_encode|raw }};
 		var pres_ids = Object.keys(pres_durations);
-    var cur_pres = 0, last_pres = pres_ids.length-1;
-    var active_intervals = [], active_timeouts = [];
-    function next_pres() {
-      document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'none';
+		var cur_pres = 0, last_pres = pres_ids.length - 1;
+		var active_intervals = [], active_timeouts = [];
+		function next_pres() {
+			document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'none';
 			if (cur_pres === last_pres) {
 				cur_pres = 0;
 			} else {
 				cur_pres++;
 			}
 			document.getElementById('pres' + pres_ids[cur_pres]).style.display = 'initial';
-      clear_timers();
-      // rotate frames in carousels
-      var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
-      for (var i = 0; i < carousels.length; i++) {
-        animate_carousel(carousels[i].children);
-      }
-      setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
-    }
-    function animate_carousel(frames) {
-      if (frames.length > 1) { // if there are multiple frames to swap between
-        var i;
-        var total_time = 0; // total duration of the cycle of presentations
-        for (i = 0; i < frames.length; i++) {
+			clear_timers();
+			// rotate frames in carousels
+			var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
+			for (var i = 0; i < carousels.length; i++) {
+				animate_carousel(carousels[i].children);
+			}
+			setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
+		}
+		function animate_carousel(frames) {
+			if (frames.length > 1) { // if there are multiple frames to swap between
+				var i;
+				var total_time = 0; // total duration of the cycle of presentations
+				for (i = 0; i < frames.length; i++) {
 					frames[i].src = frames[i].src;
-          var dur = parseInt(frames[i].getAttribute('data-duration'));
-          total_time += dur;
-        }
-        
-        var start_in = 0; // offset when each frame starts by duration of the frames that come before it
-        for (i = 0; i < frames.length; i++) {
-          if (i > 0) {
-            var last_frame = frames[i-1];
-            start_in += parseInt(last_frame.getAttribute('data-duration'));
-          }
-          if (i === frames.length-1) {
-            var next_frame = frames[0];
-          } else {
-            var next_frame = frames[i+1];
-          }
-          set_timers(frames[i], next_frame, total_time, start_in);
+					var dur = parseInt(frames[i].getAttribute('data-duration'));
+					total_time += dur;
+				}
+
+				var start_in = 0; // offset when each frame starts by duration of the frames that come before it
+				for (i = 0; i < frames.length; i++) {
+					if (i > 0) {
+						var last_frame = frames[i - 1];
+						start_in += parseInt(last_frame.getAttribute('data-duration'));
+					}
+					if (i === frames.length - 1) {
+						var next_frame = frames[0];
+					} else {
+						var next_frame = frames[i + 1];
+					}
+					set_timers(frames[i], next_frame, total_time, start_in);
 					var youtube_id = getYoutubeId(frames[i].src);
 					if (youtube_id !== false) {
 						var new_src = updateQueryStringParameter(frames[i].src, 'autoplay', '1');
@@ -80,52 +126,52 @@
 						}, frames[i].getAttribute('data-duration'));
 						active_timeouts.push(finished);
 					}
-        }
+				}
 
-      }
-    }
+			}
+		}
 
-    function set_timers(cur_frame, next_frame, total_time, start_in) {
-      var offset = setTimeout(function() {
-        var every = setInterval(function() {
-          cur_frame.style.display = 'none';
-          next_frame.style.display = 'initial';
+		function set_timers(cur_frame, next_frame, total_time, start_in) {
+			var offset = setTimeout(function () {
+				var every = setInterval(function () {
+					cur_frame.className = 'fade-out';
+					next_frame.className = 'fade-in';
 					// need to add ?autoplay=1&mute=1 to youtube url to play
 					var youtube_id = getYoutubeId(next_frame.src);
 					if (youtube_id !== false) {
 						var new_src = updateQueryStringParameter(next_frame.src, 'autoplay', '1');
 						new_src = updateQueryStringParameter(new_src, 'mute', '1');
 						next_frame.src = new_src;
-						var finished = setTimeout(function() {
+						var finished = setTimeout(function () {
 							next_frame.src = updateQueryStringParameter(next_frame.src, 'autoplay', '0');
 						}, next_frame.getAttribute('data-duration'));
 						active_timeouts.push(finished);
 					}
-        }, total_time);
-        active_intervals.push(every);
-      }, start_in);
-      active_timeouts.push(offset);
-    }
-    function clear_timers() {
+				}, total_time);
+				active_intervals.push(every);
+			}, start_in);
+			active_timeouts.push(offset);
+		}
+		function clear_timers() {
 			var i;
-      for (i = 0; i < active_intervals.length; i++) {
-        clearInterval(active_intervals[i]);
-      }
+			for (i = 0; i < active_intervals.length; i++) {
+				clearInterval(active_intervals[i]);
+			}
 			for (i = 0; i < active_timeouts.length; i++) {
 				clearTimeout(active_timeouts[i]);
 			}
 		}
 
-    // begin cycling through presentations
-    setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
-    // begin rotating frames in carousels
-    var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
-    for (var i = 0; i < carousels.length; i++) {
-      animate_carousel(carousels[i].children);
+		// begin cycling through presentations
+		setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
+		// begin rotating frames in carousels
+		var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
+		for (var i = 0; i < carousels.length; i++) {
+			animate_carousel(carousels[i].children);
 		}
 		// open websocket conn to recieve commands from remote controllers
 		var conn = new WebSocket('ws://localhost:5001/display/{{ app.request.get('id') }}');
-		conn.onmessage = function(e) {
+		conn.onmessage = function (e) {
 			var frame_id = parseInt(e.data);
 			if (e.origin !== 'ws://localhost:5001' || frame_id < 1) {
 				return;
@@ -152,10 +198,10 @@
 			}
 			clear_timers();
 			var carousels = pres.children;
-      for (i = 0; i < carousels.length; i++) {
-        animate_carousel(carousels[i].children);
-      }
-      setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
+			for (i = 0; i < carousels.length; i++) {
+				animate_carousel(carousels[i].children);
+			}
+			setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
 		};
 
 		function getYoutubeId(url) {
@@ -180,7 +226,7 @@
 			}
 		}
 
-  </script>
+	</script>
 </body>
 
 </html>

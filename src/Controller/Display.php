@@ -121,13 +121,13 @@ class Display extends AbstractController
 	}
 	
 	private function iframeMarkup($i, $frame, $entityManager) {
-		$hidden = ($i === 0) ? '' : 'display:hidden';
+		$hidden = ($i === 0) ? 'class="fade-in"' : 'class="fade-out"';
 		$url = $frame->getUrl();
 		$parts = parse_url($url);
 		switch ($parts['host']) {
 			case 'www.youtube.com':
 				parse_str($parts['query'], $get_array);
-				return "<iframe src='https://www.youtube.com/embed/{$get_array['v']}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
+				return "<iframe src='https://www.youtube.com/embed/{$get_array['v']}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
 			case 'docs.google.com':
 				preg_match('#/presentation/d/(.*?)/edit#', $parts['path'], $matches);
 				if (empty($matches)) {
@@ -135,14 +135,18 @@ class Display extends AbstractController
 				}
 				$presId = $matches[1];
 				$repository = $entityManager->getRepository(Entity\GoogleSlides::class);
-				$googleSlides = $repository->findOneBy(['presentationId' => $presId]); // TODO: make presentationId column unique
+				$googleSlides = $repository->findOneBy(['presentationId' => $presId]);
+				if ($googleSlides === null) {
+					return "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
+				}
 				$iframes = [];
 				foreach ($googleSlides->getData() as $key => $value) {
 					$key = $key + 1;
-					$iframes[] = "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview#slide={$key}' id='frame{$frame->getId()}-{$key}' data-duration='{$value}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
+					$iframes[] = "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview#slide={$key}' id='frame{$frame->getId()}-{$key}' data-duration='{$value}' frameborder='0' {$hidden}></iframe>";
+					$hidden = 'class="fade-out"';
 				}
 				return implode('', $iframes);
 		}
-		return "<iframe src='{$url}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' style='width: 100%;height: 100%;{$hidden}'></iframe>";
+		return "<iframe src='{$url}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
 	}
 }
