@@ -36,7 +36,9 @@
 					console.log(xhr, status, error);
 				}
       });
-    });
+    }).fail(function (xhr, status, error) {
+			console.log(xhr, status, error);
+		});
   };
 
   // Submit event to fire when display form submitted
@@ -65,7 +67,9 @@
 					console.log(xhr, status, error);
 				}
       });
-    });
+    }).fail(function(xhr, status, error) {
+			console.log(xhr, status, error);
+		});
   };
 
   $('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
