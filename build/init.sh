@@ -17,8 +17,3 @@ php composer.phar update
 phpdismod xdebug
 a2enmod rewrite headers
 mv /var/www/html/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
-
-# TODO
-# if [ "$ENV" = "DEV" ]; then
-#   sed -ie 's|ws://localhost:8080|ws://environmentaldashboard.org:5001/digital-signage-websockets|g' /var/www/html/templates/present.html.twig
-# fi
