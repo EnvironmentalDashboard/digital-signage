@@ -70,10 +70,54 @@
     }).fail(function(xhr, status, error) {
 			console.log(xhr, status, error);
 		});
-  };
+	};
+	
+	var savePresentation = function(e) {
+		e.preventDefault();
+		var modal = $(this).closest('.modal');
+		modal.modal('hide');
+		$.post($(this).attr('action'), $(this).serialize()).done(function() {
+      $.ajax({
+				url: "{{ path("display-table") }}",
+				type: "GET",
+				success: function(data) {
+					$("#nav-all-displays").html(data);
+					$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
+        },
+				error: function(xhr, status, error) {
+					console.log(xhr, status, error);
+				}
+      });
+    }).fail(function(xhr, status, error) {
+			console.log(xhr, status, error);
+		});
+	}
+
+	var saveFrame = function(e) {
+		e.preventDefault();
+		var modal = $(this).closest('.modal');
+		modal.modal('hide');
+		$.post($(this).attr('action'), $(this).serialize()).done(function() {
+      $.ajax({
+				url: "{{ path("carousel-table") }}",
+				type: "GET",
+				success: function(data) {
+					$("#nav-all-carousels").html(data);
+					$('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
+        },
+				error: function(xhr, status, error) {
+					console.log(xhr, status, error);
+				}
+      });
+    }).fail(function(xhr, status, error) {
+			console.log(xhr, status, error);
+		});
+	}
 
   $('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
-  $('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
+	$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
+	$('form[action$="/presentations/save"]').on('submit', savePresentation);
+	$('form[action$="/frames/save"]').on('submit', saveFrame);
 
   // Add new frame
   $(".carousel-add-new-frame").each(function(){
