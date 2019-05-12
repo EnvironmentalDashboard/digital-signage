@@ -173,7 +173,8 @@
 
 	$('.detect-duration').each(function () {
 		$(this).on('input', function() {
-			var url = $(this).val();
+			var input = $(this);
+			var url = input.val();
 			var id = getYoutubeId(url);
 			if (id !== false) {
 				var duration_input_id = $(this).attr('id').replace('create_frame_url_', 'create_frame_duration_');
@@ -182,9 +183,9 @@
 				});
 			}
 			id = getSlidesId(url);
-			console.log(id);
 			if (id !== false) {
 				if (confirm('We have detected a Google Slides URL. Would you like to read the presenter notes to set slide durations? You will need to authenticate with Google.')) {
+					input.attr('id', id); // give input a useful id to find later
 					var tag = document.createElement('script');
 					tag.src = "https://apis.google.com/js/api.js";
 					tag.onload = function() { handleClientLoad() };
@@ -349,14 +350,13 @@ function getPresenterNotes() {
 	});
 }
 function save_durations(arr, id) {
-	console.log('notes', arr);
-	$.getJSON("{{ url('index') }}google-slides/" + id + "/save",
-	{
-		durations: arr
-	},
-	function (res) {
-		console.log(res);
-	});
+	// console.log('notes', arr);
+	$.post("{{ url('index') }}google-slides/" + id + "/save", { durations: JSON.stringify(arr) }, function(data, textStatus) {
+		// console.log(data);
+		var input = $('#' + id);
+		input.addClass('is-valid');
+		input.after('<small class="form-text text-muted">Slides 1 through '+(data.length)+' will have the durations '+(data.join(', '))+'</small>');
+	}, "json");
 }
 </script>
 {% endblock %}

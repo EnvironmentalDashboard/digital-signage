@@ -58,4 +58,4 @@ youtube-video-length:
 google-slides-save:
   path: /google-slides/{presentationId}/save
   controller: App\Controller\GoogleSlides::save
-  methods: GET
+  methods: POST
