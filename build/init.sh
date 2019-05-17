@@ -18,4 +18,3 @@ php composer.phar dump-env prod
 phpdismod xdebug
 a2enmod rewrite headers
 mv /var/www/html/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
-chown -R www-data:www-data /var/www/html

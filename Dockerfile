@@ -11,4 +11,4 @@ ADD . /var/www/html
 WORKDIR /var/www/html
 RUN ./build/init.sh
 EXPOSE 80 8080
-CMD service apache2 start && php bin/console ws-server:start
+CMD service apache2 start && chown -R www-data:www-data /var/www/html && php bin/console ws-server:start
