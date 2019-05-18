@@ -10,6 +10,31 @@
 {% block javascript %}
 {{ parent() }}
 <script>
+	// Fetch google slides durations in presenter notes if given such a url
+	var detectDuration = function() {
+		var input = $(this);
+		var url = input.val();
+		var id = getYoutubeId(url);
+		if (id !== false) {
+			var duration_input_id = $(this).attr('id').replace('create_frame_url_', 'create_frame_duration_');
+			$.getJSON("{{ url('index') }}youtube/" + id + "/length", function(length) {
+				$('#' + duration_input_id).val(length);
+			});
+		}
+		id = getSlidesId(url);
+		if (id !== false) {
+			if (confirm('We have detected a Google Slides URL. Would you like to read the presenter notes to set slide durations? You will need to authenticate with Google.')) {
+				input.attr('id', id); // give input a useful id to find later
+				var tag = document.createElement('script');
+				tag.src = "https://apis.google.com/js/api.js";
+				tag.onload = function() { handleClientLoad() };
+				window.google_slide = id;
+				var firstScriptTag = document.getElementsByTagName('script')[0];
+				firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+			}
+		}
+	};
+
   // Submit event to fire when carousel form submitted
   var createCarousel = function(e) {
     e.preventDefault();
@@ -24,6 +49,9 @@
 				success: function(data) {
 					$("#nav-all-carousels").html(data);
 					$('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel); // Re-apply submit event to new forms
+					$('.detect-duration').each(function () {
+						$(this).on('input', detectDuration);
+					});
 					input.removeClass('is-valid');
 					input.val('');
 					submit.html('Create carousel');
@@ -83,6 +111,7 @@
 				success: function(data) {
 					$("#nav-all-displays").html(data);
 					$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
+					$('form[action$="/presentations/save"]').on('submit', savePresentation);
         },
 				error: function(xhr, status, error) {
 					console.log(xhr, status, error);
@@ -91,7 +120,7 @@
     }).fail(function(xhr, status, error) {
 			console.log(xhr, status, error);
 		});
-	}
+	};
 
 	var saveFrame = function(e) {
 		e.preventDefault();
@@ -104,6 +133,10 @@
 				success: function(data) {
 					$("#nav-all-carousels").html(data);
 					$('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
+					$('form[action$="/frames/save"]').on('submit', saveFrame);
+					$('.detect-duration').each(function() {
+						$(this).on('input', detectDuration);
+					});
         },
 				error: function(xhr, status, error) {
 					console.log(xhr, status, error);
@@ -112,12 +145,15 @@
     }).fail(function(xhr, status, error) {
 			console.log(xhr, status, error);
 		});
-	}
+	};
 
   $('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
 	$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
 	$('form[action$="/presentations/save"]').on('submit', savePresentation);
 	$('form[action$="/frames/save"]').on('submit', saveFrame);
+	$('.detect-duration').each(function() {
+		$(this).on('input', detectDuration);
+	});
 
   // Add new frame
   $(".carousel-add-new-frame").each(function(){
@@ -156,6 +192,7 @@
     });
   });
 
+	// Swap carousel placeholder when option selected
   {% spaceless %}
   var templates = [ '{{ render(controller('App\\Controller\\Display::template',{'name': 'fullscreen'})) }}',
                     '{{ render(controller('App\\Controller\\Display::template', {'name': 'marquee'})) }}' ];
@@ -170,32 +207,6 @@
 		var selected = $(this).find(":selected").val();
 		$(controls).html(templates[selected - 1]);
 	}
-
-	$('.detect-duration').each(function () {
-		$(this).on('input', function() {
-			var input = $(this);
-			var url = input.val();
-			var id = getYoutubeId(url);
-			if (id !== false) {
-				var duration_input_id = $(this).attr('id').replace('create_frame_url_', 'create_frame_duration_');
-				$.getJSON("{{ url('index') }}youtube/" + id + "/length", function(length) {
-					$('#' + duration_input_id).val(length);
-				});
-			}
-			id = getSlidesId(url);
-			if (id !== false) {
-				if (confirm('We have detected a Google Slides URL. Would you like to read the presenter notes to set slide durations? You will need to authenticate with Google.')) {
-					input.attr('id', id); // give input a useful id to find later
-					var tag = document.createElement('script');
-					tag.src = "https://apis.google.com/js/api.js";
-					tag.onload = function() { handleClientLoad() };
-					window.google_slide = id;
-					var firstScriptTag = document.getElementsByTagName('script')[0];
-					firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-				}
-			}
-		});
-	});
 
 {# https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API,
    https://mdn.github.io/dom-examples/drag-and-drop/copy-move-DataTransfer.html #}
@@ -351,7 +362,7 @@ function getPresenterNotes() {
 }
 function save_durations(arr, id) {
 	// console.log('notes', arr);
-	$.post("{{ url('index') }}google-slides/" + id + "/save", { durations: JSON.stringify(arr) }, function(data, textStatus) {
+	$.post("{{ path('index') }}google-slides/" + id + "/save", { durations: JSON.stringify(arr) }, function(data, textStatus) {
 		// console.log(data);
 		var input = $('#' + id);
 		input.addClass('is-valid');
