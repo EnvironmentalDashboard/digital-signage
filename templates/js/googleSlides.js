@@ -1,5 +1,5 @@
 // Fetch google slides durations in presenter notes if given such a url
-var detectDuration = function() {
+function detectDuration() {
 	var input = $(this);
 	var url = input.val();
 	var id = getYoutubeId(url);
@@ -21,18 +21,8 @@ var detectDuration = function() {
 			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 		}
 	}
-};
-
-function getYoutubeId(url) {
-	if (url != undefined || url != '') {
-		var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
-		var match = url.match(regExp);
-		if (match && match[2].length == 11) {
-			return match[2];
-		}
-	}
-	return false;
 }
+
 function getSlidesId(url) {
 	if (url != undefined || url != '') {
 		var regExp = /docs\.google\.com[\/]presentation[\/]d[\/](.*?)[\/]edit/;
@@ -111,6 +101,7 @@ function getPresenterNotes() {
 		console.log(response.result.error.message);
 	});
 }
+
 function save_durations(arr, id) {
 	// console.log('notes', arr);
 	$.post("{{ path('index') }}google-slides/" + id + "/save", { durations: JSON.stringify(arr) }, function(data, textStatus) {

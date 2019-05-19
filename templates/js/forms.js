@@ -110,6 +110,45 @@ var saveFrame = function(e) {
 	});
 };
 
+var newFrame = function(e) {
+	var carousel = $(this).data('carousel-for');
+	var clone = $('#new-frame' + carousel).clone();
+	randomize_ids(clone);
+	clone[0].firstElementChild.innerHTML = 'New frame';
+	clone.find("input[type='hidden']").val('newframe' + carousel);
+	$("#carousel-" + carousel + "-frame-edit").append(clone);
+}
+
+var newPresentation = function(e) {
+	e.preventDefault();
+	var display = $(this).data('display');
+	var clone = $('#new-pres' + display).clone();
+	randomize_ids(clone);
+	clone[0].firstElementChild.innerHTML = 'New presentation';
+	var drop_zone = clone.find('.drop-zone'), select_drop_zone = clone.find('select'), fa_input = clone.find('.hidden-frame-arrangement'), id_input = clone.find('.hidden-id');
+	var new_pres_id = guidGenerator();
+	var new_dropzone_id = guidGenerator();
+	select_drop_zone.attr('data-controls', '#' + new_dropzone_id);
+	drop_zone.attr('data-pres', new_pres_id);
+	drop_zone.attr('id', new_dropzone_id);
+	fa_input.attr('id', 'frame-arrangement-' + new_pres_id);
+	id_input.val('new');
+	var custom_option = select_drop_zone.children().last();
+	if (custom_option.text() === 'Custom') {
+		custom_option.remove();
+	}
+	// console.log(clone.html());
+	$("#display-" + display + "-presentation-edit").append(clone);
+}
+
+var dropdown_template = function(e) {
+	e.preventDefault();
+	var controls = $(this).data('controls');
+	var selected = $(this).find(":selected").val();
+	$(controls).html(templates[selected - 1]);
+}
+
+
 $('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
 $('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
 $('form[action$="/presentations/save"]').on('submit', savePresentation);
@@ -117,42 +156,11 @@ $('form[action$="/frames/save"]').on('submit', saveFrame);
 $('.detect-duration').each(function() {
 	$(this).on('input', detectDuration);
 });
-
-// Add new frame
 $(".carousel-add-new-frame").each(function(){
-	$(this).on('click', function(e) {
-		var carousel = $(this).data('carousel-for');
-		var clone = $('#new-frame' + carousel).clone();
-		randomize_ids(clone);
-		clone[0].firstElementChild.innerHTML = 'New frame';
-		clone.find("input[type='hidden']").val('newframe' + carousel);
-		$("#carousel-" + carousel + "-frame-edit").append(clone);
-	});
+	$(this).on('click', newFrame);
 });
-
-// Add new presentation
 $(".display-add-new-pres").each(function(){
-	$(this).on('click', function(e) {
-		e.preventDefault();
-		var display = $(this).data('display');
-		var clone = $('#new-pres' + display).clone();
-		randomize_ids(clone);
-		clone[0].firstElementChild.innerHTML = 'New presentation';
-		var drop_zone = clone.find('.drop-zone'), select_drop_zone = clone.find('select'), fa_input = clone.find('.hidden-frame-arrangement'), id_input = clone.find('.hidden-id');
-		var new_pres_id = guidGenerator();
-		var new_dropzone_id = guidGenerator();
-		select_drop_zone.attr('data-controls', '#' + new_dropzone_id);
-		drop_zone.attr('data-pres', new_pres_id);
-		drop_zone.attr('id', new_dropzone_id);
-		fa_input.attr('id', 'frame-arrangement-' + new_pres_id);
-		id_input.val('new');
-		var custom_option = select_drop_zone.children().last();
-		if (custom_option.text() === 'Custom') {
-			custom_option.remove();
-		}
-		// console.log(clone.html());
-		$("#display-" + display + "-presentation-edit").append(clone);
-	});
+	$(this).on('click', newPresentation);
 });
 
 // Swap carousel placeholder when option selected
@@ -164,13 +172,9 @@ var templates = [ '{{ render(controller("App\\Controller\\Display::template",{"n
 $(".template-select-dropdown").each(function(){
 	$(this).on('change', dropdown_template);
 });
-function dropdown_template(e) {
-	e.preventDefault();
-	var controls = $(this).data('controls');
-	var selected = $(this).find(":selected").val();
-	$(controls).html(templates[selected - 1]);
-}
 
+
+// utilities
 function randomize_ids(container_div) {
 	var modal_body = container_div[0];
 	var children = modal_body.children;
