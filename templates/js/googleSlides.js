@@ -108,6 +108,8 @@ function save_durations(arr, id) {
 		// console.log(data);
 		var input = $('#' + id);
 		input.addClass('is-valid');
+		var sum = data.reduce(function(a, b) { return a + b; }, 0);
+		input.val(Math.round(sum/1000));
 		input.after('<small class="form-text text-muted">Slides 1 through '+(data.length)+' will have the durations '+(data.join(', '))+'</small>');
 	}, "json");
 }
