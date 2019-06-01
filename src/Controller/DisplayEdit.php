@@ -70,6 +70,8 @@ class DisplayEdit extends AbstractController
         $presentationRepo = $entityManager->getRepository(Entity\Presentation::class);
 
         $display = $displayRepo->find($id);
+        $label = $request->request->get('display-label');
+        $display->setLabel($label);
 
         $templates = $request->request->get('pres_template');
         $durations = $request->request->get('pres_duration');

@@ -41,7 +41,7 @@
     <div class="modal-content">
       <form action="{{ path('display-save-presentations', {'id': display.id}) }}" method="POST">
 				<div class="modal-header">
-					<h4 class="modal-title">Edit Presentations</h4>
+					<h4 class="modal-title form-inline">Edit <input type="text" class="form-control ml-2" name="display-label" placeholder="Display label" value="{{ display.label }}"></h4>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
