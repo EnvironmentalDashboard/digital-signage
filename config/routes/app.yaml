@@ -59,3 +59,8 @@ google-slides-save:
   path: /google-slides/{presentationId}/save
   controller: App\Controller\GoogleSlides::save
   methods: POST
+
+remote-controller-create:
+  path: /remote/create
+  controller: App\Controller\RemoteControllerEdit::create
+  methods: POST
