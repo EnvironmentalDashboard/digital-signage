@@ -1,0 +1,58 @@
+{% if controller.id == '' %}
+{% set controller_id = "newcontroller" ~ display.id %}
+{% set is_new = true %}
+{% else %}
+{% set controller_id = controller.id %}
+{% set is_new = false %}
+{% endif %}
+<div class="modal fade" id="controller-{{controller_id}}-createButtonModal" tabindex="-1" role="dialog" aria-labelledby="createButtonModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form action="{{ path('controller-save-buttons', {'id': controller.id}) }}" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createButtonModalLabel">Add Button</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="on_display">Which display?</label>
+            <select class="form-control" id="on_display" name="on_display">
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="trigger_frame">Which frame?</label>
+            <select class="form-control" id="trigger_frame" name="trigger_frame">
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="button_twig_key">Button placement</label>
+            <select class="form-control" id="button_twig_key" name="button_twig_key">
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="save-button">Save changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

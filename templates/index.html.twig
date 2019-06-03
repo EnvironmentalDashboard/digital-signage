@@ -10,72 +10,18 @@
 {% block javascript %}
 {{ parent() }}
 <script>
-	{% include 'js/googleSlides.js' %}
+  {% include 'js/googleSlides.js' %}
 
-	{% include 'js/getYoutubeId.js' %}
+  {% include 'js/getYoutubeId.js' %}
 
-	{% include 'js/forms.js' %}
+  {% include 'js/forms.js' %}
 
-	{% include 'js/dragAndDrop.js' %}
+  {% include 'js/dragAndDrop.js' %}
 </script>
 {% endblock %}
 
 
 {% block body %}
-<!-- modal -->
-<div class="modal fade" id="createButtonModal" tabindex="-1" role="dialog" aria-labelledby="createButtonModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form>
-        <div class="modal-header">
-          <h5 class="modal-title" id="createButtonModalLabel">Add Button</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="on_display">Which display?</label>
-            <select class="form-control" id="on_display" name="on_display">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="trigger_frame">Which frame?</label>
-            <select class="form-control" id="trigger_frame" name="trigger_frame">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="button_twig_key">Button placement</label>
-            <select class="form-control" id="button_twig_key" name="button_twig_key">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="save-button">Save changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-
 <div class="container">
   <img src="https://environmentaldashboard.org/prefs/images/env_logo.png" alt="" class="img-fluid">
   <div style="height:50px;clear:both;"></div>
@@ -92,7 +38,8 @@
     </div>
     <div class="col-9">
       <div class="tab-content" id="v-pills-tabContent">
-        <div class="tab-pane fade show active" id="v-pills-displays" role="tabpanel" aria-labelledby="v-pills-display-tab">
+        <div class="tab-pane fade show active" id="v-pills-displays" role="tabpanel"
+          aria-labelledby="v-pills-display-tab">
           <nav>
             <div class="nav nav-tabs justify-content-end" id="nav-tab-display" role="tablist">
               <a class="nav-item nav-link active" id="nav-all-displays-tab" data-toggle="tab" href="#nav-all-displays"
@@ -102,7 +49,8 @@
             </div>
           </nav>
           <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-all-displays" role="tabpanel" aria-labelledby="nav-all-displays-tab">
+            <div class="tab-pane fade show active" id="nav-all-displays" role="tabpanel"
+              aria-labelledby="nav-all-displays-tab">
               {{ render(controller('App\\Controller\\Display::table')) }}
               {# <table class="table">
                 <thead>
@@ -155,17 +103,20 @@
             </div>
           </nav>
           <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-all-carousels" role="tabpanel" aria-labelledby="nav-all-carousels-tab">
-              
-            {{ render(controller('App\\Controller\\Carousel::table')) }}
+            <div class="tab-pane fade show active" id="nav-all-carousels" role="tabpanel"
+              aria-labelledby="nav-all-carousels-tab">
+
+              {{ render(controller('App\\Controller\\Carousel::table')) }}
 
             </div>
-            <div class="tab-pane fade" id="nav-create-carousel" role="tabpanel" aria-labelledby="nav-create-carousel-tab">
+            <div class="tab-pane fade" id="nav-create-carousel" role="tabpanel"
+              aria-labelledby="nav-create-carousel-tab">
               <form id="create-carousel-form" action="{{ path('carousel-create') }}" method="POST" class="mt-3">
                 <div class="form-group row">
                   <label for="carousel-label" class="col-sm-2 col-form-label">Label</label>
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" id="carousel-label" name="carousel-label" placeholder="Label">
+                    <input type="text" class="form-control" id="carousel-label" name="carousel-label"
+                      placeholder="Label">
                   </div>
                 </div>
                 <div class="form-group row">
@@ -177,85 +128,32 @@
             </div>
           </div>
         </div>
-        <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-remote-controllers-tab">
-          <p class="text-muted text-center">You have no configured remote controllers.</p>
+        <div class="tab-pane fade" id="v-pills-settings" role="tabpanel"
+          aria-labelledby="v-pills-remote-controllers-tab">
           <nav>
             <div class="nav nav-tabs justify-content-end" id="nav-tab-remote-controller" role="tablist">
-              <a class="nav-item nav-link active" id="nav-all-controllers-tab" data-toggle="tab" href="#nav-all-controllers"
-                role="tab" aria-controls="nav-all-controllers" aria-selected="true">View all</a>
-              <a class="nav-item nav-link" id="nav-create-controller-tab" data-toggle="tab" href="#nav-create-controller"
-                role="tab" aria-controls="nav-create-controller" aria-selected="false">Create new</a>
+              <a class="nav-item nav-link active" id="nav-all-controllers-tab" data-toggle="tab"
+                href="#nav-all-controllers" role="tab" aria-controls="nav-all-controllers" aria-selected="true">View
+                all</a>
+              <a class="nav-item nav-link" id="nav-create-controller-tab" data-toggle="tab"
+                href="#nav-create-controller" role="tab" aria-controls="nav-create-controller"
+                aria-selected="false">Create new</a>
             </div>
           </nav>
           <div class="tab-content">
-            <div class="tab-pane fade show active" id="nav-all-controllers" role="tabpanel" aria-labelledby="nav-all-controllers-tab">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col" style="border-top:none">#</th>
-                    <th scope="col" style="border-top:none">Label</th>
-                    <th scope="col" style="border-top:none">Buttons</th>
-                    <th scope="col" style="border-top:none">&nbsp;</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td>Remote controller a</td>
-                    <td>4</td>
-                    <td>
-                      <button class="btn btn-primary">Edit</button>
-                      <button class="btn btn-danger">Delete</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2</th>
-                    <td>Remote controller b</td>
-                    <td>4</td>
-                    <td>
-                      <button class="btn btn-primary">Edit</button>
-                      <button class="btn btn-danger">Delete</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">3</th>
-                    <td>Remote controller c</td>
-                    <td>4</td>
-                    <td>
-                      <button class="btn btn-primary">Edit</button>
-                      <button class="btn btn-danger">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div class="tab-pane fade show active" id="nav-all-controllers" role="tabpanel"
+              aria-labelledby="nav-all-controllers-tab">
+              {{ render(controller('App\\Controller\\RemoteController::table')) }}
             </div>
-            <div class="tab-pane fade show" id="nav-create-controller" role="tabpanel" aria-labelledby="nav-create-controller-tab">
-              <form id="create-controller-form" action="" method="POST" class="mt-3" data-action="create-controller">
+
+            <div class="tab-pane fade show" id="nav-create-controller" role="tabpanel"
+              aria-labelledby="nav-create-controller-tab">
+              <form id="create-controller-form" action="{{ path('controller-create') }}" method="POST" class="mt-3">
                 <div class="form-group row">
                   <label for="controller-label" class="col-sm-2 col-form-label">Label</label>
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" id="controller-label" name="controller-label" placeholder="Label">
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <label for="controller-label" class="col-sm-2 col-form-label">Controller template</label>
-                  <div class="col-sm-10">
-                    <select class="form-control" id="controller-label" name="controller-template">
-                      <option>1</option>
-                      <option>2</option>
-                      <option>3</option>
-                      <option>4</option>
-                      <option>5</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group row">
-                  <p class="col-sm-2 col-form-label">Buttons</p>
-                  <div class="col-sm-10">
-                    <ul class="list-group list-group-flush" id="button-list">
-                    </ul>
-                    <button type="button" class="btn btn-light mt-2 btn-sm" data-toggle="modal" data-target="#createButtonModal">Add
-                      button</button>
+                    <input type="text" class="form-control" id="controller-label" name="controller-label"
+                      placeholder="Label">
                   </div>
                 </div>
                 <div class="form-group row">

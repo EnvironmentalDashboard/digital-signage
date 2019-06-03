@@ -60,7 +60,19 @@ google-slides-save:
   controller: App\Controller\GoogleSlides::save
   methods: POST
 
-remote-controller-create:
+controller-create:
   path: /remote/create
   controller: App\Controller\RemoteControllerEdit::create
+  methods: POST
+controller-delete:
+  path: /remote/{id}/delete
+  controller: App\Controller\RemoteControllerEdit::delete
+  methods: POST
+controller-table-all:
+  path: /remote/table
+  controller: App\Controller\RemoteController::table
+  methods: GET
+controller-save-buttons:
+  path: /remote/{id}/buttons/save
+  controller: App\Controller\RemoteControllerEdit::saveButtons
   methods: POST

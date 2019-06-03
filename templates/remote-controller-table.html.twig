@@ -1,0 +1,35 @@
+{% if controllers is empty %}
+    <p class="text-muted text-center">You have no configured remote controllers.</p>
+{% else %}
+
+    <table class="table">
+    <thead>
+        <tr>
+        <th scope="col" style="border-top:none">#</th>
+        <th scope="col" style="border-top:none">Label</th>
+        <th scope="col" style="border-top:none">Buttons</th>
+        <th scope="col" style="border-top:none">&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for controller in controllers %}
+        <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>{{ controller.label }}</td>
+        <td>{{ controller.buttons|length }}</td>
+        <td>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createButtonModal">Edit</button>
+            <form action="{{ path('controller-delete', {'id': controller.id}) }}" method="POST">
+                <input type="submit" class="btn btn-danger" value="Delete">
+            </form>
+        </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+
+
+    {% for controller in controllers %}
+        {% include 'button-edit.html.twig' %}
+    {% endfor %}
+{% endif %}
