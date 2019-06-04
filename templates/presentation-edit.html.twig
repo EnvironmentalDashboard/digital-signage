@@ -5,42 +5,47 @@
 {% set presentation_id = presentation.id %}
 {% set is_new = false %}
 {% endif %}
-<div class="modal-body" {% if loop.index == 1 %}id="new-pres{{display.id}}"{% endif %}>
-	<h5>Presentation #{{loop.index}}</h5>
+<div class="modal-body" {% if loop.index == 1 %}id="new-pres{{display.id}}" {% endif %}>
+  <h5>Presentation #{{loop.index}}</h5>
   <div class="form-group">
     <label for="pres_template_for_{{presentation_id}}">Select template</label>
-    <select class="form-control template-select-dropdown" id="pres_template_for_{{presentation_id}}" name="pres_template[]" data-controls="#drop-zone-{{presentation_id}}">
+    <select class="form-control template-select-dropdown" id="pres_template_for_{{presentation_id}}"
+      name="pres_template[]" data-controls="#drop-zone-{{presentation_id}}">
       <option value="1">Fullscreen</option>
-			<option value="2">Fullscreen with marquee</option>
-			{% if is_new == false %}
-			<option selected value="-1">Custom</option>
-			{% endif %}
+      <option value="2">Fullscreen with marquee</option>
+      {% if is_new == false %}
+      <option selected value="-1">Custom</option>
+      {% endif %}
     </select>
-	</div>
-	<input type="hidden" name="id[]" value="{{presentation_id}}" class="hidden-id">
+  </div>
+  <input type="hidden" name="id[]" value="{{presentation_id}}" class="hidden-id">
   <div class="form-group">
-		<p>Drag carousels onto template:</p>
-    <input type="hidden" name="frame-arrangement[]" value='{% if is_new %}{}{% else %}{{ frame_arrangements[presentation_id]|json_encode|raw }}{% endif %}' id="frame-arrangement-{{presentation_id}}" class="hidden-frame-arrangement">
+    <p>Drag carousels onto template:</p>
+    <input type="hidden" name="frame-arrangement[]"
+      value='{% if is_new %}{}{% else %}{{ frame_arrangements[presentation_id]|json_encode|raw }}{% endif %}'
+      id="frame-arrangement-{{presentation_id}}" class="hidden-frame-arrangement">
     <div class="row">
       <div class="col-sm-6">
-        <div style="height: 300px;width: 100%;" class="drop-zone" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="drop-zone-{{presentation_id}}" data-pres="{{presentation_id}}">
-					{% if is_new %}
-						{{ carousels['tmp']|raw }}
-					{% else %}
+        <div style="height: 300px;width: 100%;" class="drop-zone" ondrop="drop_handler(event);"
+          ondragover="dragover_handler(event);" id="drop-zone-{{presentation_id}}" data-pres="{{presentation_id}}">
+          {% if is_new %}
+          {{ carousels['tmp']|raw }}
+          {% else %}
           {% for carousel in carousels[presentation_id] %}
-            {{ carousel|raw }}
-					{% endfor %}
-					{% endif %}
+          {{ carousel|raw }}
+          {% endfor %}
+          {% endif %}
         </div>
       </div>
       <div class="col-sm-6">
-      {{ render(controller('App\\Controller\\Carousel::list')) }}
+        {{ render(controller('App\\Controller\\Carousel::list')) }}
       </div>
     </div>
   </div>
   <div class="form-group">
     <label for="pres_duration_for_{{presentation_id}}">Duration</label>
-    <input type="number" class="form-control" id="pres_duration_for_{{presentation_id}}" aria-describedby="pres_duration_help" name="pres_duration[]" value="{{presentation.duration/1000}}">
+    <input type="number" class="form-control" id="pres_duration_for_{{presentation_id}}"
+      aria-describedby="pres_duration_help" name="pres_duration[]" value="{{presentation.duration/1000}}">
     <small id="pres_duration_help" class="form-text text-muted">In seconds</small>
   </div>
   <div class="form-group form-check">

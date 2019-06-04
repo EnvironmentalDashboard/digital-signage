@@ -70,22 +70,22 @@ class CarouselEdit extends AbstractController
         $ids = $request->request->get('id');
 
         foreach ($urls as $key => $value) {
-			$frameExists = is_numeric($ids[$key]);
+            $frameExists = is_numeric($ids[$key]);
             $frame = ($frameExists) ?
-				$frameRepo->find($ids[$key])
-					->setUrl($urls[$key])
+                $frameRepo->find($ids[$key])
+                    ->setUrl($urls[$key])
                     ->setDuration(round($durations[$key] * 1000)) :
                 (new Entity\Frame())
                     ->setUrl($urls[$key])
-					->setDuration(round($durations[$key] * 1000));
-					
+                    ->setDuration(round($durations[$key] * 1000));
+                    
             if (!$frameExists) {
-				$carousel->addFrame($frame);
-			}
+                $carousel->addFrame($frame);
+            }
             $entityManager->persist($frame);
-		}
-		
-		$entityManager->persist($carousel);
+        }
+        
+        $entityManager->persist($carousel);
         
         $entityManager->flush();
 

@@ -1,64 +1,67 @@
 {% if displays is empty %}
-  <p class="text-muted text-center">You have no configured displays or carousels. Please create a carousel before creating a display.</p>
+<p class="text-muted text-center">You have no configured displays or carousels. Please create a carousel before creating
+  a display.</p>
 {% else %}
 <table class="table">
-    <thead>
-        <tr>
-        <th scope="col" style="border-top:none">#</th>
-        <th scope="col" style="border-top:none">Label</th>
-        <th scope="col" style="border-top:none">URL</th>
-        <th scope="col" style="border-top:none">&nbsp;</th>
-        </tr>
-    </thead>
+  <thead>
+    <tr>
+      <th scope="col" style="border-top:none">#</th>
+      <th scope="col" style="border-top:none">Label</th>
+      <th scope="col" style="border-top:none">URL</th>
+      <th scope="col" style="border-top:none">&nbsp;</th>
+    </tr>
+  </thead>
 
-    <tbody>
+  <tbody>
 
     {% for display in displays %}
-        <tr>
-        <th scope="row">{{loop.index}}</th>
-        <td>{{display.label}}</td>
-        <td><a href="{{ url('index') }}display/{{ display.id }}/present" target="_blank">{{ url('index') }}display/{{ display.id }}/present</a></td>
-        <td class="form-inline" style="min-width:160px;">
-            <button class="btn btn-primary mr-2" data-toggle="modal" data-target="#display-{{display.id}}-createFormModal">Edit</button>
+    <tr>
+      <th scope="row">{{loop.index}}</th>
+      <td>{{display.label}}</td>
+      <td><a href="{{ url('index') }}display/{{ display.id }}/present"
+          target="_blank">{{ url('index') }}display/{{ display.id }}/present</a></td>
+      <td class="form-inline" style="min-width:160px;">
+        <button class="btn btn-primary mr-2" data-toggle="modal"
+          data-target="#display-{{display.id}}-createFormModal">Edit</button>
 
-            <form action="{{ path('display-delete', {'id': display.id}) }}" method="POST">
-                <input type="submit" class="btn btn-danger" value="Delete">
-            </form>
-        </td>
-        </tr>
+        <form action="{{ path('display-delete', {'id': display.id}) }}" method="POST">
+          <input type="submit" class="btn btn-danger" value="Delete">
+        </form>
+      </td>
+    </tr>
     {% endfor %}
 
-
-    </tbody>
+  </tbody>
 
 </table>
 {% endif %}
 
 {% for display in displays %}
-<div class="modal fade" id="display-{{display.id}}-createFormModal" tabindex="-1" role="dialog" aria-labelledby="display-{{display.id}}-createFormModal-Label"
-  aria-hidden="true">
+<div class="modal fade" id="display-{{display.id}}-createFormModal" tabindex="-1" role="dialog"
+  aria-labelledby="display-{{display.id}}-createFormModal-Label" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <form action="{{ path('display-save-presentations', {'id': display.id}) }}" method="POST">
-				<div class="modal-header">
-					<h4 class="modal-title form-inline">Edit <input type="text" class="form-control ml-2" name="display-label" placeholder="Display label" value="{{ display.label }}"></h4>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
+        <div class="modal-header">
+          <h4 class="modal-title form-inline">Edit <input type="text" class="form-control ml-2" name="display-label"
+              placeholder="Display label" value="{{ display.label }}"></h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
         <div id="display-{{display.id}}-presentation-edit">
-        {% for presentation in display.presentations %}
-        
-            {% include 'presentation-edit.html.twig' %}
+          {% for presentation in display.presentations %}
 
-        {% endfor %}
+          {% include 'presentation-edit.html.twig' %}
+
+          {% endfor %}
         </div>
         <div class="modal-body">
           <div class="form-group">
             <button class="btn btn-primary display-add-new-pres" data-display="{{display.id}}">Add presentation</button>
           </div>
         </div>
-        
+
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

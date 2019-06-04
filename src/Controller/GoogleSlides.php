@@ -19,32 +19,32 @@ class GoogleSlides extends AbstractController
      */
     public function save(Request $request, EntityManagerInterface $entityManager, $presentationId)
     {
-		$filtered = [];
-		$data = json_decode($request->request->get('durations'), true);
-		if (!is_array($data)) {
-			throw new \Exception('Invalid durations payload');
-		}
-		foreach ($data as $key => $value) {
-			preg_match("/duration:[\s]?(\d*)/i", $value, $matches);
-			if ($matches) {
-				$value = round($matches[1] * 1000);
-				if ($value < 0 || $value > 1000000) {
-					$value = 3000;
-				}
-			} else {
-				$value = 3000;
-			}
-			$filtered[$key] = $value;
-		}
+        $filtered = [];
+        $data = json_decode($request->request->get('durations'), true);
+        if (!is_array($data)) {
+            throw new \Exception('Invalid durations payload');
+        }
+        foreach ($data as $key => $value) {
+            preg_match("/duration:[\s]?(\d*)/i", $value, $matches);
+            if ($matches) {
+                $value = round($matches[1] * 1000);
+                if ($value < 0 || $value > 1000000) {
+                    $value = 3000;
+                }
+            } else {
+                $value = 3000;
+            }
+            $filtered[$key] = $value;
+        }
 
-		$repository = $entityManager->getRepository(Entity\GoogleSlides::class);
-		$toDelete = $repository->findOneBy(['presentationId' => $presentationId]);
-		if ($toDelete) {
-			$entityManager->remove($toDelete);
-			$entityManager->flush(); // DELETE query isn't actually executed until flush() called
-		}
-		$entity = (new Entity\GoogleSlides())->setPresentationId($presentationId)->setData($filtered);
-		$entityManager->persist($entity);
+        $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
+        $toDelete = $repository->findOneBy(['presentationId' => $presentationId]);
+        if ($toDelete) {
+            $entityManager->remove($toDelete);
+            $entityManager->flush(); // DELETE query isn't actually executed until flush() called
+        }
+        $entity = (new Entity\GoogleSlides())->setPresentationId($presentationId)->setData($filtered);
+        $entityManager->persist($entity);
         $entityManager->flush();
         return new JsonResponse($filtered);
     }

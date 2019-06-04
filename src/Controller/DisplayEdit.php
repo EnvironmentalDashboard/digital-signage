@@ -78,7 +78,7 @@ class DisplayEdit extends AbstractController
         $frameArrangements = $request->request->get('frame-arrangement');
         $skips = $request->request->get('skip');
         $ids = $request->request->get('id');
-		// they're all the same length ^^^
+        // they're all the same length ^^^
         for ($i = 0; $i < count($templates); $i++) {
             $parentId = (int) $templates[$i];
             $duration = round($durations[$i] * 1000);
@@ -86,14 +86,14 @@ class DisplayEdit extends AbstractController
             $skip = ($skips[$i] === '1') ? true : false;
 
             $presentationExists = is_numeric($ids[$i]);
-			$presentation = ($presentationExists) ? $presentationRepo->find($ids[$i]) : new Entity\Presentation();
-			
-			if ($parentId !== -1) { // not custom template
-				$template = $templateFactory->fromParent($parentId);
-				// todo: set custom twig
-				$entityManager->persist($template);
-				$presentation->setTemplate($template);
-			}
+            $presentation = ($presentationExists) ? $presentationRepo->find($ids[$i]) : new Entity\Presentation();
+            
+            if ($parentId !== -1) { // not custom template
+                $template = $templateFactory->fromParent($parentId);
+                // todo: set custom twig
+                $entityManager->persist($template);
+                $presentation->setTemplate($template);
+            }
             $presentation->setDuration($duration);
             $presentation->setLabel("Presentation for display #{$id}");
             $presentation->setSkip($skip);
@@ -103,8 +103,8 @@ class DisplayEdit extends AbstractController
             }
 
             $entityManager->persist($presentation);
-			$entityManager->persist($display);
-			
+            $entityManager->persist($display);
+            
             foreach ($frameArrangement as $twig_key => $carousel_id) {
                 $map = new Entity\CarouselPresentationMap();
                 $map->setPresentation($presentation);
