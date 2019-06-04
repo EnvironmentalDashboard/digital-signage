@@ -97,7 +97,7 @@ class Display extends AbstractController
     }
 
     /**
-     * display-templates
+     * display-template
      */
     public function template(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory, $name)
     {

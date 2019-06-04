@@ -141,11 +141,18 @@ var newPresentation = function(e) {
 	$("#display-" + display + "-presentation-edit").append(clone);
 }
 
-var dropdown_template = function(e) {
+var displayDropdownTemplate = function(e) {
 	e.preventDefault();
 	var controls = $(this).data('controls');
 	var selected = $(this).find(":selected").val();
-	$(controls).html(templates[selected - 1]);
+	$(controls).html(displayTemplates[selected - 1]);
+}
+
+var controllerDropdownTemplate = function(e) {
+	e.preventDefault();
+	var controls = $(this).data('controls');
+	var selected = $(this).find(":selected").val();
+	$(controls).html(controllerTemplates[selected - 1]);
 }
 
 
@@ -165,12 +172,16 @@ $(".display-add-new-pres").each(function(){
 
 // Swap carousel placeholder when option selected
 /* {% spaceless %} */
-var templates = [ '{{ render(controller("App\\Controller\\Display::template",{"name": "fullscreen"})) }}',
-									'{{ render(controller("App\\Controller\\Display::template", {"name": "marquee"})) }}' ];
+var displayTemplates = [ '{{ render(controller("App\\Controller\\Display::template",{"name": "fullscreen"})) }}',
+													'{{ render(controller("App\\Controller\\Display::template", {"name": "marquee"})) }}' ];
+var controllerTemplates = ['{{ render(controller("App\\Controller\\RemoteController::template", {"name": "2 Buttons"})) }}' ];
 /* {% endspaceless %} */
 
 $(".template-select-dropdown").each(function(){
-	$(this).on('change', dropdown_template);
+	$(this).on('change', displayDropdownTemplate);
+});
+$(".controller-select-dropdown").each(function(){
+	$(this).on('change', controllerDropdownTemplate);
 });
 
 
@@ -188,7 +199,7 @@ function randomize_ids(container_div) {
 				descendants[j].setAttribute('id', cur_id);
 			} else if (descendants[j].tagName === 'SELECT') {
 				descendants[j].setAttribute('id', cur_id);
-				$(descendants[j]).on('change', dropdown_template);
+				$(descendants[j]).on('change', displayDropdownTemplate);
 			}
 		}
 		

@@ -1,0 +1,5 @@
+<ul class="list-group list-group-flush">
+    {% for controller in controllers %}
+        <li class="list-group-item draggable-item" draggable="true" ondragstart="dragstart_handler(event);" ondragend="dragend_handler(event);" id="controller{{controller.id}}">{{controller.label}}</li>
+    {% endfor %}
+</ul>

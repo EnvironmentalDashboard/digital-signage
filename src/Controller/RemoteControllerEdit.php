@@ -28,7 +28,6 @@ class RemoteControllerEdit extends AbstractController
         $controller = new Entity\RemoteController;
         $controller->setLabel($label);
 
-        $template = new Entity\Template;
         $template = $templateFactory->fromParent(3); // pick default template
         $controller->setTemplate($template);
 

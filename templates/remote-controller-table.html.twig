@@ -17,8 +17,8 @@
         <th scope="row">{{loop.index}}</th>
         <td>{{ controller.label }}</td>
         <td>{{ controller.buttons|length }}</td>
-        <td>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createButtonModal">Edit</button>
+        <td class="form-inline" style="min-width: 160px">
+            <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#controller-{{controller.id}}-createButtonModal">Edit</button>
             <form action="{{ path('controller-delete', {'id': controller.id}) }}" method="POST">
                 <input type="submit" class="btn btn-danger" value="Delete">
             </form>
@@ -27,7 +27,6 @@
         {% endfor %}
     </tbody>
     </table>
-
 
     {% for controller in controllers %}
         {% include 'button-edit.html.twig' %}

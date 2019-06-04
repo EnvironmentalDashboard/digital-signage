@@ -1,11 +1,4 @@
-{% if controller.id == '' %}
-{% set controller_id = "newcontroller" ~ display.id %}
-{% set is_new = true %}
-{% else %}
-{% set controller_id = controller.id %}
-{% set is_new = false %}
-{% endif %}
-<div class="modal fade" id="controller-{{controller_id}}-createButtonModal" tabindex="-1" role="dialog" aria-labelledby="createButtonModalLabel"
+<div class="modal fade" id="controller-{{controller.id}}-createButtonModal" tabindex="-1" role="dialog" aria-labelledby="createButtonModalLabel"
   aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -18,39 +11,35 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="on_display">Which display?</label>
-            <select class="form-control" id="on_display" name="on_display">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+            <label for="controller_template_for_{{controller.id}}">Select template</label>
+            <select class="form-control template-select-dropdown" id="controller_template_for_{{controller.id}}" name="controller_template[]" data-controls="#controller-drop-zone-{{controller.id}}">
+                {% if controller.buttons|length > 0 %}
+                <option value="3">2 Buttons</option>
+                {% else %}
+                <option value="-1">Custom</option>
+                {% endif %}
             </select>
           </div>
+          <input type="hidden" name="id[]" value="{{controller.id}}" class="hidden-id">
           <div class="form-group">
-            <label for="trigger_frame">Which frame?</label>
-            <select class="form-control" id="trigger_frame" name="trigger_frame">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-            </select>
+            <p>Drag carousels onto template:</p>
+            <input type="hidden" name="button-arrangement[]" value='' id="button-arrangement-{{controller.id}}" class="hidden-button-arrangement">
+            <div class="row">
+              <div class="col-sm-6">
+                <div style="height: 300px;width: 100%;" class="drop-zone" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="controller-drop-zone-{{controller.id}}" data-controller="{{controller.id}}">
+                  {{ markup[loop.index-1]|raw }}
+                </div>
+              </div>
+              <div class="col-sm-6">
+              {{ render(controller('App\\Controller\\RemoteController::listByController')) }}
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="button_twig_key">Button placement</label>
-            <select class="form-control" id="button_twig_key" name="button_twig_key">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-            </select>
-          </div>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="save-button">Save changes</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
         </div>
       </form>
     </div>

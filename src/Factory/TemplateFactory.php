@@ -28,7 +28,7 @@ class TemplateFactory
 
     $parent = $repository->find($id);
 
-    $template = clone $parent;
+    $template = clone $parent; // todo: does cloning create a new row?
 
     return $template;
   }
