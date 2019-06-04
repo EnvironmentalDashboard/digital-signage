@@ -81,7 +81,7 @@ class DisplayEdit extends AbstractController
             $presentation = ($presentationExists) ? $presentationRepo->find($ids[$i]) : new Entity\Presentation();
             
             if ($parentId !== -1) { // not custom template
-                $template = $templateFactory->fromParent($parentId);
+                $template = $templateFactory->cloneParent($parentId);
                 // todo: set custom twig
                 $entityManager->persist($template);
                 $presentation->setTemplate($template);

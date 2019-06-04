@@ -13,8 +13,8 @@ VALUES (1, 2, 1, 'marquee pres', 0, 25000), (2, 1, 1, 'fullscreen pres', 0, 2500
 INSERT INTO `carousel_presentation_map` (`id`, `presentation_id`, `carousel_id`, `template_key`)
 VALUES (1, 2, 1, 'url1'), (2, 1, 3, 'url1'), (3, 1, 2, 'url2');
 
-INSERT INTO `remote_controller` (`id`, `label`, `template_id`)
-VALUES (1, "test controller", 0);
+-- INSERT INTO `remote_controller` (`id`, `label`, `template_id`)
+-- VALUES (1, "test controller", 0);
 
-INSERT INTO `button` (`id`, `controller_id`, `trigger_frame_id`, `on_display_id`, `twig_key`)
-VALUES (1, 1, 5, 1, "btn1"), (2, 1, 4, 1, "btn2");
+-- INSERT INTO `button` (`id`, `controller_id`, `trigger_frame_id`, `on_display_id`, `twig_key`)
+-- VALUES (1, 1, 5, 1, "btn1"), (2, 1, 4, 1, "btn2");

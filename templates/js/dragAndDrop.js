@@ -29,6 +29,14 @@ function drop_handler(ev) {
 	cur_elems[twig_key] = carousel_id;
 	input.value = JSON.stringify(cur_elems);
 }
+function controller_drop_handler(ev) {
+	ev.preventDefault();
+	var id = ev.dataTransfer.getData("text");
+	var text = document.getElementById(id).innerHTML;
+	ev.target.innerHTML = text;
+	var twig_key = ev.target.getAttribute('data-twig');
+	console.log(twig_key);
+}
 function dragend_handler(ev) {
 	// Restore source's border
 	ev.target.style.border = "none";

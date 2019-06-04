@@ -1,47 +1,27 @@
-<div class="modal fade" id="controller-{{controller.id}}-createButtonModal" tabindex="-1" role="dialog" aria-labelledby="createButtonModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <form action="{{ path('controller-save-buttons', {'id': controller.id}) }}" method="POST">
-        <div class="modal-header">
-          <h5 class="modal-title" id="createButtonModalLabel">Add Button</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+<div class="modal-body">
+  <div class="form-group">
+    <label for="controller_template_for_{{controller.id}}">Select template</label>
+    <select class="form-control controller-select-dropdown" id="controller_template_for_{{controller.id}}" name="controller_template[]" data-controls="#controller-drop-zone-{{controller.id}}">
+        {% if controller.template.id > 3 %} {# todo: hardcoded maximium parent template id #}
+        <option value="-1" selected>Custom</option>
+        {% endif %}
+        <option value="1">2 Buttons</option>
+    </select>
+  </div>
+  <input type="hidden" name="id[]" value="{{controller.id}}">
+  <div class="form-group">
+    <p>Drag buttons onto controller:</p>
+    <input type="hidden" name="button-arrangement[]" value='' id="button-arrangement-{{controller.id}}" class="hidden-button-arrangement">
+    <div class="row">
+      <div class="col-sm-6">
+        <div style="height: 300px;width: 100%;" class="drop-zone" ondrop="controller_drop_handler(event);" ondragover="dragover_handler(event);" id="controller-drop-zone-{{controller.id}}" data-controller="{{controller.id}}">
+          {{ markup[loop.index-1]|raw }}
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="controller_template_for_{{controller.id}}">Select template</label>
-            <select class="form-control template-select-dropdown" id="controller_template_for_{{controller.id}}" name="controller_template[]" data-controls="#controller-drop-zone-{{controller.id}}">
-                {% if controller.buttons|length > 0 %}
-                <option value="3">2 Buttons</option>
-                {% else %}
-                <option value="-1">Custom</option>
-                {% endif %}
-            </select>
-          </div>
-          <input type="hidden" name="id[]" value="{{controller.id}}" class="hidden-id">
-          <div class="form-group">
-            <p>Drag carousels onto template:</p>
-            <input type="hidden" name="button-arrangement[]" value='' id="button-arrangement-{{controller.id}}" class="hidden-button-arrangement">
-            <div class="row">
-              <div class="col-sm-6">
-                <div style="height: 300px;width: 100%;" class="drop-zone" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" id="controller-drop-zone-{{controller.id}}" data-controller="{{controller.id}}">
-                  {{ markup[loop.index-1]|raw }}
-                </div>
-              </div>
-              <div class="col-sm-6">
-              {{ render(controller('App\\Controller\\RemoteController::listByController')) }}
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </form>
+      </div>
+      <div class="col-sm-6">
+      {{ render(controller('App\\Controller\\Button::listAll')) }}
+      </div>
     </div>
   </div>
+
 </div>

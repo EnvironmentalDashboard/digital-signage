@@ -1,34 +1,54 @@
 {% if controllers is empty %}
-    <p class="text-muted text-center">You have no configured remote controllers.</p>
+<p class="text-muted text-center">You have no configured remote controllers.</p>
 {% else %}
 
-    <table class="table">
+<table class="table">
     <thead>
         <tr>
-        <th scope="col" style="border-top:none">#</th>
-        <th scope="col" style="border-top:none">Label</th>
-        <th scope="col" style="border-top:none">Buttons</th>
-        <th scope="col" style="border-top:none">&nbsp;</th>
+            <th scope="col" style="border-top:none">#</th>
+            <th scope="col" style="border-top:none">Label</th>
+            <th scope="col" style="border-top:none">Buttons</th>
+            <th scope="col" style="border-top:none">&nbsp;</th>
         </tr>
     </thead>
     <tbody>
         {% for controller in controllers %}
         <tr>
-        <th scope="row">{{loop.index}}</th>
-        <td>{{ controller.label }}</td>
-        <td>{{ controller.buttons|length }}</td>
-        <td class="form-inline" style="min-width: 160px">
-            <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#controller-{{controller.id}}-createButtonModal">Edit</button>
-            <form action="{{ path('controller-delete', {'id': controller.id}) }}" method="POST">
-                <input type="submit" class="btn btn-danger" value="Delete">
-            </form>
-        </td>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{ controller.label }}</td>
+            <td>{{ controller.buttons|length }}</td>
+            <td class="form-inline" style="min-width: 160px">
+                <button type="button" class="btn btn-primary mr-2" data-toggle="modal"
+                    data-target="#controller-{{controller.id}}-createButtonModal">Edit</button>
+                <form action="{{ path('controller-delete', {'id': controller.id}) }}" method="POST">
+                    <input type="submit" class="btn btn-danger" value="Delete">
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
-    </table>
+</table>
 
-    {% for controller in controllers %}
-        {% include 'button-edit.html.twig' %}
-    {% endfor %}
+{% for controller in controllers %}
+<div class="modal fade" id="controller-{{controller.id}}-createButtonModal" tabindex="-1" role="dialog"
+    aria-labelledby="createButtonModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="{{ path('controller-save-buttons', {'id': controller.id}) }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createButtonModalLabel">Add Button</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% include 'button-edit.html.twig' %}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endif %}

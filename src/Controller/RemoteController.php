@@ -15,6 +15,25 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class RemoteController extends AbstractController
 {
+
+    /**
+     * remote-controller
+     */
+    public function getController($id, Request $request, EntityManagerInterface $entityManager)
+    {
+        $repository = $entityManager->getRepository(Entity\RemoteController::class);
+        $controller = $repository->find($id);
+        $buttons = $controller->getButtons();
+        $twigKeys = [];
+        foreach ($buttons as $button) {
+            $twigKeys[$button->getTwigKey()] = $button->getTriggerFrame()->getUrl();
+        }
+        
+        $twig = $controller->getTemplate()->getTwig();
+        $template = $this->get('twig')->createTemplate($twig);
+        return $template->render($twigKeys);
+    }
+
     /**
      * controller-table-all
      */
@@ -37,6 +56,7 @@ class RemoteController extends AbstractController
             // setup blank button that can be edited for controllers with no buttons
             if (count($buttons) === 0) {
                 $button_arrangements['btn1'] = "placeholder";
+                $button_arrangements['btn2'] = "placeholder";
             }
             $rendered[] = $template->render($button_arrangements);
         }
@@ -71,7 +91,7 @@ class RemoteController extends AbstractController
                 $template_id = 3;
                 break;
         }
-        $template = $templateFactory->fromParent($template_id);
+        $template = $templateFactory->cloneParent($template_id);
         $twig = $template->getTwig();
         $template = $this->get('twig')->createTemplate($twig);
         return new Response($template->render(['btn1' => 'drag button here', 'btn2' => 'drag button here'])); // need to include all possible twig keys

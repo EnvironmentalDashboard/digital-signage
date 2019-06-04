@@ -78,7 +78,11 @@ controller-save-buttons:
   methods: POST
 button-list-by-controller:
   path: /remote/{id}/button/all
-  controller: App\Controller\RemoteController::listByController
+  controller: App\Controller\Button::listByController
+  methods: GET
+button-list-all:
+  path: /button/all
+  controller: App\Controller\Button::listByController
   methods: GET
 controller-template:
   path: /remote/template/{name}
