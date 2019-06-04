@@ -7,8 +7,6 @@ use App\Factory;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use Symfony\Component\Routing\Annotation\Route;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,7 +26,7 @@ class RemoteControllerEdit extends AbstractController
         $controller = new Entity\RemoteController;
         $controller->setLabel($label);
 
-        $template = $templateFactory->fromParent(3); // pick default template
+        $template = $templateFactory->fromParent(3); // pick default template to be edited later
         $controller->setTemplate($template);
 
         $entityManager->persist($controller);

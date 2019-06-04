@@ -7,8 +7,6 @@ use App\Factory;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-use Symfony\Component\Routing\Annotation\Route;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,20 +22,14 @@ class DisplayEdit extends AbstractController
     {
         $label = $request->request->get('display-label');
 
-        // Create display
+        // Create blank display w no presentations (pres created when editing)
         $display = new Entity\Display;
         $display->setLabel($label);
 
         $entityManager->persist($display);
         $entityManager->flush();
 
-        // Response
-        return new JsonResponse([
-            'display' => [
-                'id' => $display->getId(),
-                'label' => $display->getLabel()
-            ]
-        ]);
+        return new JsonResponse(true);
     }
 
     /**
@@ -121,8 +113,4 @@ class DisplayEdit extends AbstractController
         return new JsonResponse(true);
     }
 
-    private function templateTwig($id)
-    {
-        return 'test';
-    }
 }
