@@ -143,24 +143,22 @@ var newPresentation = function(e) {
 
 var newButton = function(e) {
 	e.preventDefault();
-	// var modal = $(this).closest('.modal');
-	// modal.modal('hide');
-	// $.post($(this).attr('action'), $(this).serialize()).done(function() {
-	// 	$.ajax({
-	// 		url: '{{ path("display-table") }}',
-	// 		type: "GET",
-	// 		success: function(data) {
-	// 			$("#nav-all-displays").html(data);
-	// 			$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
-	// 			$('form[action$="/presentations/save"]').on('submit', savePresentation);
-	// 		},
-	// 		error: function(xhr, status, error) {
-	// 			console.log(xhr, status, error);
-	// 		}
-	// 	});
-	// }).fail(function(xhr, status, error) {
-	// 	console.log(xhr, status, error);
-	// });
+	$.post($(this).attr('action'), $(this).serialize()).done(function() {
+		// $.ajax({
+		// 	url: '{{ path("display-table") }}',
+		// 	type: "GET",
+		// 	success: function(data) {
+		// 		$("#nav-all-displays").html(data);
+		// 		$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
+		// 		$('form[action$="/presentations/save"]').on('submit', savePresentation);
+		// 	},
+		// 	error: function(xhr, status, error) {
+		// 		console.log(xhr, status, error);
+		// 	}
+		// });
+	}).fail(function(xhr, status, error) {
+		console.log(xhr, status, error);
+	});
 };
 
 var loadFrames = function(e) {
@@ -213,9 +211,6 @@ $(".carousel-add-new-frame").each(function(){
 });
 $(".display-add-new-pres").each(function(){
 	$(this).on('click', newPresentation);
-});
-$(".controller-add-new-button").each(function(){
-	$(this).on('submit', newButton);
 });
 
 // Swap carousel placeholder when option selected

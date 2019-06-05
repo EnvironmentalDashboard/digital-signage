@@ -21,7 +21,8 @@
       <div class="col-sm-6">
       {{ render(controller('App\\Controller\\Button::listAll')) }}
       <p><button type="button" class="btn btn-link" data-toggle="popover" title="Create new button" data-content='
-        <form class="controller-add-new-button">
+        <form onsubmit="newButton(this)" action="{{ path("button-create") }}" method="POST">
+          <input type="hidden" name="controllerId" value="{{controller.id}}">
           <div class="form-group">
             <label for="buttonDisplaySelect{{controller.id}}">Select display</label>
             <select class="form-control" id="buttonDisplaySelect{{controller.id}}" name="buttonDisplaySelect" onchange="loadFrames(this)" data-target="#frameList{{controller.id}}">
