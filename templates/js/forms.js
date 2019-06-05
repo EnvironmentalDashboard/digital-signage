@@ -141,21 +141,38 @@ var newPresentation = function (e) {
 	$("#display-" + display + "-presentation-edit").append(clone);
 }
 
-var newButton = function (e) {
-	e.preventDefault();
+var newButton = function (ev, el) {
+	ev.preventDefault();
+	var $el = $(el);
+	var controllerId = $el.find('input[name="controllerId"]').val();
+	var target = $('#buttonList' + controllerId);
 	$.ajax({
 		// Your server script to process the upload
-		url: $(this).attr('action'),
+		url: $el.attr('action'),
 		type: 'POST',
 
 		// Form data
-		data: new FormData($(this)),
+		data: new FormData(el),
 
 		// Tell jQuery not to process data or worry about content-type
 		// You *must* include these options!
 		cache: false,
 		contentType: false,
 		processData: false,
+
+		success: function(res) {
+			console.log(res);
+			$.ajax({
+				url: '{{ path("button-list-all") }}',
+				type: "GET",
+				success: function(data) {
+					target.html(data);
+				},
+				error: function(xhr, status, error) {
+					console.log(xhr, status, error);
+				}
+			});
+		},
 
 		// Custom XMLHttpRequest
 		xhr: function () {
@@ -176,22 +193,6 @@ var newButton = function (e) {
 			return myXhr;
 		}
 	});
-	// $.post($(this).attr('action'), $(this).serialize()).done(function () {
-	// 	// $.ajax({
-	// 	// 	url: '{{ path("display-table") }}',
-	// 	// 	type: "GET",
-	// 	// 	success: function(data) {
-	// 	// 		$("#nav-all-displays").html(data);
-	// 	// 		$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
-	// 	// 		$('form[action$="/presentations/save"]').on('submit', savePresentation);
-	// 	// 	},
-	// 	// 	error: function(xhr, status, error) {
-	// 	// 		console.log(xhr, status, error);
-	// 	// 	}
-	// 	// });
-	// }).fail(function (xhr, status, error) {
-	// 	console.log(xhr, status, error);
-	// });
 };
 
 var loadFrames = function (e) {
@@ -261,7 +262,12 @@ $(".controller-select-dropdown").each(function () {
 });
 
 $(function () {
-	$('[data-toggle="popover"]').popover({ html: true });
+	var popovers = $('[data-toggle="popover"]');
+	popovers.popover({ html: true });
+	popovers.on('shown.bs.popover', function (e) {
+		var id = $(e.target).attr('data-displayList');
+		loadFrames(document.getElementById(id));
+	});
 });
 
 // utilities

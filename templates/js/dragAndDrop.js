@@ -35,7 +35,11 @@ function controller_drop_handler(ev) {
 	var text = document.getElementById(id).innerHTML;
 	ev.target.innerHTML = text;
 	var twig_key = ev.target.getAttribute('data-twig');
-	console.log(twig_key);
+	var button_id = id.substring(6); // cut off 'button'
+	var input = document.getElementById('button-arrangement-' + ev.target.parentNode.getAttribute('data-controller'));
+	var cur_elems = JSON.parse(input.value);
+	cur_elems[twig_key] = button_id;
+	input.value = JSON.stringify(cur_elems);
 }
 function dragend_handler(ev) {
 	// Restore source's border

@@ -1,31 +1,36 @@
 <div class="modal-body">
   <div class="form-group">
     <label for="controller_template_for_{{controller.id}}">Select template</label>
-    <select class="form-control controller-select-dropdown" id="controller_template_for_{{controller.id}}" name="controller_template[]" data-controls="#controller-drop-zone-{{controller.id}}">
-        {% if controller.template.id > 3 %} {# todo: hardcoded maximium parent template id #}
-        <option value="-1" selected>Custom</option>
-        {% endif %}
-        <option value="1">2 Buttons</option>
+    <select class="form-control controller-select-dropdown" id="controller_template_for_{{controller.id}}"
+      name="controller_template[]" data-controls="#controller-drop-zone-{{controller.id}}">
+      {% if controller.template.id > 3 %} {# todo: hardcoded maximium parent template id #}
+      <option value="-1" selected>Custom</option>
+      {% endif %}
+      <option value="1">2 Buttons</option>
     </select>
   </div>
   <input type="hidden" name="id[]" value="{{controller.id}}">
   <div class="form-group">
     <p>Drag buttons onto controller:</p>
-    <input type="hidden" name="button-arrangement[]" value='' id="button-arrangement-{{controller.id}}" class="hidden-button-arrangement">
+    <input type="hidden" name="button-arrangement[]" id="button-arrangement-{{controller.id}}"
+      class="hidden-button-arrangement"
+      value='{{ button_arrangements[controller.id]|json_encode|raw }}'>
     <div class="row">
       <div class="col-sm-6">
-        <div style="height: 300px;width: 100%;" class="drop-zone" ondrop="controller_drop_handler(event);" ondragover="dragover_handler(event);" id="controller-drop-zone-{{controller.id}}" data-controller="{{controller.id}}">
+        <div style="height: 300px;width: 100%;" class="drop-zone" ondrop="controller_drop_handler(event);"
+          ondragover="dragover_handler(event);" id="controller-drop-zone-{{controller.id}}"
+          data-controller="{{controller.id}}">
           {{ markup[loop.index-1]|raw }}
         </div>
       </div>
       <div class="col-sm-6">
-      {{ render(controller('App\\Controller\\Button::listAll')) }}
-      <p><button type="button" class="btn btn-link" data-toggle="popover" title="Create new button" data-content='
-        <form onsubmit="newButton(this)" action="{{ path("button-create") }}" method="POST" enctype="multipart/form-data">
+        <div id="buttonList{{controller.id}}">{{ render(controller('App\\Controller\\Button::listAll')) }}</div>
+        <p><button type="button" class="btn btn-link" data-toggle="popover" title="Create new button" data-displayList="buttonDisplaySelect{{controller.id}}" data-content='
+        <form onsubmit="return newButton(event, this)" action="{{ path("button-create") }}" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="controllerId" value="{{controller.id}}">
           <div class="form-group">
             <label for="buttonDisplaySelect{{controller.id}}">Select display</label>
-            <select class="form-control" id="buttonDisplaySelect{{controller.id}}" name="buttonDisplaySelect" onchange="loadFrames(this)" data-target="#frameList{{controller.id}}">
+            <select class="form-control" id="buttonDisplaySelect{{controller.id}}" name="buttonDisplaySelect" onchange="return loadFrames(this)" data-target="#frameList{{controller.id}}">
               {% for display in displays %}
               <option value="{{display.id}}">{{display.label}}</option>
               {% endfor %}
@@ -34,7 +39,7 @@
           <div class="form-group" id="frameList{{controller.id}}">
           </div>
           <div class="form-group">
-            <label for="file{{controller.id}}">Example file input</label>
+            <label for="file{{controller.id}}">Button image</label>
             <input type="file" class="form-control-file" id="file{{controller.id}}" name="file">
           </div>
           <button type="submit" class="btn btn-primary">Submit</button>

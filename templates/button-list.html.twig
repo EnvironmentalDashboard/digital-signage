@@ -1,5 +1,5 @@
 <ul class="list-group list-group-flush">
     {% for button in buttons %}
-        <li class="list-group-item draggable-item" draggable="true" ondragstart="dragstart_handler(event);" ondragend="dragend_handler(event);" id="button{{button.id}}">{{button.label}}</li>
+        <li class="list-group-item draggable-item" draggable="true" ondragstart="dragstart_handler(event);" ondragend="dragend_handler(event);" id="button{{button.id}}">{{button.triggerFrame.url}}</li>
     {% endfor %}
 </ul>

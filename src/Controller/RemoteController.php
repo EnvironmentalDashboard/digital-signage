@@ -41,27 +41,34 @@ class RemoteController extends AbstractController
     {
         $repository = $entityManager->getRepository(Entity\RemoteController::class);
         $rendered = [];
-        $button_arrangements = [];
+        $buttonArrangement = [];
         $entities = $repository->findAll();
 
         foreach ($entities as $controller) {
             $buttons = $controller->getButtons();
             $twig = $controller->getTemplate()->getTwig();
             $template = $this->get('twig')->createTemplate($twig);
-            $button_arrangements = [];
+            $buttonCount = substr_count($twig, '{{'); // the number of twig placeholders in the markup
+            $counter = 1;
+            $controllerButtons = [];
             // compile twig templates
-            foreach ($buttons as $i => $button) {
-                $button_arrangements['btn'.($i+1)] = "trigger {$button->getTriggerFrame()->getUrl()}";
+            foreach ($buttons as $button) {
+                $controllerButtons["btn{$counter}"] = "trigger {$button->getTriggerFrame()->getUrl()}";
+                $buttonArrangement[$controller->getId()]["btn{$counter}"] = $button->getId();
+                $counter++;
+            }
+            for (; $counter <= $buttonCount; $counter++) { // if we're missing buttons create dummy ones so can still compile twig
+                $controllerButtons["btn{$counter}"] = "placeholder";
             }
             // setup blank button that can be edited for controllers with no buttons
             if (count($buttons) === 0) {
-                $button_arrangements['btn1'] = "placeholder";
-                $button_arrangements['btn2'] = "placeholder";
+                $controllerButtons['btn1'] = "placeholder";
+                $controllerButtons['btn2'] = "placeholder";
             }
-            $rendered[] = $template->render($button_arrangements);
+            $rendered[] = $template->render($controllerButtons);
         }
 
-        return $this->render('remote-controller-table.html.twig', ['controllers' => $entities, 'markup' => $rendered, 'displays' => $entityManager->getRepository(Entity\Display::class)->findAll()]);
+        return $this->render('remote-controller-table.html.twig', ['controllers' => $entities, 'markup' => $rendered, 'button_arrangements' => $buttonArrangement, 'displays' => $entityManager->getRepository(Entity\Display::class)->findAll()]);
     }
 
     /**
