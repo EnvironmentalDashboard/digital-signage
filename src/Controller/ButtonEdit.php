@@ -23,6 +23,15 @@ class ButtonEdit extends AbstractController
         $displayId = $request->request->get('buttonDisplaySelect');
         $frameId = $request->request->get('buttonFrameSelect');
         $controllerId = $request->request->get('controllerId');
+        $image = $request->files->get('file');
+        $path = '/var/www/html/uploads/';
+        $name = $image->getClientOriginalName();
+        if ($image->isValid()) {
+            if (file_exists($path . $name)) {
+                $name = uniqid() . '.' . $image->guessClientExtension();
+            }
+            $image->move($path, $name);
+        }
 
         $display = $entityManager->getRepository(Entity\Display::class)->find($displayId);
         $frame = $entityManager->getRepository(Entity\Frame::class)->find($frameId);
@@ -33,6 +42,7 @@ class ButtonEdit extends AbstractController
         $button->setTriggerFrame($frame);
         $button->setController($controller);
         $button->setTwigKey('btn1');
+        $button->setImage($path . $name);
 
         $entityManager->persist($button);
         $entityManager->flush();

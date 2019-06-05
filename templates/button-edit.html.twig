@@ -21,7 +21,7 @@
       <div class="col-sm-6">
       {{ render(controller('App\\Controller\\Button::listAll')) }}
       <p><button type="button" class="btn btn-link" data-toggle="popover" title="Create new button" data-content='
-        <form onsubmit="newButton(this)" action="{{ path("button-create") }}" method="POST">
+        <form onsubmit="newButton(this)" action="{{ path("button-create") }}" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="controllerId" value="{{controller.id}}">
           <div class="form-group">
             <label for="buttonDisplaySelect{{controller.id}}">Select display</label>
@@ -34,8 +34,8 @@
           <div class="form-group" id="frameList{{controller.id}}">
           </div>
           <div class="form-group">
-            <label for="exampleFormControlFile1">Example file input</label>
-            <input type="file" class="form-control-file" id="exampleFormControlFile1">
+            <label for="file{{controller.id}}">Example file input</label>
+            <input type="file" class="form-control-file" id="file{{controller.id}}" name="file">
           </div>
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
