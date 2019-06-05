@@ -27,19 +27,19 @@
   <div style="height:50px;clear:both;"></div>
   <div class="row">
     <div class="col-3">
-      <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-        <a class="nav-link active" id="v-pills-display-tab" data-toggle="pill" href="#v-pills-displays" role="tab"
-          aria-controls="v-pills-displays" aria-selected="true">Displays</a>
-        <a class="nav-link" id="v-pills-carousels-tab" data-toggle="pill" href="#v-pills-carousels" role="tab"
-          aria-controls="v-pills-carousels" aria-selected="false">Carousels</a>
-        <a class="nav-link" id="v-pills-remote-controllers-tab" data-toggle="pill" href="#v-pills-settings" role="tab"
-          aria-controls="v-pills-settings" aria-selected="false">Remote Controllers</a>
+      <div class="nav flex-column nav-pills" id="tab" role="tablist" aria-orientation="vertical">
+        <a class="nav-link active" id="display-tab" data-toggle="pill" href="#displays" role="tab"
+          aria-controls="displays" aria-selected="true">Displays</a>
+        <a class="nav-link" id="carousels-tab" data-toggle="pill" href="#carousels" role="tab"
+          aria-controls="carousels" aria-selected="false">Carousels</a>
+        <a class="nav-link" id="remote-controllers-tab" data-toggle="pill" href="#controllers" role="tab"
+          aria-controls="controllers" aria-selected="false">Remote Controllers</a>
       </div>
     </div>
     <div class="col-9">
-      <div class="tab-content" id="v-pills-tabContent">
-        <div class="tab-pane fade show active" id="v-pills-displays" role="tabpanel"
-          aria-labelledby="v-pills-display-tab">
+      <div class="tab-content" id="tabContent">
+        <div class="tab-pane fade show active" id="displays" role="tabpanel"
+          aria-labelledby="display-tab">
           <nav>
             <div class="nav nav-tabs justify-content-end" id="nav-tab-display" role="tablist">
               <a class="nav-item nav-link active" id="nav-all-displays-tab" data-toggle="tab" href="#nav-all-displays"
@@ -93,7 +93,7 @@
             </div>
           </div>
         </div>
-        <div class="tab-pane fade" id="v-pills-carousels" role="tabpanel" aria-labelledby="v-pills-carousels-tab">
+        <div class="tab-pane fade" id="carousels" role="tabpanel" aria-labelledby="carousels-tab">
           <nav>
             <div class="nav nav-tabs justify-content-end" id="nav-tab-carousel" role="tablist">
               <a class="nav-item nav-link active" id="nav-all-carousels-tab" data-toggle="tab" href="#nav-all-carousels"
@@ -128,8 +128,8 @@
             </div>
           </div>
         </div>
-        <div class="tab-pane fade" id="v-pills-settings" role="tabpanel"
-          aria-labelledby="v-pills-remote-controllers-tab">
+        <div class="tab-pane fade" id="controllers" role="tabpanel"
+          aria-labelledby="remote-controllers-tab">
           <nav>
             <div class="nav nav-tabs justify-content-end" id="nav-tab-remote-controller" role="tablist">
               <a class="nav-item nav-link active" id="nav-all-controllers-tab" data-toggle="tab"

@@ -27,4 +27,25 @@ class Frame extends AbstractController
 
         return $this->render('frame-list-edit.html.twig', ['frames' => $entities]);
     }
+
+    /**
+     * frame-list-by-display
+     */
+    public function listByDisplay(Request $request, $id, EntityManagerInterface $entityManager)
+    {
+        $repository = $entityManager->getRepository(Entity\Display::class);
+        $frames = [];
+
+        $display = $repository->find($id);
+        foreach ($display->getPresentations() as $presentation) {
+            $maps = $presentation->getCarouselPresentationMaps();
+            foreach ($maps as $map) {
+                foreach ($map->getCarousel()->getFrames() as $frame) {
+                    $frames[] = ['id' => $frame->getId(), 'url' => $frame->getUrl()];
+                }
+            }
+        }
+
+        return new JsonResponse($frames);
+    }
 }

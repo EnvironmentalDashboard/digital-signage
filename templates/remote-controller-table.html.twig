@@ -19,7 +19,7 @@
             <td>{{ controller.buttons|length }}</td>
             <td class="form-inline" style="min-width: 160px">
                 <button type="button" class="btn btn-primary mr-2" data-toggle="modal"
-                    data-target="#controller-{{controller.id}}-createButtonModal">Edit</button>
+                    data-target="#controller-{{controller.id}}-editControllerModal">Edit</button>
                 <form action="{{ path('controller-delete', {'id': controller.id}) }}" method="POST">
                     <input type="submit" class="btn btn-danger" value="Delete">
                 </form>
@@ -30,13 +30,13 @@
 </table>
 
 {% for controller in controllers %}
-<div class="modal fade" id="controller-{{controller.id}}-createButtonModal" tabindex="-1" role="dialog"
-    aria-labelledby="createButtonModalLabel" aria-hidden="true">
+<div class="modal fade" id="controller-{{controller.id}}-editControllerModal" tabindex="-1" role="dialog"
+    aria-labelledby="editControllerModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form action="{{ path('controller-save-buttons', {'id': controller.id}) }}" method="POST">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createButtonModalLabel">Add Button</h5>
+                    <h5 class="modal-title" id="editControllerModalLabel">Edit remote controller</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

@@ -20,6 +20,25 @@
       </div>
       <div class="col-sm-6">
       {{ render(controller('App\\Controller\\Button::listAll')) }}
+      <p><button type="button" class="btn btn-link" data-toggle="popover" title="Create new button" data-content='
+        <form class="controller-add-new-button">
+          <div class="form-group">
+            <label for="buttonDisplaySelect{{controller.id}}">Select display</label>
+            <select class="form-control" id="buttonDisplaySelect{{controller.id}}" name="buttonDisplaySelect" onchange="loadFrames(this)" data-target="#frameList{{controller.id}}">
+              {% for display in displays %}
+              <option value="{{display.id}}">{{display.label}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group" id="frameList{{controller.id}}">
+          </div>
+          <div class="form-group">
+            <label for="exampleFormControlFile1">Example file input</label>
+            <input type="file" class="form-control-file" id="exampleFormControlFile1">
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        '>Add button</button></p>
       </div>
     </div>
   </div>

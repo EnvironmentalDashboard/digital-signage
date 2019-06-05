@@ -61,7 +61,7 @@ class RemoteController extends AbstractController
             $rendered[] = $template->render($button_arrangements);
         }
 
-        return $this->render('remote-controller-table.html.twig', ['controllers' => $entities, 'markup' => $rendered]);
+        return $this->render('remote-controller-table.html.twig', ['controllers' => $entities, 'markup' => $rendered, 'displays' => $entityManager->getRepository(Entity\Display::class)->findAll()]);
     }
 
     /**

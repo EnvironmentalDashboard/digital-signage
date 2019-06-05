@@ -141,6 +141,51 @@ var newPresentation = function(e) {
 	$("#display-" + display + "-presentation-edit").append(clone);
 }
 
+var newButton = function(e) {
+	e.preventDefault();
+	// var modal = $(this).closest('.modal');
+	// modal.modal('hide');
+	// $.post($(this).attr('action'), $(this).serialize()).done(function() {
+	// 	$.ajax({
+	// 		url: '{{ path("display-table") }}',
+	// 		type: "GET",
+	// 		success: function(data) {
+	// 			$("#nav-all-displays").html(data);
+	// 			$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
+	// 			$('form[action$="/presentations/save"]').on('submit', savePresentation);
+	// 		},
+	// 		error: function(xhr, status, error) {
+	// 			console.log(xhr, status, error);
+	// 		}
+	// 	});
+	// }).fail(function(xhr, status, error) {
+	// 	console.log(xhr, status, error);
+	// });
+};
+
+var loadFrames = function(e) {
+	var select = $(e);
+	var target = $(select.data('target'));
+	var id = select.val();
+	$.ajax({
+		url: '/digital-signage/display/' + id + '/frame/all',
+		type: "GET",
+		success: function(data) {
+			var markup = '<label for="'+id+'">Select frame</label><select class="form-control" id="'+id+'" name="buttonFrameSelect">';
+			for (var i = 0; i < data.length; i++) {
+				var frame = data[i];
+				var id = guidGenerator();
+				markup += '<option value="'+frame.id+'">'+frame.url+'</option>';
+			}
+			markup += '</select>';
+			target.html(markup);
+		},
+		error: function(xhr, status, error) {
+			console.log(xhr, status, error);
+		}
+	});
+};
+
 var displayDropdownTemplate = function(e) {
 	e.preventDefault();
 	var controls = $(this).data('controls');
@@ -169,11 +214,14 @@ $(".carousel-add-new-frame").each(function(){
 $(".display-add-new-pres").each(function(){
 	$(this).on('click', newPresentation);
 });
+$(".controller-add-new-button").each(function(){
+	$(this).on('submit', newButton);
+});
 
 // Swap carousel placeholder when option selected
 /* {% spaceless %} */
 var displayTemplates = [ '{{ render(controller("App\\Controller\\Display::template",{"name": "fullscreen"})) }}',
-													'{{ render(controller("App\\Controller\\Display::template", {"name": "marquee"})) }}' ];
+						 '{{ render(controller("App\\Controller\\Display::template", {"name": "marquee"})) }}' ];
 var controllerTemplates = ['{{ render(controller("App\\Controller\\RemoteController::template", {"name": "2 Buttons"})) }}' ];
 /* {% endspaceless %} */
 
@@ -184,6 +232,9 @@ $(".controller-select-dropdown").each(function(){
 	$(this).on('change', controllerDropdownTemplate);
 });
 
+$(function () {
+	$('[data-toggle="popover"]').popover({html: true});
+});
 
 // utilities
 function randomize_ids(container_div) {
