@@ -93,7 +93,7 @@ button-list-by-controller:
   methods: GET
 button-list-all:
   path: /button/all
-  controller: App\Controller\Button::listByController
+  controller: App\Controller\Button::listAll
   methods: GET
 button-create:
   path: /button/create/
