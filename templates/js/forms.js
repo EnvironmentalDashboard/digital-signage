@@ -147,6 +147,8 @@ var newButton = function (ev, el) {
 	var controllerId = $el.find('input[name="controllerId"]').val();
 	var target = $('#buttonList' + controllerId);
 	var progressBar = $('#progress-bar' + controllerId);
+	var progressBarContainer = progressBar.parent();
+	progressBarContainer.css('display', '');
 	$.ajax({
 		// Your server script to process the upload
 		url: $el.attr('action'),
@@ -168,6 +170,9 @@ var newButton = function (ev, el) {
 				type: "GET",
 				success: function(data) {
 					target.html(data);
+					setTimeout(function() {
+						progressBarContainer.css('display', 'none');	
+					}, 2000);
 				},
 				error: function(xhr, status, error) {
 					console.log(xhr, status, error);

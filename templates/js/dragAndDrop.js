@@ -32,7 +32,7 @@ function drop_handler(ev) {
 function controller_drop_handler(ev) {
 	ev.preventDefault();
 	var id = ev.dataTransfer.getData("text");
-	var text = document.getElementById(id).innerHTML;
+	var text = document.getElementById(id).getAttribute('src');
 	ev.target.innerHTML = text;
 	var twig_key = ev.target.getAttribute('data-twig');
 	var button_id = id.substring(6); // cut off 'button'

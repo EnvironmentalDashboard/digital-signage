@@ -14,5 +14,5 @@ then
 else
 	# dev env:
 	# (bind mount code so changes to code don't require image rebuild, bind mount sqlite db so data persists across rebuilds)
-	docker run -dit -p 5000:80 -p 5001:8080 --restart always -v $(pwd)/uploads:/var/www/html/public/uploads -v $(pwd)/var:/var/www/html/var/ -v $(pwd):/var/www/html/ -e APP_ENV=dev --name DEV_DS digital-signage
+	docker run -dit -p 5000:80 -p 5001:8080 --restart always -v $(pwd)/public/uploads:/var/www/html/public/uploads -v $(pwd)/var:/var/www/html/var/ -v $(pwd):/var/www/html/ -e APP_ENV=dev --name DEV_DS digital-signage
 fi
