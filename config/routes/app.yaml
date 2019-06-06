@@ -72,7 +72,7 @@ controller-delete:
   path: /remote/{id}/delete
   controller: App\Controller\RemoteControllerEdit::delete
   methods: POST
-controller-table-all:
+controller-table:
   path: /remote/table
   controller: App\Controller\RemoteController::table
   methods: GET

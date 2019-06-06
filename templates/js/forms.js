@@ -3,7 +3,7 @@ var createCarousel = function (e) {
 	e.preventDefault();
 	var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
 	input.addClass('is-valid');
-	submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class= "sr-only">Loading...</span></div>');
+	submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class="sr-only">Loading...</span></div>');
 	// Update carousel list & modals
 	$.post($(this).attr('action'), $(this).serialize()).done(function () {
 		$.ajax({
@@ -37,7 +37,7 @@ var createDisplay = function (e) {
 	e.preventDefault();
 	var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
 	input.addClass('is-valid');
-	submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class= "sr-only">Loading...</span></div>');
+	submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class="sr-only">Loading...</span></div>');
 	// Update display list & modals
 	$.post($(this).attr('action'), $(this).serialize()).done(function () {
 		$.ajax({
@@ -51,6 +51,37 @@ var createDisplay = function (e) {
 				submit.html('Create display');
 				$('#nav-all-displays-tab').tab('show');
 				var new_row = $('#nav-all-displays > table > tbody > tr:last-child');
+				new_row.addClass('table-primary');
+				setTimeout(function () { new_row.removeClass('table-primary'); }, 1500);
+			},
+			error: function (xhr, status, error) {
+				console.log(xhr, status, error);
+			}
+		});
+	}).fail(function (xhr, status, error) {
+		console.log(xhr, status, error);
+	});
+};
+
+// Submit event to fire when create remote controller form submitted
+var createController = function (e) {
+	e.preventDefault();
+	var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
+	input.addClass('is-valid');
+	submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class="sr-only">Loading...</span></div>');
+	// Update display list & modals
+	$.post($(this).attr('action'), $(this).serialize()).done(function () {
+		$.ajax({
+			url: '{{ path("controller-table") }}',
+			type: "GET",
+			success: function (data) {
+				$("#nav-all-controllers").html(data);
+				$('form[action="{{ path("controller-create") }}"]').on('submit', createController); // Re-apply submit event to new forms
+				input.removeClass('is-valid');
+				input.val('');
+				submit.html('Create remote controller');
+				$('#nav-all-controllers-tab').tab('show');
+				var new_row = $('#nav-all-controllers > table > tbody > tr:last-child');
 				new_row.addClass('table-primary');
 				setTimeout(function () { new_row.removeClass('table-primary'); }, 1500);
 			},
@@ -239,6 +270,7 @@ var controllerDropdownTemplate = function (e) {
 
 $('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
 $('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
+$('form[action="{{ path("controller-create") }}"]').on('submit', createController);
 $('form[action$="/presentations/save"]').on('submit', savePresentation);
 $('form[action$="/frames/save"]').on('submit', saveFrame);
 $('.detect-duration').each(function () {

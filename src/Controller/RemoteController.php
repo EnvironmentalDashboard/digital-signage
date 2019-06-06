@@ -35,7 +35,7 @@ class RemoteController extends AbstractController
     }
 
     /**
-     * controller-table-all
+     * controller-table
      */
     public function table(Request $request, EntityManagerInterface $entityManager)
     {
