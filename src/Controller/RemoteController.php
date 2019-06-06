@@ -45,6 +45,7 @@ class RemoteController extends AbstractController
         $entities = $repository->findAll();
 
         foreach ($entities as $controller) {
+            $controllerId = $controller->getId();
             $buttons = $controller->getButtons();
             $twig = $controller->getTemplate()->getTwig();
             $template = $this->get('twig')->createTemplate($twig);
@@ -54,16 +55,12 @@ class RemoteController extends AbstractController
             // compile twig templates
             foreach ($buttons as $button) {
                 $controllerButtons["btn{$counter}"] = "trigger {$button->getTriggerFrame()->getUrl()}";
-                $buttonArrangement[$controller->getId()]["btn{$counter}"] = $button->getId();
+                $buttonArrangement[$controllerId]["btn{$counter}"] = $button->getId();
                 $counter++;
             }
             for (; $counter <= $buttonCount; $counter++) { // if we're missing buttons create dummy ones so can still compile twig
                 $controllerButtons["btn{$counter}"] = "placeholder";
-            }
-            // setup blank button that can be edited for controllers with no buttons
-            if (count($buttons) === 0) {
-                $controllerButtons['btn1'] = "placeholder";
-                $controllerButtons['btn2'] = "placeholder";
+                $buttonArrangement[$controllerId]["btn{$counter}"] = 0;
             }
             $rendered[] = $template->render($controllerButtons);
         }
@@ -94,13 +91,28 @@ class RemoteController extends AbstractController
     public function template(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory, $name)
     {
         switch ($name) {
+            case '2 Buttons':
+                $templateId = -3;
+                break;
+            case '4 Buttons':
+                $templateId = -4;
+                break;
+            case '8 Buttons':
+                $templateId = -5;
+                break;
             default:
-                $template_id = 3;
+                $templateId = -3;
                 break;
         }
-        $template = $templateFactory->cloneParent($template_id);
+
+        $template = $templateFactory->getParent($templateId);
         $twig = $template->getTwig();
         $template = $this->get('twig')->createTemplate($twig);
-        return new Response($template->render(['btn1' => 'drag button here', 'btn2' => 'drag button here'])); // need to include all possible twig keys
+        return new Response($template->render(
+            array_fill_keys(array_map( // need to include all possible twig keys
+                function ($n) { return "btn{$n}"; },
+                range(1, 8)
+            ), 'drag button here')
+        ));
     }
 }

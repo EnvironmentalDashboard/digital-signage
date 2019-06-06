@@ -76,7 +76,7 @@ class Display extends AbstractController
             }
             // setup blank presentation that can be edited for displays with no presentations
             if (count($presentations) === 0) {
-                $template = $templateFactory->cloneParent(1); // pick a default template
+                $template = $templateFactory->cloneParent(-1); // pick a default template
                 $tmp = new Entity\Presentation;
                 $tmp->setTemplate($template);
                 $tmp->setDisplay($display);
@@ -102,18 +102,18 @@ class Display extends AbstractController
     {
         switch ($name) {
             case 'fullscreen':
-                $template_id = 1;
+                $template_id = -1;
                 break;
             
             case 'marquee':
-                $template_id = 2;
+                $template_id = -2;
                 break;
             
             default:
-                $template_id = 1;
+                $template_id = -1;
                 break;
         }
-        $template = $templateFactory->cloneParent($template_id);
+        $template = $templateFactory->getParent($template_id);
         $twig = $template->getTwig();
         $template = $this->get('twig')->createTemplate($twig);
         return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here'])); // need to include all possible twig keys

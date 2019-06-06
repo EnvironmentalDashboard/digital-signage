@@ -82,10 +82,10 @@ controller-save-buttons:
   methods: POST
 controller-template:
   path: /remote/template/{name}
-  controller: App\Controller\Display::template
+  controller: App\Controller\RemoteController::template
   methods: GET
   requirements:
-    name: "2 Buttons"
+    name: "2 Buttons|4 Buttons|8 Buttons"
 
 button-list-by-controller:
   path: /remote/{id}/button/all

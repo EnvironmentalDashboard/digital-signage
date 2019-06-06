@@ -8,7 +8,7 @@ INSERT INTO `display` (`id`, `label`)
 VALUES (1, 'display 1');
 
 INSERT INTO `presentation` (`id`, `template_id`, `display_id`, `label`, `skip`, `duration`)
-VALUES (1, 2, 1, 'marquee pres', 0, 25000), (2, 1, 1, 'fullscreen pres', 0, 25000);
+VALUES (1, -2, 1, 'marquee pres', 0, 25000), (2, -1, 1, 'fullscreen pres', 0, 25000);
 
 INSERT INTO `carousel_presentation_map` (`id`, `presentation_id`, `carousel_id`, `template_key`)
 VALUES (1, 2, 1, 'url1'), (2, 1, 3, 'url1'), (3, 1, 2, 'url2');
