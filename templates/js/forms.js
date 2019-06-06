@@ -146,6 +146,7 @@ var newButton = function (ev, el) {
 	var $el = $(el);
 	var controllerId = $el.find('input[name="controllerId"]').val();
 	var target = $('#buttonList' + controllerId);
+	var progressBar = $('#progress-bar' + controllerId);
 	$.ajax({
 		// Your server script to process the upload
 		url: $el.attr('action'),
@@ -182,11 +183,9 @@ var newButton = function (ev, el) {
 				// For handling the progress of the upload
 				myXhr.upload.addEventListener('progress', function (e) {
 					if (e.lengthComputable) {
-						// progress.attr({
-						// 	value: e.loaded,
-						// 	max: e.total,
-						// });
-						console.log(e.loaded/e.total);
+						var pct = (e.loaded/e.total) * 100;
+						progressBar.attr('aria-valuenow', pct);
+						progressBar.css('width', pct + '%');
 					}
 				}, false);
 			}
@@ -251,7 +250,9 @@ $(".display-add-new-pres").each(function () {
 /* {% spaceless %} */
 var displayTemplates = ['{{ render(controller("App\\Controller\\Display::template",{"name": "fullscreen"})) }}',
 	'{{ render(controller("App\\Controller\\Display::template", {"name": "marquee"})) }}'];
-var controllerTemplates = ['{{ render(controller("App\\Controller\\RemoteController::template", {"name": "2 Buttons"})) }}'];
+var controllerTemplates = ['{{ render(controller("App\\Controller\\RemoteController::template", {"name": "2 Buttons"})) }}',
+						'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "4 Buttons"})) }}',
+						'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "8 Buttons"})) }}'	];
 /* {% endspaceless %} */
 
 $(".template-select-dropdown").each(function () {
