@@ -136,12 +136,12 @@ class Display extends AbstractController
                 $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
                 $googleSlides = $repository->findOneBy(['presentationId' => $presId]);
                 if ($googleSlides === null) {
-                    return "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
+                    return "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
                 }
                 $iframes = [];
                 foreach ($googleSlides->getData() as $key => $value) {
                     $key = $key + 1;
-                    $iframes[] = "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview#slide={$key}' id='frame{$frame->getId()}-{$key}' data-duration='{$value}' frameborder='0' {$hidden}></iframe>";
+                    $iframes[] = "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal#slide={$key}' id='frame{$frame->getId()}-{$key}' data-duration='{$value}' frameborder='0' {$hidden}></iframe>";
                     $hidden = 'class="fade-out"';
                 }
                 return implode('', $iframes);
