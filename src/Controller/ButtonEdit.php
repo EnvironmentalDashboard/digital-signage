@@ -33,13 +33,13 @@ class ButtonEdit extends AbstractController
             throw new Exception("Missing fields: need to POST 'buttonDisplaySelect', 'buttonFrameSelect', 'controllerId', 'file'");
         }
         if ($image->isValid()) {
-            $path = '/var/www/html/uploads/';
+            $path = '/var/www/html/public/uploads/';
             $name = $image->getClientOriginalName();
             if (file_exists($path . $name)) {
                 $name = uniqid() . '.' . $image->guessClientExtension();
             }
             $image->move($path, $name);
-            $button->setImage($path . $name);
+            $button->setImage($name);
         }
 
         $display = $entityManager->getRepository(Entity\Display::class)->find($displayId);

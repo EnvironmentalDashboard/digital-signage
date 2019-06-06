@@ -1,6 +1,6 @@
 /config/secrets.yaml
+/public/uploads/
 .DS_Store
-/uploads/
 composer.phar
 ###> symfony/framework-bundle ###
 /.env.local
