@@ -30,7 +30,7 @@ class RemoteController
     private $template;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Button", mappedBy="controller", orphanRemoval=true)
+     * @ORM\ManyToMany(targetEntity="App\Entity\Button", mappedBy="controller")
      */
     private $buttons;
 

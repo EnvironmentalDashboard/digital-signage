@@ -48,7 +48,7 @@ class ButtonEdit extends AbstractController
 
         $button->setOnDisplay($display);
         $button->setTriggerFrame($frame);
-        $button->setController($controller);
+        $button->addController($controller);
 
         $entityManager->persist($button);
         $entityManager->flush();

@@ -1,8 +1,8 @@
 <div class="modal-body">
   <div class="form-group">
-    <label for="controller_template_for_{{controller.id}}">Select template</label>
-    <select class="form-control controller-select-dropdown" id="controller_template_for_{{controller.id}}"
-      name="controller_template[]" data-controls="#controller-drop-zone-{{controller.id}}">
+    <label for="controller-template-for-{{controller.id}}">Select template</label>
+    <select class="form-control controller-select-dropdown" id="controller-template-for-{{controller.id}}"
+      name="controller-template" data-controls="#controller-drop-zone-{{controller.id}}">
       {% if controller.template.id > 0 %}
       <option value="0" selected>Custom</option>
       {% endif %}
@@ -11,10 +11,10 @@
       <option value="3">8 Buttons</option>
     </select>
   </div>
-  <input type="hidden" name="id[]" value="{{controller.id}}">
+  <input type="hidden" name="id" value="{{controller.id}}">
   <div class="form-group">
     <p>Drag buttons onto controller:</p>
-    <input type="hidden" name="button-arrangement[]" id="button-arrangement-{{controller.id}}"
+    <input type="hidden" name="button-arrangement" id="button-arrangement-{{controller.id}}"
       class="hidden-button-arrangement"
       value='{{ button_arrangements[controller.id]|json_encode|raw }}'>
     <div class="row">

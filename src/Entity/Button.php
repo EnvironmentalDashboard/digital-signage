@@ -17,8 +17,7 @@ class Button
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\RemoteController", inversedBy="buttons")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToMany(targetEntity="App\Entity\RemoteController", inversedBy="buttons")
      */
     private $controller;
 
@@ -44,19 +43,38 @@ class Button
      */
     private $image;
 
+    public function __construct()
+    {
+        $this->controller = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getController(): ?RemoteController
+    /**
+     * @return Collection|RemoteController[]
+     */
+    public function getController(): Collection
     {
         return $this->controller;
     }
 
-    public function setController(?RemoteController $controller): self
+    public function addController(RemoteController $controller): self
     {
-        $this->controller = $controller;
+        if (!$this->controller->contains($controller)) {
+            $this->controller[] = $controller;
+        }
+
+        return $this;
+    }
+
+    public function removeController(RemoteController $controller): self
+    {
+        if ($this->controller->contains($controller)) {
+            $this->controller->removeElement($controller);
+        }
 
         return $this;
     }
