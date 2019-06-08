@@ -80,6 +80,10 @@ controller-save-buttons:
   path: /remote/{id}/buttons/save
   controller: App\Controller\RemoteControllerEdit::saveButtons
   methods: POST
+controller-url:
+  path: /remote/{id}
+  controller: App\Controller\RemoteController::show
+  methods: GET
 controller-template:
   path: /remote/template/{name}
   controller: App\Controller\RemoteController::template

@@ -17,6 +17,27 @@ class RemoteController extends AbstractController
 {
 
     /**
+     * controller-url
+     */
+    public function show($id, Request $request, EntityManagerInterface $entityManager)
+    {
+        $repository = $entityManager->getRepository(Entity\RemoteController::class);
+        $controller = $repository->find($id);
+        if (!$controller) {
+            throw new \Exception("No remote controller with id {$id}");
+        }
+
+        $twigKeys = [];
+        foreach ($controller->getButtons() as $button) {
+            $twigKeys[$button->getTwigKey()] = "<img data-id='{$button->getId()}' src='{$this->generateUrl('index')}uploads/{$button->getImage()}' />";
+        }
+        $twigKeys['controllerId'] = $id;
+        $twig = '{% include "remote-controller-top.html.twig" %}' . $controller->getTemplate()->getTwig() . '{% include "remote-controller-bottom.html.twig" %}';
+        $template = $this->get('twig')->createTemplate($twig);
+        return new Response($template->render($twigKeys));
+    }
+
+    /**
      * remote-controller
      */
     public function getController($id, Request $request, EntityManagerInterface $entityManager)
@@ -79,13 +100,6 @@ class RemoteController extends AbstractController
     }
 
     /**
-     * controller-save-buttons
-     */
-    public function saveButtons(Request $request, EntityManagerInterface $entityManager)
-    {
-    }
-
-    /**
      * controller-template
      */
     public function template(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory, $name)
@@ -110,7 +124,9 @@ class RemoteController extends AbstractController
         $template = $this->get('twig')->createTemplate($twig);
         return new Response($template->render(
             array_fill_keys(array_map( // need to include all possible twig keys
-                function ($n) { return "btn{$n}"; },
+                function ($n) {
+                    return "btn{$n}";
+                },
                 range(1, 8)
             ), 'drag button here')
         ));

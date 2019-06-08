@@ -8,6 +8,7 @@
             <th scope="col" style="border-top:none">#</th>
             <th scope="col" style="border-top:none">Label</th>
             <th scope="col" style="border-top:none">Buttons</th>
+            <th scope="col" style="border-top:none">URL</th>
             <th scope="col" style="border-top:none">&nbsp;</th>
         </tr>
     </thead>
@@ -17,6 +18,12 @@
             <th scope="row">{{loop.index}}</th>
             <td>{{ controller.label }}</td>
             <td>{{ controller.buttons|length }}</td>
+            <td>
+                {% if controller.buttons|length > 0 %}
+                <a href="{{ path('controller-url', {'id': controller.id}) }}"
+                    target="_blank">{{ path('controller-url', {'id': controller.id}) }}</a>
+                {% endif %}
+            </td>
             <td class="form-inline" style="min-width: 160px">
                 <button type="button" class="btn btn-primary mr-2" data-toggle="modal"
                     data-target="#controller-{{controller.id}}-editControllerModal">Edit</button>
@@ -44,7 +51,7 @@
                 {% include 'button-edit.html.twig' %}
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
                 </div>
             </form>
         </div>
