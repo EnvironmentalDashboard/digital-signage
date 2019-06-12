@@ -40,8 +40,8 @@ class WebsocketCommand extends Command
             $output->writeln('Starting...');
             // $app = IoServer::factory(new HttpServer(new WsServer(new WsManager())), 8080);
             $app = new App("localhost", 8080, '0.0.0.0');
-            $app->route('/remote-controller/{id}', $this->manager, ['*']);
-            $app->route('/display/{id}', $this->manager, ['*']);
+            $app->route('/digital-signage/websockets/remote-controller/{id}', $this->manager, ['*']);
+            $app->route('/digital-signage/websockets/display/{id}', $this->manager, ['*']);
             $app->run();
 
     }
