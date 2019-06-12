@@ -1,11 +1,12 @@
 // open websocket conn to recieve commands from remote controllers
 /*{% set wsPort = app.request.port + 1 %}*/
-var conn = new WebSocket("ws://{{app.request.host}}:{{wsPort}}/display/{{ app.request.get('id') }}");
+// var conn = new WebSocket("ws://{{app.request.host}}:{{wsPort}}/display/{{ app.request.get('id') }}");
+var conn = new WebSocket("ws://environmentaldashboard.org/digital-signage/websockets/display/{{ app.request.get('id') }}");
 conn.onmessage = function (e) {
 	var frame_id = parseInt(e.data);
-	if (e.origin !== 'ws://{{app.request.host}}:{{wsPort}}' || frame_id < 1) {
-		return;
-	}
+	// if (e.origin !== 'ws://{{app.request.host}}:{{wsPort}}' || frame_id < 1) {
+	// 	return;
+	// }
 	var frame = document.getElementById('frame' + frame_id);
 	if (frame === null) {
 		console.log(e.data);
