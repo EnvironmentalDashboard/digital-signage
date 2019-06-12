@@ -230,6 +230,28 @@ var newButton = function (ev, el) {
 	});
 };
 
+var saveButton = function (e) {
+	e.preventDefault();
+	var modal = $(this).closest('.modal');
+	modal.modal('hide');
+	$.post($(this).attr('action'), $(this).serialize()).done(function () {
+		$.ajax({
+			url: '{{ path("controller-table") }}',
+			type: "GET",
+			success: function (data) {
+				$("#nav-all-controllers").html(data);
+				$('form[action="{{ path("controller-create") }}"]').on('submit', createController);
+				$('form[action$="/frames/save"]').on('submit', saveFrame);
+			},
+			error: function (xhr, status, error) {
+				console.log(xhr, status, error);
+			}
+		});
+	}).fail(function (xhr, status, error) {
+		console.log(xhr, status, error);
+	});
+};
+
 var loadFrames = function (e) {
 	var select = $(e);
 	var target = $(select.data('target'));
@@ -273,6 +295,7 @@ $('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
 $('form[action="{{ path("controller-create") }}"]').on('submit', createController);
 $('form[action$="/presentations/save"]').on('submit', savePresentation);
 $('form[action$="/frames/save"]').on('submit', saveFrame);
+$('form[action$="/buttons/save"]').on('submit', saveButton);
 $('.detect-duration').each(function () {
 	$(this).on('input', detectDuration);
 });
