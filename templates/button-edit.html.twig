@@ -19,7 +19,7 @@
       value='{{ button_arrangements[controller.id]|json_encode|raw }}'>
     <div class="row">
       <div class="col-sm-6">
-        <div style="height: 300px;width: 100%;" class="drop-zone" ondrop="controller_drop_handler(event);"
+        <div style="height: 300px;width: 100%;display: inline-flex; flex-flow: row wrap; justify-content: center; align-items: center;" class="drop-zone" ondrop="controller_drop_handler(event);"
           ondragover="dragover_handler(event);" id="controller-drop-zone-{{controller.id}}"
           data-controller="{{controller.id}}">
           {{ markup[loop.index-1]|raw }}
