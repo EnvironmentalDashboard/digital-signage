@@ -53,10 +53,7 @@ class Button
         return $this->id;
     }
 
-    /**
-     * @return Collection|RemoteController[]
-     */
-    public function getController(): Collection
+    public function getController(): ?RemoteController
     {
         return $this->controller;
     }
