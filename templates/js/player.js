@@ -18,7 +18,9 @@ function next_pres() {
 	for (var i = 0; i < carousels.length; i++) {
 		animate_carousel(carousels[i].children);
 	}
-	setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
+	if (pres_durations[pres_ids[cur_pres]] !== 0) {
+		setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);	
+	}
 }
 
 function animate_carousel(frames) {
@@ -91,7 +93,9 @@ function clear_timers() {
 }
 
 // begin cycling through presentations
-setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);
+if (pres_durations[pres_ids[cur_pres]] !== 0) {
+	setTimeout(next_pres, pres_durations[pres_ids[cur_pres]]);	
+}
 // begin rotating frames in carousels
 var carousels = document.getElementById('pres' + pres_ids[cur_pres]).children;
 for (var i = 0; i < carousels.length; i++) {
