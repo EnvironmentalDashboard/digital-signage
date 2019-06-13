@@ -37,7 +37,7 @@ class WebsocketCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-            $host = ($_SERVER['HTTP_HOST'] === null) ? 'localhost' : $_SERVER['HTTP_HOST'];
+            $host = (getenv('APP_ENV') === 'prod') ? 'environmentaldashboard.org' : 'localhost';
             $output->writeln("Starting on {$host}");
             // $app = IoServer::factory(new HttpServer(new WsServer(new WsManager())), 8080);
             $app = new App($host, 8080, '0.0.0.0');
