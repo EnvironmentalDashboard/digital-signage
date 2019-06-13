@@ -42,6 +42,7 @@ function animate_carousel(frames) {
 			} else {
 				var next_frame = frames[i + 1];
 			}
+			// console.log('moving from', frames[i], '=>', next_frame, 'in', total_time)
 			set_timers(frames[i], next_frame, total_time, start_in);
 			var youtube_id = getYoutubeId(frames[i].src);
 			if (youtube_id !== false) {
