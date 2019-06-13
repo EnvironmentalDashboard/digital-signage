@@ -18,6 +18,11 @@ class WsManager implements MessageComponentInterface
     protected $buttons;
     private $entityManager;
 
+    // URLs look like this: /digital-signage/websockets/{slug}/{id}
+    private const ROUTE_SLUG = 3;
+    private const ROUTE_ID = 4;
+    private const ROUTE_LEN = 5;
+
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->displays = [];
@@ -30,10 +35,13 @@ class WsManager implements MessageComponentInterface
         // http://socketo.me/api/class-Psr.Http.Message.RequestInterface.html
         $route = $conn->httpRequest->getUri()->getPath();
         $parts = explode('/', $route);
-        $slug = $parts[1];
+        if (count($parts) !== self::ROUTE_LEN) {
+            throw new ResourceNotFoundException("Malformed route {$route}");
+        }
+        $slug = $parts[self::ROUTE_SLUG];
         // Store the new connection to send messages to later
         if ($slug === 'display') {
-            $display_id = $parts[2];
+            $display_id = $parts[self::ROUTE_ID];
             $this->displays[$display_id] = $conn;
         } elseif ($slug !== 'remote-controller') {
             throw new ResourceNotFoundException("Route {$route} not found");
@@ -66,9 +74,9 @@ class WsManager implements MessageComponentInterface
         // The connection is closed, remove it, as we can no longer send it messages
         $route = $conn->httpRequest->getUri()->getPath();
         $parts = explode('/', $route);
-        $slug = $parts[1];
+        $slug = $parts[self::ROUTE_SLUG];
         if ($slug === 'display') {
-            $id = $parts[2];
+            $id = $parts[self::ROUTE_ID];
             unset($this->displays[$id]);
         }
         $conn->close();
