@@ -37,9 +37,10 @@ class WebsocketCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-            $output->writeln('Starting...');
+            $host = ($_SERVER['HTTP_HOST'] === null) ? 'localhost' : $_SERVER['HTTP_HOST'];
+            $output->writeln("Starting on {$host}");
             // $app = IoServer::factory(new HttpServer(new WsServer(new WsManager())), 8080);
-            $app = new App("localhost", 8080, '0.0.0.0');
+            $app = new App($host, 8080, '0.0.0.0');
             $app->route('/digital-signage/websockets/remote-controller/{id}', $this->manager, ['*']);
             $app->route('/digital-signage/websockets/display/{id}', $this->manager, ['*']);
             $app->run();
