@@ -48,4 +48,14 @@ class GoogleSlides extends AbstractController
         $entityManager->flush();
         return new JsonResponse($filtered);
     }
+
+    /**
+     * google-slides-exists
+     */
+    public function exists(Request $request, EntityManagerInterface $entityManager, $presentationId)
+    {
+        $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
+        $res = ($repository->findOneBy(['presentationId' => $presentationId]) == null) ? false : true;
+        return new JsonResponse($res);
+    }
 }

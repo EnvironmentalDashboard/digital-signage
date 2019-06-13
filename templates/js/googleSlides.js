@@ -1,10 +1,11 @@
 // Fetch google slides durations in presenter notes if given such a url
 function detectDuration() {
 	var input = $(this);
+	var originalId = input.attr('id');
 	var url = input.val();
 	var id = getYoutubeId(url);
 	if (id !== false) {
-		var duration_input_id = $(this).attr('id').replace('create_frame_url_', 'create_frame_duration_');
+		var duration_input_id = originalId.replace('create_frame_url_', 'create_frame_duration_');
 		$.getJSON("{{ url('index') }}youtube/" + id + "/length", function(length) {
 			$('#' + duration_input_id).val(length);
 		});
@@ -12,13 +13,18 @@ function detectDuration() {
 	id = getSlidesId(url);
 	if (id !== false) {
 		if (confirm('We have detected a Google Slides URL. Would you like to read the presenter notes to set slide durations? You will need to authenticate with Google.')) {
-			input.attr('id', id); // give input a useful id to find later
-			var tag = document.createElement('script');
-			tag.src = "https://apis.google.com/js/api.js";
-			tag.onload = function() { handleClientLoad() };
-			window.google_slide = id;
-			var firstScriptTag = document.getElementsByTagName('script')[0];
-			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+			$.post("{{ path('index') }}google-slides/" + id + "/exists", function(res) {
+				if (res === false || confirm('Presenter notes for these slides have already been imported. Would you like to delete existing durations and re-import?')) {
+					$('#' + originalId.replace('url', 'duration')).attr('id', 'dur' + id);
+					input.attr('id', id); // give input a useful id to find later
+					var tag = document.createElement('script');
+					tag.src = "https://apis.google.com/js/api.js";
+					tag.onload = function() { handleClientLoad() };
+					window.google_slide = id;
+					var firstScriptTag = document.getElementsByTagName('script')[0];
+					firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+				}
+			}, "json");
 		}
 	}
 }
@@ -106,10 +112,11 @@ function save_durations(arr, id) {
 	// console.log('notes', arr);
 	$.post("{{ path('index') }}google-slides/" + id + "/save", { durations: JSON.stringify(arr) }, function(data, textStatus) {
 		// console.log(data);
-		var input = $('#' + id);
-		input.addClass('is-valid');
+		var frameInput = $('#' + id);
+		var durInput = $('#dur' + id);
+		frameInput.addClass('is-valid');
 		var sum = data.reduce(function(a, b) { return a + b; }, 0);
-		input.val(Math.round(sum/1000));
-		input.after('<small class="form-text text-muted">Slides 1 through '+(data.length)+' will have the durations '+(data.join(', '))+'</small>');
+		durInput.val(Math.round(sum/1000));
+		frameInput.after('<small class="form-text text-muted">Slides 1 through '+(data.length)+' will have the durations '+(data.join(', '))+'</small>');
 	}, "json");
 }
