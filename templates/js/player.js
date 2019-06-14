@@ -83,12 +83,13 @@ function set_timers(cur_frame, next_frame, total_time, start_in) {
 	active_timeouts.push(offset);
 }
 function clear_timers() {
-	var i;
-	for (i = 0; i < active_intervals.length; i++) {
-		clearInterval(active_intervals[i]);
+	while (active_intervals.length > 0) {
+		var interval = active_intervals.pop();
+		clearInterval(interval);
 	}
-	for (i = 0; i < active_timeouts.length; i++) {
-		clearTimeout(active_timeouts[i]);
+	while (active_timeouts.length > 0) {
+		var timeout = active_timeouts.pop();
+		clearInterval(timeout);
 	}
 }
 
