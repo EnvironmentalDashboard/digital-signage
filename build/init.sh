@@ -12,9 +12,20 @@ ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
 echo $TZ > /etc/timezone
 
 ./build/composer-install.sh
+
+phpdismod xdebug
+
 php composer.phar install
 php composer.phar update
 php composer.phar dump-env prod
-phpdismod xdebug
+
+php bin/console cache:clear
+php bin/console cache:warmup
+
 a2enmod rewrite headers
 mv /var/www/html/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
+
+chown -R www-data:www-data /var/www/
+find /var/www/ -type d -exec chmod 775 "{}" \;
+find /var/www/ -type f -exec chmod 664 "{}" \;
+find /var/www -type d -exec chmod g+s "{}" \;
