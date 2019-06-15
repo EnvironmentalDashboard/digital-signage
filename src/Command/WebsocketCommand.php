@@ -39,8 +39,8 @@ class WebsocketCommand extends Command
     {
             $host = (getenv('APP_ENV') === 'prod') ? 'environmentaldashboard.org' : 'localhost';
             $output->writeln("Starting on {$host}");
-            // $app = IoServer::factory(new HttpServer(new WsServer(new WsManager())), 8080);
-            $app = new App($host, 8080, '0.0.0.0');
+            // $app = IoServer::factory(new HttpServer(new WsServer(new WsManager())), 80);
+            $app = new App($host, 80, '0.0.0.0');
             $app->route('/digital-signage/websockets/remote-controller/{id}', $this->manager, ['*']);
             $app->route('/digital-signage/websockets/display/{id}', $this->manager, ['*']);
             $app->run();
