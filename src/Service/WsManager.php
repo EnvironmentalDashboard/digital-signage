@@ -66,6 +66,9 @@ class WsManager implements MessageComponentInterface
         }
         $display_id = $button->getOnDisplay()->getId();
         $to_trigger = $button->getTriggerFrame()->getId();
+        if ($this->displays[$display_id] === null) {
+            throw new Exception("Display {$display_id} not connected; button {$button_id} failed to trigger frame {$to_trigger}");
+        }
         $this->displays[$display_id]->send($to_trigger);
     }
 
