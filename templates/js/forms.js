@@ -1,3 +1,22 @@
+var mainProgressBar = function () {
+	var myXhr = $.ajaxSettings.xhr();
+	var progress = $('main-progress');
+	console.log('a');
+	if (myXhr.upload) {
+		progress.removeClass('d-none');
+		myXhr.upload.addEventListener('progress', function (e) {
+			if (e.lengthComputable) {
+				var pct = (e.loaded/e.total) * 100;
+				progress.attr('aria-valuenow', pct);
+				progress.css('width', pct + '%');
+				if (pct === 100) {
+					setTimeout(function() {progress.addClass('d-none');}, 500);
+				}
+			}
+		}, false);
+	}
+	return myXhr;
+};
 // Submit event to fire when carousel form submitted
 var createCarousel = function (e) {
 	e.preventDefault();
@@ -15,6 +34,10 @@ var createCarousel = function (e) {
 				$('.detect-duration').each(function () {
 					$(this).on('input', detectDuration);
 				});
+				$(".carousel-add-new-frame").each(function () {
+					$(this).on('click', newFrame);
+				});
+				$('form[action$="/frames/save"]').on('submit', saveFrame);
 				input.removeClass('is-valid');
 				input.val('');
 				submit.html('Create carousel');
@@ -25,7 +48,8 @@ var createCarousel = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			}
+			},
+			xhr: mainProgressBar
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -56,7 +80,8 @@ var createDisplay = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			}
+			},
+			xhr: mainProgressBar
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -87,7 +112,8 @@ var createController = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			}
+			},
+			xhr: mainProgressBar
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -109,7 +135,8 @@ var savePresentation = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			}
+			},
+			xhr: mainProgressBar
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -134,7 +161,8 @@ var saveFrame = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			}
+			},
+			xhr: mainProgressBar
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -245,7 +273,8 @@ var saveButton = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			}
+			},
+			xhr: mainProgressBar
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -271,7 +300,8 @@ var loadFrames = function (e) {
 		},
 		error: function (xhr, status, error) {
 			console.log(xhr, status, error);
-		}
+		},
+		xhr: mainProgressBar
 	});
 };
 
