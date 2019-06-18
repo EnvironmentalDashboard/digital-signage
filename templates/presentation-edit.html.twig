@@ -11,8 +11,8 @@
     <label for="pres_template_for_{{presentation_id}}">Select template</label>
     <select class="form-control template-select-dropdown" id="pres_template_for_{{presentation_id}}"
       name="pres_template[]" data-controls="#drop-zone-{{presentation_id}}">
-      <option value="1">Fullscreen</option>
-      <option value="2">Fullscreen with marquee</option>
+      <option value="-1" data-index="1">Fullscreen</option>
+      <option value="-2" data-index="2">Fullscreen with marquee</option>
       {% if is_new == false %}
       <option selected value="0">Custom</option>
       {% endif %}

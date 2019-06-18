@@ -29,10 +29,10 @@ class GoogleSlides extends AbstractController
             if ($matches) {
                 $value = round($matches[1] * 1000);
                 if ($value < 0 || $value > 1000000) {
-                    $value = 3000;
+                    $value = 7000;
                 }
             } else {
-                $value = 3000;
+                $value = 7000;
             }
             $filtered[$key] = $value;
         }

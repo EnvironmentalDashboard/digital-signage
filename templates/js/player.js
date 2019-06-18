@@ -82,6 +82,7 @@ function set_timers(cur_frame, next_frame, next_next_frame, total_time, start_in
 				active_timeouts.push(finished);
 			}
 		};
+		console.log(next_frame);
 		advanceFrame(); // setInterval doesn't fire immediately
 		var every = setInterval(advanceFrame, total_time);
 		active_intervals.push(every);

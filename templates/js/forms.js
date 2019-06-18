@@ -1,7 +1,6 @@
 var mainProgressBar = function () {
 	var myXhr = $.ajaxSettings.xhr();
 	var progress = $('main-progress');
-	console.log('a');
 	if (myXhr.upload) {
 		progress.removeClass('d-none');
 		myXhr.upload.addEventListener('progress', function (e) {
@@ -313,14 +312,14 @@ var loadFrames = function (e) {
 var displayDropdownTemplate = function (e) {
 	e.preventDefault();
 	var controls = $(this).data('controls');
-	var selected = $(this).find(":selected").val();
+	var selected = $(this).find(":selected").data('index');
 	$(controls).html(displayTemplates[selected - 1]);
 }
 
 var controllerDropdownTemplate = function (e) {
 	e.preventDefault();
 	var controls = $(this).data('controls');
-	var selected = $(this).find(":selected").val();
+	var selected = $(this).find(":selected").data('index');
 	$(controls).html(controllerTemplates[selected - 1]);
 }
 
