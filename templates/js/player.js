@@ -69,7 +69,7 @@ function set_timers(cur_frame, next_frame, next_next_frame, total_time, start_in
 			if (cur_frame.id !== next_next_frame.id) {
 				cur_frame.addEventListener("animationend", function() { cur_frame.src = 'about:blank'; });
 			}
-			next_next_frame.src = next_frame.getAttribute('data-src');
+			next_next_frame.src = next_next_frame.getAttribute('data-src');
 			// need to add ?autoplay=1&mute=1 to youtube url to play
 			var youtube_id = getYoutubeId(next_frame.src);
 			if (youtube_id !== false) {
