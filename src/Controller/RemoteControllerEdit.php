@@ -65,6 +65,8 @@ class RemoteControllerEdit extends AbstractController
 
         $controllerRepo = $entityManager->getRepository(Entity\RemoteController::class);
         $controller = $controllerRepo->find($controllerId);
+        $controller->setTemplate($entityManager->getRepository(Entity\Template::class)->find($templateId));
+
         $btnRepo = $entityManager->getRepository(Entity\Button::class);
         foreach ($btnArrangement as $twigKey => $btnId) {
             $btn = $btnRepo->find($btnId);
