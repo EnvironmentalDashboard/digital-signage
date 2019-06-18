@@ -42,6 +42,9 @@ class WsManager implements MessageComponentInterface
         // Store the new connection to send messages to later
         if ($slug === 'display') {
             $display_id = $parts[self::ROUTE_ID];
+            if (isset($this->displays[$display_id])) {
+                $this->displays[$display_id]->close();
+            }
             $this->displays[$display_id] = $conn;
         } elseif ($slug !== 'remote-controller') {
             throw new ResourceNotFoundException("Route {$route} not found");
@@ -53,16 +56,16 @@ class WsManager implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $button_id)
     {
-        // Remote controllers will send what button was pressed to the appriopriate display
-        if (isset($buttons[$button_id])) {
-            $button = $buttons[$button_id];
+        // Remote controllers will send what button was pressed to the appropriate display
+        if (isset($this->buttons[$button_id])) {
+            $button = $this->buttons[$button_id];
         } else {
             $buttonRepository = $this->entityManager->getRepository(Entity\Button::class);
             $button = $buttonRepository->find($button_id);
             if ($button === null) {
                 throw new ResourceNotFoundException("Button {$button_id} not found");
             }
-            $buttons[$button_id] = $button;
+            $this->buttons[$button_id] = $button;
         }
         $display_id = $button->getOnDisplay()->getId();
         $to_trigger = $button->getTriggerFrame()->getId();

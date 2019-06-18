@@ -126,7 +126,7 @@ class Display extends AbstractController
         switch ($parts['host']) {
             case 'www.youtube.com':
                 parse_str($parts['query'], $get_array);
-                return "<iframe src='https://www.youtube.com/embed/{$get_array['v']}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
+                return "<iframe src='about:blank' data-src='https://www.youtube.com/embed/{$get_array['v']}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
             case 'docs.google.com':
                 preg_match('#/presentation/d/(.*?)/edit#', $parts['path'], $matches);
                 if (empty($matches)) {
@@ -136,16 +136,17 @@ class Display extends AbstractController
                 $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
                 $googleSlides = $repository->findOneBy(['presentationId' => $presId]);
                 if ($googleSlides === null) {
-                    return "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
+                    return "<iframe src='about:blank' data-src='https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
                 }
                 $iframes = [];
                 foreach ($googleSlides->getData() as $key => $value) {
+                    $id = ($key === 0) ? "frame{$frame->getId()}" : "frame{$frame->getId()}-{$key}"; // buttons trigger frames with document.getElementById('frame' + frameId), so give first slide this special id to be found
                     $key = $key + 1;
-                    $iframes[] = "<iframe src='https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal#slide={$key}' id='frame{$frame->getId()}-{$key}' data-duration='{$value}' frameborder='0' {$hidden}></iframe>";
+                    $iframes[] = "<iframe src='about:blank' data-src='https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal#slide={$key}' id='{$id}' data-duration='{$value}' frameborder='0' {$hidden}></iframe>";
                     $hidden = 'class="fade-out"';
                 }
                 return implode('', $iframes);
         }
-        return "<iframe src='{$url}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
+        return "<iframe src='about:blank' data-src='{$url}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
     }
 }
