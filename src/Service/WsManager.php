@@ -36,7 +36,7 @@ class WsManager implements MessageComponentInterface
         $route = $conn->httpRequest->getUri()->getPath();
         $parts = explode('/', $route);
         if (count($parts) !== self::ROUTE_LEN) {
-            throw new ResourceNotFoundException("Malformed route {$route}");
+            throw new ResourceNotFoundException(date('c') . ": Malformed route {$route}");
         }
         $slug = $parts[self::ROUTE_SLUG];
         // Store the new connection to send messages to later
@@ -47,7 +47,7 @@ class WsManager implements MessageComponentInterface
             }
             $this->displays[$display_id] = $conn;
         } elseif ($slug !== 'remote-controller') {
-            throw new ResourceNotFoundException("Route {$route} not found");
+            throw new ResourceNotFoundException(date('c') . ": Route {$route} not found");
             $conn->close();
         }
         // $this->clients->attach($conn);
@@ -63,14 +63,14 @@ class WsManager implements MessageComponentInterface
             $buttonRepository = $this->entityManager->getRepository(Entity\Button::class);
             $button = $buttonRepository->find($button_id);
             if ($button === null) {
-                throw new ResourceNotFoundException("Button {$button_id} not found");
+                throw new ResourceNotFoundException(date('c') . ": Button {$button_id} not found");
             }
             $this->buttons[$button_id] = $button;
         }
         $display_id = $button->getOnDisplay()->getId();
         $to_trigger = $button->getTriggerFrame()->getId();
         if (!isset($this->displays[$display_id])) {
-            throw new Exception("Display {$display_id} not connected; button {$button_id} failed to trigger frame {$to_trigger}");
+            throw new Exception(date('c') . ": Display {$display_id} not connected; button {$button_id} failed to trigger frame {$to_trigger}\n");
         }
         $this->displays[$display_id]->send($to_trigger);
     }
