@@ -24,7 +24,9 @@ function next_pres() {
 }
 
 function animate_carousel(frames) {
+	frames[0].src = frames[0].getAttribute('data-src');
 	if (frames.length > 1) { // if there are multiple frames to swap between
+		frames[1].src = frames[1].getAttribute('data-src');
 		var i;
 		var total_time = 0; // total duration of the cycle of presentations
 		for (i = 0; i < frames.length; i++) {
@@ -39,13 +41,10 @@ function animate_carousel(frames) {
 				var last_frame = frames[i - 1];
 				start_in += parseInt(last_frame.getAttribute('data-duration'));
 			}
-			if (i === frames.length - 1) {
-				var next_frame = frames[0];
-			} else {
-				var next_frame = frames[i + 1];
-			}
+			var next_frame = (i === frames.length - 1) ? frames[0] : frames[i + 1];
+			var next_next_frame = (i >= frames.length - 2) ? frames[(i === frames.length - 1) ? 1 : 0] : frames[i + 2];
 			// console.log('moving from', frames[i], '=>', next_frame, 'in', total_time)
-			set_timers(frames[i], next_frame, total_time, start_in);
+			set_timers(frames[i], next_frame, next_next_frame, total_time, start_in);
 			var youtube_id = getYoutubeId(frames[i].src);
 			if (youtube_id !== false) {
 				var new_src = updateQueryStringParameter(frames[i].src, 'autoplay', '1');
@@ -61,11 +60,16 @@ function animate_carousel(frames) {
 	}
 }
 
-function set_timers(cur_frame, next_frame, total_time, start_in) {
+function set_timers(cur_frame, next_frame, next_next_frame, total_time, start_in) {
 	var offset = setTimeout(function () {
-		var every = setInterval(function () {
+		var advanceFrame = function () {
 			cur_frame.className = 'fade-out';
 			next_frame.className = 'fade-in';
+			// console.log(cur_frame.id, next_next_frame.id);
+			if (cur_frame.id !== next_next_frame.id) {
+				cur_frame.addEventListener("animationend", function() { cur_frame.src = 'about:blank'; });
+			}
+			next_next_frame.src = next_frame.getAttribute('data-src');
 			// need to add ?autoplay=1&mute=1 to youtube url to play
 			var youtube_id = getYoutubeId(next_frame.src);
 			if (youtube_id !== false) {
@@ -77,7 +81,9 @@ function set_timers(cur_frame, next_frame, total_time, start_in) {
 				}, next_frame.getAttribute('data-duration'));
 				active_timeouts.push(finished);
 			}
-		}, total_time);
+		};
+		advanceFrame(); // setInterval doesn't fire immediately
+		var every = setInterval(advanceFrame, total_time);
 		active_intervals.push(every);
 	}, start_in);
 	active_timeouts.push(offset);

@@ -175,6 +175,11 @@ var newFrame = function (e) {
 	randomize_ids(clone);
 	clone[0].firstElementChild.innerHTML = 'New frame';
 	clone.find("input[type='hidden']").val('newframe' + carousel);
+	clone.find("input[type='number']").val('');
+	var url = clone.find("input[type='url']");
+	url.val('');
+	url.removeClass('is-valid');
+	url.on('input', detectDuration);
 	$("#carousel-" + carousel + "-frame-edit").append(clone);
 }
 
