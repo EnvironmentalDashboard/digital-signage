@@ -111,8 +111,11 @@ class RemoteController extends AbstractController
             case '4 Buttons':
                 $templateId = -4;
                 break;
-            case '8 Buttons':
+            case '6 Buttons':
                 $templateId = -5;
+                break;
+            case '8 Buttons':
+                $templateId = -6;
                 break;
             default:
                 $templateId = -3;

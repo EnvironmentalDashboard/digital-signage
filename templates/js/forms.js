@@ -347,6 +347,7 @@ var displayTemplates = ['{{ render(controller("App\\Controller\\Display::templat
 	'{{ render(controller("App\\Controller\\Display::template", {"name": "marquee"})) }}'];
 var controllerTemplates = ['{{ render(controller("App\\Controller\\RemoteController::template", {"name": "2 Buttons"})) }}',
 						'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "4 Buttons"})) }}',
+						'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "6 Buttons"})) }}',
 						'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "8 Buttons"})) }}'	];
 /* {% endspaceless %} */
 
