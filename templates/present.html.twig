@@ -11,56 +11,68 @@
             height: 100%;
             width: 100%;
         }
+
         body {
             margin: 0px;
             padding: 0px;
             background: #000;
         }
+
         iframe {
             width: 100%;
             height: 100%;
-            position: absolute; /* this is key for the fadeOut/fadeIn animations; also .carousel needs position:relative */
+            position: absolute;
+            /* this is key for the fadeOut/fadeIn animations; also .carousel needs position:relative */
             top: 0;
             left: 0;
             right: 0;
             border: none;
         }
+
         .presentation {
             height: 100%;
             width: 100%;
         }
+
         @keyframes fadeIn {
             0% {
                 display: none;
                 opacity: 0;
             }
+
             1% {
                 display: initial;
                 opacity: 0;
             }
+
             100% {
                 display: initial;
                 opacity: 1;
             }
         }
+
         @keyframes fadeOut {
             0% {
                 display: initial;
                 opacity: 1;
             }
+
             99% {
                 display: initial;
                 opacity: 0;
             }
+
             100% {
                 display: none;
                 opacity: 0;
             }
         }
+
         .fade-in {
             -webkit-animation: fadeIn 1s linear 0s 1 normal forwards;
             animation: fadeIn 1s linear 0s 1 normal forwards;
         }
+
         .fade-out {
             -webkit-animation: fadeOut 1s linear 0s 1 normal forwards;
             animation: fadeOut 1s linear 0s 1 normal forwards;
@@ -69,14 +81,12 @@
 </head>
 
 <body>
-    {% for presentation in cycle %}
-    <div id="pres{{presentation.id}}" class="presentation" {% if loop.index != 1 %} style="display:none" {% endif %}>
-        {{ presentation.markup|raw }}
+    {% for id, presentation in presentations %}
+    <div id="pres{{id}}" class="presentation" {% if loop.index != 1 %} style="display:none" {% endif %}>
+        {{ presentation.template|raw }}
     </div>
     {% endfor %}
     <script>
-        {% include 'js/getYoutubeId.js' %}
-
         {% include 'js/player.js' %}
 
         {% include 'js/commandReceiver.js' %}
