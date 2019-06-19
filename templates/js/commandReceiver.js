@@ -3,7 +3,6 @@ var conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/webso
 var WS_READY = true;
 conn.onmessage = function (e) {
 	if (WS_READY === false) {
-		console.log("NOT READY");
 		return;
 	} else {
 		WS_READY = false;
@@ -13,14 +12,26 @@ conn.onmessage = function (e) {
 		return;
 	}
 	var target = 'frame' + frameId;
-	for (let i = 0; i < frames[sequence[index].element.id].length; i++) {
-		if (frames[sequence[index].element.id][i].carousel.id === target) {
-			clearTimers();
-			console.log(i);
-			animateFrames(frames[sequence[index].element.id], sequence[index].element.id, i);
-			break;
+	var i, j = 0;
+	for (var key in frames) {
+		if (frames.hasOwnProperty(key)) {
+			for (i = 0; i < frames[key].length; i++) {
+				var frame = frames[key][i];
+				if (frame.carousel.id === target) {
+					clearTimers();
+					if (index !== j) {
+						sequence[index].element.style.display = 'none';
+						index = j;
+						sequence[index].element.style.display = '';
+					}
+
+					animateFrames(frames[key], key, i);
+					break;
+				}
+			}
 		}
-		
+		j++;
 	}
+
 	WS_READY = true;
 };

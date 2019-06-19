@@ -72,6 +72,7 @@ function nextPres(sequence) {
 
 
 function animateFrames(frameList, curPres, i = 0) {
+	// console.log(frameList[i].carousel.url);
 	var primaryIframe = document.getElementById(curPres + '-' + frameList[i].carouselId + '-primary');
 	var secondaryIframe = document.getElementById(curPres + '-' + frameList[i].carouselId + '-secondary');
 	primaryIframe.src = frameList[i].carousel.url;
