@@ -1,4 +1,4 @@
-var conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/remote-controller/{{controllerId}}");
+var conn = new WebSocket("{{ websocketBaseUrl }}/digital-signage/websockets/remote-controller/{{controllerId}}");
 	conn.onmessage = function(e) { console.log(e.data); };
 	conn.onerror = function() { location.reload(true); };
 	conn.onclose = function() { location.reload(true); };

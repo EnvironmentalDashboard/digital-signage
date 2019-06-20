@@ -1,5 +1,5 @@
 // open websocket conn to receive commands from remote controllers
-var conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/{{ app.request.get('id') }}");
+var conn = new WebSocket("{{ websocketBaseUrl }}/digital-signage/websockets/display/{{ app.request.get('id') }}");
 var WS_READY = true;
 conn.onerror = function() { location.reload(true); };
 conn.onclose = function() { location.reload(true); };
@@ -10,7 +10,7 @@ conn.onmessage = function (e) {
 		WS_READY = false;
 	}
 	var frameId = parseInt(e.data);
-	if (e.origin !== 'wss://environmentaldashboard.org' || frameId < 1) {
+	if (e.origin !== '{{ websocketBaseUrl }}' || frameId < 1) {
 		return;
 	}
 	var target = 'frame' + frameId;
