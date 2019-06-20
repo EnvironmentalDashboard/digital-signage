@@ -50,6 +50,7 @@ function animateCarousels(carouselList, curPres, triggerFrame = null) {
 			frameIdx = 0;
 		}
 		loadingElement.classList = 'fade-out';
+		// console.log('next', frameSequence[frameIdx].url, sequence[frameIdx].dur);
 		loadingElement.src = sequence[frameIdx].url;
 		targetElement.classList = 'fade-in';
 		var timeout = setTimeout(function() {
@@ -65,12 +66,16 @@ function animateCarousels(carouselList, curPres, triggerFrame = null) {
 			var primaryIframe = document.getElementById(curPres + '-' + carouselId + '-primary');
 			var secondaryIframe = document.getElementById(curPres + '-' + carouselId + '-secondary');
 			var frameIdx = 0;
+			if (secondaryIframe == null) { // todo hacky fix
+				break;
+			}
 			for (var i = 0; i < frames.length; i++) {
 				frameSequence.push(frames[i]);
 				if (frames[i].id === triggerFrame) {
 					frameIdx = i;
 				}
 			}
+			// console.log('now', frameSequence[frameIdx].url);
 			secondaryIframe.src = frameSequence[frameIdx].url;
 			if (i > 1) {
 				nextFrame(frameSequence, frameIdx + 1, secondaryIframe, primaryIframe);
@@ -78,6 +83,7 @@ function animateCarousels(carouselList, curPres, triggerFrame = null) {
 		}
 	}
 
+	return true;
 	
 }
 
@@ -89,6 +95,8 @@ function nextPres() {
 	}
 	sequence[presentationIdx].element.style.display = '';
 	animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id);
+	// console.log('next pres in', sequence[presentationIdx].duration);
+	setTimeout(nextPres, sequence[presentationIdx].duration);
 }
 
 

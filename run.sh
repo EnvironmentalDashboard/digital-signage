@@ -17,4 +17,5 @@ else
 	# (bind mount code so changes to code don't require image rebuild, bind mount sqlite db so data persists across rebuilds)
 	docker run -dit -p 5000:80 --restart always -v $(pwd)/public/uploads:/var/www/html/public/uploads -v $(pwd)/var:/var/www/html/var/ -v $(pwd):/var/www/html/ -e APP_ENV=dev --name DEV_DS digital-signage
 	docker run -dit -p 5001:80 --restart always -v $(pwd):/var/www/html/ -e APP_ENV=dev --name DEV_DS_WS digital-signage-wsserver
+	docker exec DEV_DS bash -c "sed -ie 's|wss://environmentaldashboard.org|ws://localhost:5001|g' /var/www/html/templates/js/commandReceiver.js && sed -ie 's|wss://environmentaldashboard.org|ws://localhost:5001|g' /var/www/html/templates/js/remoteController.js"
 fi

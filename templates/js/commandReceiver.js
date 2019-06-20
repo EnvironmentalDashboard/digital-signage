@@ -1,6 +1,8 @@
 // open websocket conn to receive commands from remote controllers
 var conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/{{ app.request.get('id') }}");
 var WS_READY = true;
+conn.onerror = function() { location.reload(true); };
+conn.onclose = function() { location.reload(true); };
 conn.onmessage = function (e) {
 	if (WS_READY === false) {
 		return;
@@ -20,13 +22,13 @@ conn.onmessage = function (e) {
 					for (var i = 0; i < frames[key][carousel].length; i++) {
 						if (frames[key][carousel][i].id === target) {
 							clearTimers();
-							if (presentationIdx !== j) {
-								sequence[presentationIdx].element.style.display = 'none';
-								presentationIdx = j;
-								sequence[presentationIdx].element.style.display = '';
+							if (animateCarousels(frames[key], key, target)) {
+								if (presentationIdx !== j) {
+									sequence[presentationIdx].element.style.display = 'none';
+									presentationIdx = j;
+									sequence[presentationIdx].element.style.display = '';
+								}	
 							}
-
-							animateCarousels(frames[key], key, target);
 							// console.log(frames[key], key, i);
 							break;
 						}
