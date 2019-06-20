@@ -87,6 +87,8 @@
     </div>
     {% endfor %}
     <script>
+        var presentations = {{ presentations | json_encode | raw }};
+        
         {% include 'js/player.js' %}
 
         {% include 'js/commandReceiver.js' %}

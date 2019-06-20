@@ -1,9 +1,11 @@
-var presentations = {{ presentations| json_encode | raw }};
 var activeTimeouts = [];
 var activeIntervals = [];
+
 var sequence = [];
 var frames = [];
-var totalDur = 0;
+
+var presentationIdx = 0;
+
 for (var key in presentations) {
 	if (presentations.hasOwnProperty(key)) {
 		var presentation = presentations[key];
@@ -19,7 +21,10 @@ for (var key in presentations) {
 							if (frames[presElement.id] === undefined) {
 								frames[presElement.id] = [];
 							}
-							frames[presElement.id].push({ carouselId: carouselId, carousel: carousel[carouselId][i] });
+							if (frames[presElement.id][carouselId] === undefined) {
+								frames[presElement.id][carouselId] = [];
+							}
+							frames[presElement.id][carouselId].push(carousel[carouselId][i]);
 						}
 					}
 				}
@@ -29,91 +34,61 @@ for (var key in presentations) {
 			}
 		}
 		sequence.push({ element: presElement, duration: duration });
-		totalDur += duration;
-		// if (duration !== 0) {
-		//     console.log(presElement, duration);
-		//     setInterval(function() {
-		//         console.log('hide', presElement);
-		//     }, duration);
-		// }
 
 	}
 }
 
-
-var counter = 0;
-while (counter < sequence.length) {
-	var timeout = setTimeout(function () {
-		if (sequence.length > 1) {
-			var interval = setInterval(function () {
-				nextPres(sequence);
-			}, totalDur);
-			activeIntervals.push(interval);
-			nextPres(sequence);
-		}
-	}, sequence[counter].duration);
-	activeTimeouts.push(timeout);
-	animateFrames(frames[sequence[counter].element.id], sequence[counter].element.id);
-	counter++;
+animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id);
+if (sequence.length > 1 && sequence[presentationIdx].duration > 0) {
+	setTimeout(nextPres, sequence[presentationIdx].duration);
 }
 
+function animateCarousels(carouselList, curPres, triggerFrame = null) {
 
-var index = 0;
-function nextPres(sequence) {
-	clearTimers();
-	var len = sequence.length;
-	animateFrames(frames[sequence[index].element.id], sequence[index].element.id);
-	sequence[index].element.style.display = 'none';
-	if (++index === len) {
-		index = 0;
-	}
-	sequence[index].element.style.display = '';
-}
-
-
-function animateFrames(frameList, curPres, i = 0) {
-	// console.log(frameList[i].carousel.url);
-	var primaryIframe = document.getElementById(curPres + '-' + frameList[i].carouselId + '-primary');
-	var secondaryIframe = document.getElementById(curPres + '-' + frameList[i].carouselId + '-secondary');
-	primaryIframe.src = frameList[i].carousel.url;
-	primaryIframe.className = 'fade-in';
-	secondaryIframe.className = 'fade-out';
-	var nextFrame = function () {
-		if (++i === frameList.length) {
-			i = 0;
+	var nextFrame = function(sequence, frameIdx, targetElement, loadingElement) {
+		if (frameIdx === sequence.length) {
+			frameIdx = 0;
 		}
-		var primaryIframe = document.getElementById(curPres + '-' + frameList[i].carouselId + '-primary');
-		var secondaryIframe = document.getElementById(curPres + '-' + frameList[i].carouselId + '-secondary');
-		if (primaryIframe.className === 'fade-in') {
-			var toHide = primaryIframe;
-			var toShow = secondaryIframe;
-		} else {
-			var toHide = secondaryIframe;
-			var toShow = primaryIframe;
-		}
-		toHide.className = 'fade-out';
-		toShow.className = 'fade-in';
-		var onAnimEnd = function () {
-			this.src = frameList[i].carousel.url;
-			this.removeEventListener('animationend', onAnimEnd)
-		};
-		toHide.addEventListener("animationend", onAnimEnd);
-		// toHide.src = frameList[i].carousel.url;
-		var timeout = setTimeout(nextFrame, frameList[i].carousel.dur);
+		loadingElement.classList = 'fade-out';
+		loadingElement.src = sequence[frameIdx].url;
+		targetElement.classList = 'fade-in';
+		var timeout = setTimeout(function() {
+			nextFrame(sequence, frameIdx + 1, loadingElement, targetElement);
+		}, sequence[frameIdx].dur);
 		activeTimeouts.push(timeout);
-		// var youtube_id = getYoutubeId(frames[i].src);
-		// if (youtube_id !== false) {
-		// 	var new_src = updateQueryStringParameter(frames[i].src, 'autoplay', '1');
-		// 	new_src = updateQueryStringParameter(new_src, 'mute', '1'); // see https://stackoverflow.com/a/50272974 for why mute=1
-		// 	frames[i].src = new_src;
-		// 	var finished = setTimeout(function () {
-		// 		frames[i].src = updateQueryStringParameter(frames[i].src, 'autoplay', '0');
-		// 	}, frames[i].getAttribute('data-duration'));
-		// 	active_timeouts.push(finished);
-		// }
-	};
-	var timeout = setTimeout(nextFrame, frameList[i].carousel.dur);
-	activeTimeouts.push(timeout);
+	}
+
+	for (var carouselId in carouselList) {
+		if (carouselList.hasOwnProperty(carouselId)) {
+			var frames = carouselList[carouselId];
+			var frameSequence = [];
+			var primaryIframe = document.getElementById(curPres + '-' + carouselId + '-primary');
+			var secondaryIframe = document.getElementById(curPres + '-' + carouselId + '-secondary');
+			var frameIdx = 0;
+			for (var i = 0; i < frames.length; i++) {
+				frameSequence.push(frames[i]);
+				if (frames[i].id === triggerFrame) {
+					frameIdx = i;
+				}
+			}
+			secondaryIframe.src = frameSequence[frameIdx].url;
+			if (i > 1) {
+				nextFrame(frameSequence, frameIdx + 1, secondaryIframe, primaryIframe);
+			}
+		}
+	}
+
+	
+}
+
+function nextPres() {
+	clearTimers();
+	sequence[presentationIdx].element.style.display = 'none';
+	if (++presentationIdx === sequence.length) {
+		presentationIdx = 0;
+	}
+	sequence[presentationIdx].element.style.display = '';
+	animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id);
 }
 
 

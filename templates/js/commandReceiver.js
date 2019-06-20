@@ -12,21 +12,27 @@ conn.onmessage = function (e) {
 		return;
 	}
 	var target = 'frame' + frameId;
-	var i, j = 0;
+	var j = 0;
 	for (var key in frames) {
 		if (frames.hasOwnProperty(key)) {
-			for (i = 0; i < frames[key].length; i++) {
-				var frame = frames[key][i];
-				if (frame.carousel.id === target) {
-					clearTimers();
-					if (index !== j) {
-						sequence[index].element.style.display = 'none';
-						index = j;
-						sequence[index].element.style.display = '';
-					}
+			for (const carousel in frames[key]) {
+				if (frames[key].hasOwnProperty(carousel)) {
+					for (var i = 0; i < frames[key][carousel].length; i++) {
+						if (frames[key][carousel][i].id === target) {
+							clearTimers();
+							if (presentationIdx !== j) {
+								sequence[presentationIdx].element.style.display = 'none';
+								presentationIdx = j;
+								sequence[presentationIdx].element.style.display = '';
+							}
 
-					animateFrames(frames[key], key, i);
-					break;
+							animateCarousels(frames[key], key, target);
+							// console.log(frames[key], key, i);
+							break;
+						}
+						
+					}
+					
 				}
 			}
 		}
