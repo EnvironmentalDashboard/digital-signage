@@ -28,7 +28,7 @@
       </div>
       <div class="col-sm-6">
         <div id="buttonList{{controller.id}}">{{ render(controller('App\\Controller\\Button::listAll')) }}</div>
-        <p><button type="button" class="btn btn-link" data-toggle="popover" title="Create new button" data-displayList="buttonDisplaySelect{{controller.id}}" data-content='
+        <p><button type="button" class="btn btn-link" data-toggle="popover" title="Create new button" data-content='
         <form onsubmit="return newButton(event, this)" action="{{ path("button-create") }}" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="controllerId" value="{{controller.id}}">
           <div class="form-group">

@@ -56,4 +56,33 @@ class ButtonEdit extends AbstractController
         return new JsonResponse(true);
     }
 
+    /**
+     * button-edit
+     */
+    public function edit(Request $request, EntityManagerInterface $entityManager, $id)
+    {
+        $repository = $entityManager->getRepository(Entity\Button::class);
+        $button = $repository->find($id);
+        if (!$button) {
+            throw new Exception("Button #{$id} not found");
+        }
+        $displayId = $request->request->get('buttonEditDisplaySelect');
+        $frameId = $request->request->get('buttonFrameSelect');
+        if ($displayId === null || $frameId === null) {
+            throw new Exception("Missing fields: need to POST 'buttonEditDisplaySelect', 'buttonFrameSelect'");
+        }
+        
+        $display = $entityManager->getRepository(Entity\Display::class)->find($displayId);
+        $frame = $entityManager->getRepository(Entity\Frame::class)->find($frameId);
+
+        $button->setOnDisplay($display);
+        $button->setTriggerFrame($frame);
+
+        $entityManager->persist($button);
+        $entityManager->flush();
+
+        return new JsonResponse(true);
+
+    }
+
 }

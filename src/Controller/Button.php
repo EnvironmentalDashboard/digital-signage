@@ -30,9 +30,28 @@ class Button extends AbstractController
      */
     public function listAll(Request $request, EntityManagerInterface $entityManager)
     {
-        $repository = $entityManager->getRepository(Entity\Button::class);
-        $entities = $repository->findAll();
-        return $this->render('button-list.html.twig', ['buttons' => $entities]);
+        $displays = $entityManager->getRepository(Entity\Display::class)->findAll();
+        $buttons = $entityManager->getRepository(Entity\Button::class)->findAll();
+        $frames = [];
+        
+        foreach ($entityManager->getRepository(Entity\Frame::class)->findAll() as $frame) {
+            $cache = [];
+            $carousel = $frame->getCarousel();
+            foreach ($carousel->getCarouselPresentationMaps() as $relation) {
+                $presentation = $relation->getPresentation();
+                if (in_array($presentation->getId(), $cache)) {
+                    continue;
+                }
+                $cache[] = $presentation->getId();
+                $frames[$presentation->getDisplay()->getId()][] = $frame;
+            }
+        }
+
+        return $this->render('button-list.html.twig', [
+            'displays' => $displays,
+            'buttons' => $buttons,
+            'frames' => $frames
+        ]);
     }
 
 }

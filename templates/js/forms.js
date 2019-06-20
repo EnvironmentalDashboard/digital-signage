@@ -262,6 +262,34 @@ var newButton = function (ev, el) {
 	});
 };
 
+var editButton = function (ev, el) {
+	ev.preventDefault();
+	var $el = $(el);
+	var target = $('#' + $el.attr('data-buttonListItem')).parent().parent();
+	$('[data-toggle="popover"]').popover('hide');
+	$.ajax({
+		url: $el.attr('action'),
+		type: 'POST',
+		data: new FormData(el),
+		cache: false,
+		contentType: false,
+		processData: false,
+		success: function(res) {
+			console.log(res);
+			$.ajax({
+				url: '{{ path("button-list-all") }}',
+				type: "GET",
+				success: function(data) {
+					target.html(data);
+				},
+				error: function(xhr, status, error) {
+					console.log(xhr, status, error);
+				}
+			});
+		}
+	});
+};
+
 var saveButton = function (e) {
 	e.preventDefault();
 	var modal = $(this).closest('.modal');
@@ -286,17 +314,17 @@ var saveButton = function (e) {
 };
 
 var loadFrames = function (e) {
+	console.log(e);
 	var select = $(e);
 	var target = $(select.data('target'));
-	var id = select.val();
 	$.ajax({
-		url: '/digital-signage/display/' + id + '/frame/all',
+		url: '/digital-signage/display/' + select.val() + '/frame/all',
 		type: "GET",
 		success: function (data) {
+			var id = guidGenerator();
 			var markup = '<label for="' + id + '">Select frame</label><select class="form-control" id="' + id + '" name="buttonFrameSelect">';
 			for (var i = 0; i < data.length; i++) {
 				var frame = data[i];
-				var id = guidGenerator();
 				markup += '<option value="' + frame.id + '">' + frame.url + '</option>';
 			}
 			markup += '</select>';
@@ -362,7 +390,10 @@ $(function () {
 	popovers.popover({ html: true });
 	popovers.on('shown.bs.popover', function (e) {
 		var id = $(e.target).attr('data-displayList');
-		loadFrames(document.getElementById(id));
+		if (id != null) {
+			console.log(id);
+			loadFrames(document.getElementById(id));	
+		}
 	});
 });
 
