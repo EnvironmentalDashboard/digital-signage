@@ -67,6 +67,7 @@ function animateCarousels(carouselList, curPres, triggerFrame = null) {
 			var secondaryIframe = document.getElementById(curPres + '-' + carouselId + '-secondary');
 			var frameIdx = 0;
 			if (secondaryIframe == null) { // todo hacky fix
+				// console.log(secondaryIframe, primaryIframe, curPres, carouselId);
 				break;
 			}
 			for (var i = 0; i < frames.length; i++) {
@@ -75,10 +76,12 @@ function animateCarousels(carouselList, curPres, triggerFrame = null) {
 					frameIdx = i;
 				}
 			}
-			// console.log('now', frameSequence[frameIdx].url);
+			// console.log('now', frameSequence[frameIdx].url, frameSequence[frameIdx].dur);
 			secondaryIframe.src = frameSequence[frameIdx].url;
 			if (i > 1) {
 				nextFrame(frameSequence, frameIdx + 1, secondaryIframe, primaryIframe);
+			} else {				
+				setTimeout(nextPres, frameSequence[frameIdx].dur);
 			}
 		}
 	}
@@ -89,13 +92,13 @@ function animateCarousels(carouselList, curPres, triggerFrame = null) {
 
 function nextPres() {
 	clearTimers();
+	clearCurrentPres();
 	sequence[presentationIdx].element.style.display = 'none';
 	if (++presentationIdx === sequence.length) {
 		presentationIdx = 0;
 	}
 	sequence[presentationIdx].element.style.display = '';
 	animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id);
-	// console.log('next pres in', sequence[presentationIdx].duration);
 	setTimeout(nextPres, sequence[presentationIdx].duration);
 }
 
@@ -108,6 +111,16 @@ function clearTimers() {
 	while (activeIntervals.length > 0) {
 		var interval = activeIntervals.pop();
 		clearInterval(interval);
+	}
+}
+
+function clearCurrentPres() {
+	var carousels = sequence[presentationIdx].element.children;
+	for (var i = 0; i < carousels.length; i++) {
+		var frameList = carousels[i].children;
+		for (let j = 0; j < frameList.length; j++) {
+			frameList[j].src = 'about:blank';
+		}
 	}
 }
 

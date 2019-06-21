@@ -23,6 +23,7 @@ conn.onmessage = function (e) {
 						if (frames[key][carousel][i].id === target) {
 							clearTimers();
 							if (animateCarousels(frames[key], key, target)) {
+								clearCurrentPres();
 								if (presentationIdx !== j) {
 									sequence[presentationIdx].element.style.display = 'none';
 									presentationIdx = j;
