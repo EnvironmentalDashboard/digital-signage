@@ -42,10 +42,10 @@ class WsManager implements MessageComponentInterface
         // Store the new connection to send messages to later
         if ($slug === 'display') {
             $display_id = $parts[self::ROUTE_ID];
-            if (isset($this->displays[$display_id])) {
-                $this->displays[$display_id]->close();
+            if (!isset($this->displays[$display_id])) {
+                $this->displays[$display_id] = [];
             }
-            $this->displays[$display_id] = $conn;
+            $this->displays[$display_id][] = $conn;
         } elseif ($slug !== 'remote-controller') {
             throw new ResourceNotFoundException(date('c') . ": Route {$route} not found");
             $conn->close();
@@ -72,7 +72,9 @@ class WsManager implements MessageComponentInterface
         if (!isset($this->displays[$display_id])) {
             throw new Exception(date('c') . ": Display {$display_id} not connected; button {$button_id} failed to trigger frame {$to_trigger}\n");
         }
-        $this->displays[$display_id]->send($to_trigger);
+        foreach ($this->displays[$display_id] as $display) {
+            $display->send($to_trigger);
+        }
     }
 
     public function onClose(ConnectionInterface $conn)
@@ -83,7 +85,11 @@ class WsManager implements MessageComponentInterface
         $slug = $parts[self::ROUTE_SLUG];
         if ($slug === 'display') {
             $id = $parts[self::ROUTE_ID];
-            unset($this->displays[$id]);
+            for ($i = 0; $i < count($this->displays[$id]); $i++) { 
+                if ($conn->resourceId === $this->displays[$id][$i]->resourceId) {
+                    unset($this->displays[$id][$i]);
+                }
+            }
         }
         $conn->close();
         // echo "Connection {$conn->resourceId} has disconnected\n";
