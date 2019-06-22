@@ -30,7 +30,7 @@ class ButtonEdit extends AbstractController
         $controllerId = $request->request->get('controllerId');
         $image = $request->files->get('file');
         if ($displayId === null || $frameId === null || $controllerId === null || $image === null) {
-            throw new Exception("Missing fields: need to POST 'buttonDisplaySelect', 'buttonFrameSelect', 'controllerId', 'file'");
+            throw new Exception("Missing fields: need to POST 'buttonDisplaySelect', 'buttonFrameSelect', 'controllerId', 'file'; received " . json_encode($request->request->all()));
         }
         if ($image->isValid()) {
             $path = '/var/www/html/public/uploads/';
