@@ -1,29 +1,13 @@
 <ul class="list-group list-group-flush">
     {% for button in buttons %}
+        {% set buttonFormHandler = "editButton" %}
+        {% set buttonFormAction = path("button-edit", {id: button.id}) %}
+        {% set controller = []|merge({'id': button.id})  %}
         <li class="list-group-item" id="buttonListItem{{button.id}}">
             <img style="width: 100%" draggable="true" ondragstart="dragstart_handler(event);" ondragend="dragend_handler(event);" id="button{{button.id}}" src="{{ path('index') }}uploads/{{button.image}}" alt="Button image">
             Trigger {{button.triggerFrame.url}} on {{button.onDisplay.label}}
-            <button type="button" class="btn btn-link" data-toggle="popover" title="Edit button" data-content='
-            <form onsubmit="return editButton(event, this)" action="{{ path("button-edit", {id: button.id}) }}" method="POST" data-buttonListItem="buttonListItem{{button.id}}">
-            <input type="hidden" name="buttonId" value="{{button.id}}">
-            <div class="form-group">
-            <label for="buttonEditDisplaySelect{{button.id}}">Select display</label>
-            <select class="form-control" id="buttonEditDisplaySelect{{button.id}}" name="buttonEditDisplaySelect" onchange="return loadFrames(this)" data-target="#frameList{{button.id}}Edit">
-                    {% set curDisplayId = null %}
-                {% for display in displays %}
-                <option {% if display.id == button.onDisplay.id %}selected{% set curDisplayId = display.id %}{% endif %} value="{{display.id}}">{{display.label}}</option>
-                {% endfor %}
-            </select>
-            </div>
-            <div class="form-group" id="frameList{{button.id}}Edit">
-                <label for="selectFrame{{button.id}}">Select frame</label><select class="form-control" id="selectFrame{{button.id}}" name="buttonFrameSelect">
-                {% for frame in frames[curDisplayId] %}
-                <option {% if frame.id == button.triggerFrame.id %}selected{% endif %} value="{{frame.id}}">{{frame.url}}</option>
-                {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+            <button type="button" class="btn btn-link" data-toggle="popover" data-placement="top" title="Edit button" data-displayList="buttonDisplaySelect{{controller.id}}" data-content='
+            {% include "button-create.html.twig" %}
             '>Edit</button>
         </li>
     {% endfor %}

@@ -38,8 +38,11 @@ for (var key in presentations) {
 	}
 }
 
+// begin rotating frames in all carousels in the given presentation (ie. sequence[presentationIdx])
 animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id);
+// advance to next presentation in after current presentations duration
 if (sequence.length > 1 && sequence[presentationIdx].duration > 0) {
+	console.log('nextPres in', sequence[presentationIdx].duration);
 	setTimeout(nextPres, sequence[presentationIdx].duration);
 }
 
@@ -59,7 +62,7 @@ function animateCarousels(carouselList, curPres, triggerFrame = null) {
 		activeTimeouts.push(timeout);
 	}
 
-	for (var carouselId in carouselList) {
+	for (var carouselId in carouselList) { // for each carousel in the presentation
 		if (carouselList.hasOwnProperty(carouselId)) {
 			var frames = carouselList[carouselId];
 			var frameSequence = [];
@@ -70,18 +73,18 @@ function animateCarousels(carouselList, curPres, triggerFrame = null) {
 				// console.log(secondaryIframe, primaryIframe, curPres, carouselId);
 				break;
 			}
-			for (var i = 0; i < frames.length; i++) {
+			for (var i = 0; i < frames.length; i++) { // for each frame in the carousel
 				frameSequence.push(frames[i]);
 				if (frames[i].id === triggerFrame) {
 					frameIdx = i;
 				}
 			}
 			// console.log('now', frameSequence[frameIdx].url, frameSequence[frameIdx].dur);
-			secondaryIframe.src = frameSequence[frameIdx].url;
-			if (i > 1) {
+			secondaryIframe.src = frameSequence[frameIdx].url; // reveal first frame of carousel
+			if (i > 1) { // if there are multiple frames in carousel
 				nextFrame(frameSequence, frameIdx + 1, secondaryIframe, primaryIframe);
-			} else {				
-				setTimeout(nextPres, frameSequence[frameIdx].dur);
+			} else { // todo hacky fix
+				// setTimeout(nextPres, frameSequence[frameIdx].dur);
 			}
 		}
 	}
@@ -99,6 +102,7 @@ function nextPres() {
 	}
 	sequence[presentationIdx].element.style.display = '';
 	animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id);
+	console.log('nextPres in', sequence[presentationIdx].duration);
 	setTimeout(nextPres, sequence[presentationIdx].duration);
 }
 

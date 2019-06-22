@@ -170,34 +170,35 @@ class Display extends AbstractController
         return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here'])); // need to include all possible twig keys
     }
     
-    private function iframeMarkup($i, $frame, $entityManager) {
-        $hidden = ($i === 0) ? 'class="fade-in"' : 'class="fade-out"';
-        $url = $frame->getUrl();
-        $parts = parse_url($url);
-        switch ($parts['host']) {
-            case 'www.youtube.com':
-                parse_str($parts['query'], $get_array);
-                return "<iframe src='about:blank' data-src='https://www.youtube.com/embed/{$get_array['v']}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
-            case 'docs.google.com':
-                preg_match('#/presentation/d/(.*?)/edit#', $parts['path'], $matches);
-                if (empty($matches)) {
-                    break;
-                }
-                $presId = $matches[1];
-                $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
-                $googleSlides = $repository->findOneBy(['presentationId' => $presId]);
-                if ($googleSlides === null) {
-                    return "<iframe src='about:blank' data-src='https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
-                }
-                $iframes = [];
-                foreach ($googleSlides->getData() as $key => $value) {
-                    $id = ($key === 0) ? "frame{$frame->getId()}" : "frame{$frame->getId()}-{$key}"; // buttons trigger frames with document.getElementById('frame' + frameId), so give first slide this special id to be found
-                    $key = $key + 1;
-                    $iframes[] = "<iframe src='about:blank' data-src='https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal#slide={$key}' id='{$id}' data-duration='{$value}' frameborder='0' {$hidden}></iframe>";
-                    $hidden = 'class="fade-out"';
-                }
-                return implode('', $iframes);
+    /**
+     * carousel-list-by-display
+     */
+    public function carouselListByDisplay(Request $request, EntityManagerInterface $entityManager, $id)
+    {
+        $carousels = [];
+        $buttonId = $request->query->get('buttonId');
+        $selectedCarouselId = false;
+        if ($buttonId !== null) {
+            $button = $entityManager->getRepository(Entity\Button::class)->find($buttonId);
+            if ($button !== null) {
+                $frame = $button->getTriggerFrame();
+                $carousel = $frame->getCarousel();
+                $selectedCarouselId = $carousel->getId();
+            }
         }
-        return "<iframe src='about:blank' data-src='{$url}' id='frame{$frame->getId()}' data-duration='{$frame->getDuration()}' frameborder='0' {$hidden}></iframe>";
+        $display = $entityManager->getRepository(Entity\Display::class)->find($id);
+        foreach ($display->getPresentations() as $pres) {
+            foreach ($pres->getCarouselPresentationMaps() as $map) {
+                $carousel = $map->getCarousel();
+                // todo don't fetch duplicates from db
+                $carousels[$carousel->getId()] = [
+                    'id' => $carousel->getId(),
+                    'label' => $carousel->getLabel(),
+                    'selected' => ($selectedCarouselId === $carousel->getId()) ? true : false];
+            }
+        }
+        // var_dump($button);die;
+
+        return new JsonResponse(array_values($carousels));
     }
 }

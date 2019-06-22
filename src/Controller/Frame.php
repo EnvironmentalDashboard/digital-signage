@@ -20,12 +20,20 @@ class Frame extends AbstractController
     public function listByCarousel(Request $request, $id, EntityManagerInterface $entityManager)
     {
         $repository = $entityManager->getRepository(Entity\Frame::class);
-        
-        $entities = $repository->findBy([
-            'carousel' => $id
-        ]);
+        $buttonId = $request->query->get('buttonId');
+        $selectedFrame = false;
+        if ($buttonId !== null) {
+            $button = $entityManager->getRepository(Entity\Button::class)->find($buttonId);
+            if ($button !== null) {
+                $selectedFrame = $button->getTriggerFrame();
+            }
+        }
+        $frames = [];
+        foreach ($repository->findBy(['carousel' => $id]) as $frame) {
+            $frames[] = ['id' => $frame->getId(), 'url' => $frame->getUrl(), 'selected' => ($selectedFrame === $frame->getId()) ? true : false];
+        }
 
-        return $this->render('frame-list-edit.html.twig', ['frames' => $entities]);
+        return new JsonResponse($frames);
     }
 
     /**

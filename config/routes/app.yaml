@@ -29,9 +29,13 @@ display-template:
   methods: GET
   requirements:
     name: "fullscreen|marquee"
-frame-list-by-display:
-  path: /display/{id}/frame/all
-  controller: App\Controller\Frame::listByDisplay
+# frame-list-by-display:
+#   path: /display/{id}/frame/all
+#   controller: App\Controller\Frame::listByDisplay
+#   methods: GET
+carousel-list-by-display:
+  path: /display/{id}/carousel/all
+  controller: App\Controller\Display::carouselListByDisplay
   methods: GET
 
 carousel-table:

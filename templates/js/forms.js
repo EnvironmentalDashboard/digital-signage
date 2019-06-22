@@ -313,19 +313,44 @@ var saveButton = function (e) {
 	});
 };
 
-var loadFrames = function (e) {
-	console.log(e);
+var loadCarousels = function(e) {
 	var select = $(e);
 	var target = $(select.data('target'));
 	$.ajax({
-		url: '/digital-signage/display/' + select.val() + '/frame/all',
+		url: '/digital-signage/display/' + select.val() + '/carousel/all',
 		type: "GET",
+		data: "buttonId=" + target.attr('id').replace('carouselList', ''),
+		success: function (data) {
+			var id = guidGenerator();
+			var frameTarget = target.attr('id').replace('carouselList', 'frameList');
+			var markup = '<label for="' + id + '">Select carousel</label><select class="form-control" id="' + id + '" name="notNeeded" onchange="return loadFrames(this);" data-target="' + frameTarget + '">';
+			for (var i = 0; i < data.length; i++) {
+				var carousel = data[i];
+				markup += '<option ' + (carousel.selected ? 'selected' : '') + ' value="' + carousel.id + '">' + carousel.label + '</option>';
+			}
+			markup += '</select>';
+			target.html(markup);
+		},
+		error: function (xhr, status, error) {
+			console.log(xhr, status, error);
+		},
+		xhr: mainProgressBar
+	});
+}
+
+var loadFrames = function (e) {
+	var select = $(e);
+	var target = $('#' + select.attr('data-target'));
+	$.ajax({
+		url: '/digital-signage/carousel/' + select.val() + '/frame/all',
+		type: "GET",
+		data: "buttonId=" + target.attr('id').replace('carouselList', ''),
 		success: function (data) {
 			var id = guidGenerator();
 			var markup = '<label for="' + id + '">Select frame</label><select class="form-control" id="' + id + '" name="buttonFrameSelect">';
 			for (var i = 0; i < data.length; i++) {
 				var frame = data[i];
-				markup += '<option value="' + frame.id + '">' + frame.url + '</option>';
+				markup += '<option ' + (frame.selected ? 'selected' : '') + ' value="' + frame.id + '">' + frame.url + '</option>';
 			}
 			markup += '</select>';
 			target.html(markup);
@@ -391,8 +416,7 @@ $(function () {
 	popovers.on('shown.bs.popover', function (e) {
 		var id = $(e.target).attr('data-displayList');
 		if (id != null) {
-			console.log(id);
-			loadFrames(document.getElementById(id));	
+			loadCarousels(document.getElementById(id));	
 		}
 	});
 });

@@ -28,35 +28,10 @@
       </div>
       <div class="col-sm-6">
         <div id="buttonList{{controller.id}}">{{ render(controller('App\\Controller\\Button::listAll')) }}</div>
-        <p><button type="button" class="btn btn-link" data-toggle="popover" title="Create new button" data-displayList="buttonDisplaySelect{{controller.id}}" data-content='
-        <form onsubmit="return newButton(event, this)" action="{{ path("button-create") }}" method="POST" enctype="multipart/form-data">
-          <input type="hidden" name="controllerId" value="{{controller.id}}">
-          <div class="form-group">
-            <label for="buttonDisplaySelect{{controller.id}}">Select display</label>
-            <select class="form-control" id="buttonDisplaySelect{{controller.id}}" name="buttonDisplaySelect" onchange="return loadFrames(this)" data-target="#frameList{{controller.id}}">
-              {% for display in displays %}
-              <option value="{{display.id}}">{{display.label}}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="form-group" id="frameList{{controller.id}}">
-            <div class="d-flex justify-content-center">
-              <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="file{{controller.id}}">Button image</label>
-            <input type="file" class="form-control-file" id="file{{controller.id}}" name="file">
-          </div>
-          <div class="form-group">
-            <div class="progress" style="display: none">
-              <div class="progress-bar" id="progress-bar{{controller.id}}" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-          </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+        <p><button type="button" class="btn btn-link" data-toggle="popover" data-placement="top" title="Create new button" data-displayList="buttonDisplaySelect{{controller.id}}" data-content='
+          {% set buttonFormHandler = "newButton" %}
+          {% set buttonFormAction = path("button-create") %}
+          {% include "button-create.html.twig" %}
         '>Add button</button></p>
       </div>
     </div>
