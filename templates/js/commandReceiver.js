@@ -22,15 +22,11 @@ conn.onmessage = function (e) {
 					for (var i = 0; i < frames[key][carousel].length; i++) {
 						if (frames[key][carousel][i].id === target) {
 							clearTimers();
-							if (animateCarousels(frames[key], key, target)) {
-								clearCurrentPres();
-								if (presentationIdx !== j) {
-									sequence[presentationIdx].element.style.display = 'none';
-									presentationIdx = j;
-									sequence[presentationIdx].element.style.display = '';
-								}	
-							}
-							// console.log(frames[key], key, i);
+							clearCurrentPres();
+							presentationIdx = j;
+							nextPres(false, target);
+							// console.log(frames[key], key, target, j, sequence[j]);
+
 							break;
 						}
 						

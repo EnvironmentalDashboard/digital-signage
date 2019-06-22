@@ -42,7 +42,7 @@ for (var key in presentations) {
 animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id);
 // advance to next presentation in after current presentations duration
 if (sequence.length > 1 && sequence[presentationIdx].duration > 0) {
-	console.log('nextPres in', sequence[presentationIdx].duration);
+	// console.log('first nextPres in', sequence[presentationIdx].duration);
 	setTimeout(nextPres, sequence[presentationIdx].duration);
 }
 
@@ -93,16 +93,26 @@ function animateCarousels(carouselList, curPres, triggerFrame = null) {
 	
 }
 
-function nextPres() {
-	clearTimers();
-	clearCurrentPres();
+function nextPres(increment = true, target = null) {
+	if (target === null) {
+		clearTimers();
+		clearCurrentPres();
+	}
+	// console.log('arg', sequence[presentationIdx].element);
+	// if (nextPres.caller === null) {
+	// 	return;
+	// }
 	sequence[presentationIdx].element.style.display = 'none';
-	if (++presentationIdx === sequence.length) {
+	if (increment && ++presentationIdx === sequence.length) {
 		presentationIdx = 0;
 	}
 	sequence[presentationIdx].element.style.display = '';
-	animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id);
-	console.log('nextPres in', sequence[presentationIdx].duration);
+	if (target === null) {
+		animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id);
+	} else {
+		animateCarousels(frames[sequence[presentationIdx].element.id], sequence[presentationIdx].element.id, target);
+	}
+	// console.log('nextPres in', sequence[presentationIdx].duration);
 	setTimeout(nextPres, sequence[presentationIdx].duration);
 }
 
@@ -126,6 +136,8 @@ function clearCurrentPres() {
 			frameList[j].src = 'about:blank';
 		}
 	}
+	// console.log(sequence[presentationIdx].element);
+	sequence[presentationIdx].element.style.display = 'none';
 }
 
 // utilities
