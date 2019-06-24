@@ -53,7 +53,7 @@ class RemoteControllerEdit extends AbstractController
     /**
      * controller-save-buttons
      */
-    public function saveButtons(Request $request, EntityManagerInterface $entityManager)
+    public function saveButtons(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory)
     {
         $controllerId = $request->request->get('id');
         $templateId = $request->request->get('controller-template');
@@ -65,7 +65,14 @@ class RemoteControllerEdit extends AbstractController
 
         $controllerRepo = $entityManager->getRepository(Entity\RemoteController::class);
         $controller = $controllerRepo->find($controllerId);
-        $controller->setTemplate($entityManager->getRepository(Entity\Template::class)->find($templateId));
+        
+        if ($templateId !== 0) { // not custom template
+            $template = $templateFactory->cloneParent($templateId);
+            // todo: set custom twig
+            $entityManager->persist($template);
+            $controller->setTemplate($template);
+        }
+        $entityManager->persist($controller);
 
         $btnRepo = $entityManager->getRepository(Entity\Button::class);
         foreach ($btnArrangement as $twigKey => $btnId) {

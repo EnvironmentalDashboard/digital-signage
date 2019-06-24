@@ -19,14 +19,14 @@
       class="hidden-button-arrangement"
       value='{{ button_arrangements[controller.id]|json_encode|raw }}'>
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-sm-4">
         <div style="height: 300px;width: 100%;display: inline-flex; flex-flow: row wrap; justify-content: center; align-items: center;" class="drop-zone" ondrop="controller_drop_handler(event);"
           ondragover="dragover_handler(event);" id="controller-drop-zone-{{controller.id}}"
           data-controller="{{controller.id}}">
           {{ markup[loop.index-1]|raw }}
         </div>
       </div>
-      <div class="col-sm-6">
+      <div class="col-sm-8">
         <div id="buttonList{{controller.id}}">{{ render(controller('App\\Controller\\Button::listAll')) }}</div>
         <p><button type="button" class="btn btn-link" data-toggle="popover" data-placement="top" title="Create new button" data-displayList="buttonDisplaySelect{{controller.id}}" data-content='
           {% set buttonFormHandler = "newButton" %}

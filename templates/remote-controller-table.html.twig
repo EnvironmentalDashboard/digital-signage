@@ -39,7 +39,7 @@
 {% for controller in controllers %}
 <div class="modal fade" id="controller-{{controller.id}}-editControllerModal" tabindex="-1" role="dialog"
     aria-labelledby="editControllerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <form action="{{ path('controller-save-buttons', {'id': controller.id}) }}" method="POST">
                 <div class="modal-header">

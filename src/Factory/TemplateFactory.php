@@ -28,7 +28,7 @@ class TemplateFactory
     
         $template = clone $parent;
     
-        return $template; // if this template is saved in the db it will recieve a new ID
+        return $template; // if this template is saved in the db it will receive a new ID
     }
 
     /**

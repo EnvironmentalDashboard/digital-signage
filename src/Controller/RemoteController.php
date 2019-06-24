@@ -75,7 +75,7 @@ class RemoteController extends AbstractController
             $controllerButtons = [];
             // compile twig templates
             foreach ($buttons as $button) {
-                $controllerButtons["btn{$counter}"] = "trigger {$button->getTriggerFrame()->getUrl()}";
+                $controllerButtons["btn{$counter}"] = "<img src='/digital-signage/uploads/{$button->getImage()}' class='img-fluid' />";
                 $buttonArrangement[$controllerId]["btn{$counter}"] = $button->getId();
                 $counter++;
             }

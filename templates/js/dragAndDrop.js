@@ -33,7 +33,7 @@ function controller_drop_handler(ev) {
 	ev.preventDefault();
 	var id = ev.dataTransfer.getData("text");
 	var text = document.getElementById(id).getAttribute('src');
-	ev.target.innerHTML = text;
+	ev.target.innerHTML = "<img src='" + text + "' class='img-fluid' />";
 	var twig_key = ev.target.getAttribute('data-twig');
 	var button_id = id.substring(6); // cut off 'button'
 	var input = document.getElementById('button-arrangement-' + ev.target.parentNode.getAttribute('data-controller'));

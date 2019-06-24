@@ -1,14 +1,27 @@
 <ul class="list-group list-group-flush">
-    {% for button in buttons %}
-        {% set buttonFormHandler = "editButton" %}
-        {% set buttonFormAction = path("button-edit", {id: button.id}) %}
-        {% set controller = []|merge({'id': button.id})  %}
-        <li class="list-group-item" id="buttonListItem{{button.id}}">
-            <img style="width: 100%" draggable="true" ondragstart="dragstart_handler(event);" ondragend="dragend_handler(event);" id="button{{button.id}}" src="{{ path('index') }}uploads/{{button.image}}" alt="Button image">
-            Trigger {{button.triggerFrame.url}} on {{button.onDisplay.label}}
-            <button type="button" class="btn btn-link" data-toggle="popover" data-placement="top" title="Edit button" data-displayList="buttonDisplaySelect{{controller.id}}" data-content='
-            {% include "button-create.html.twig" %}
-            '>Edit</button>
-        </li>
-    {% endfor %}
+    <div class="row">
+        {% set buttonCount = buttons|length %}
+        {% set halfway = (buttonCount / 2)|round(0, 'floor') + 1 %}
+        {% for button in buttons %}
+            {% set buttonFormHandler = "editButton" %}
+            {% set buttonFormAction = path("button-edit", {id: button.id}) %}
+            {% set controller = []|merge({'id': button.id})  %}
+            {% if loop.index == 1 or loop.index == halfway %}
+            <div class="col-md-6">
+                {% endif %}
+                <li class="list-group-item" id="buttonListItem{{button.id}}">
+                    <img style="width: 100%" draggable="true" ondragstart="dragstart_handler(event);"
+                        ondragend="dragend_handler(event);" id="button{{button.id}}"
+                        src="{{ path('index') }}uploads/{{button.image}}" alt="Button image">
+                    Trigger {{button.triggerFrame.url}} on {{button.onDisplay.label}}
+                    <button type="button" class="btn btn-link" data-toggle="popover" data-placement="top"
+                        title="Edit button" data-displayList="buttonDisplaySelect{{controller.id}}" data-content='
+                            {% include "button-create.html.twig" %}
+                            '>Edit</button>
+                </li>
+                {% if loop.index == buttonCount or loop.index + 1 == halfway %}
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
 </ul>

@@ -29,7 +29,7 @@ var createCarousel = function (e) {
 			type: "GET",
 			success: function (data) {
 				$("#nav-all-carousels").html(data);
-				$('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel); // Re-apply submit event to new forms
+				// Re-apply submit event to new forms
 				$('.detect-duration').each(function () {
 					$(this).on('input', detectDuration);
 				});
@@ -101,6 +101,10 @@ var createController = function (e) {
 			success: function (data) {
 				$("#nav-all-controllers").html(data);
 				$('form[action="{{ path("controller-create") }}"]').on('submit', createController); // Re-apply submit event to new forms
+				enablePopovers();
+				$(".controller-select-dropdown").each(function () {
+					$(this).on('change', controllerDropdownTemplate);
+				});
 				input.removeClass('is-valid');
 				input.val('');
 				submit.html('Create remote controller');
@@ -157,6 +161,9 @@ var saveFrame = function (e) {
 				$('.detect-duration').each(function () {
 					$(this).on('input', detectDuration);
 				});
+				$(".carousel-add-new-frame").each(function () {
+					$(this).on('click', newFrame);
+				});
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
@@ -212,6 +219,7 @@ var newButton = function (ev, el) {
 	var progressBar = $('#progress-bar' + controllerId);
 	var progressBarContainer = progressBar.parent();
 	progressBarContainer.css('display', '');
+	$('[data-toggle="popover"]').popover('hide');
 	$.ajax({
 		// Your server script to process the upload
 		url: $el.attr('action'),
@@ -410,7 +418,7 @@ $(".controller-select-dropdown").each(function () {
 	$(this).on('change', controllerDropdownTemplate);
 });
 
-$(function () {
+function enablePopovers() {
 	var popovers = $('[data-toggle="popover"]');
 	popovers.popover({ html: true });
 	popovers.on('shown.bs.popover', function (e) {
@@ -419,7 +427,8 @@ $(function () {
 			loadCarousels(document.getElementById(id));	
 		}
 	});
-});
+}
+enablePopovers();
 
 // utilities
 function randomize_ids(container_div) {
