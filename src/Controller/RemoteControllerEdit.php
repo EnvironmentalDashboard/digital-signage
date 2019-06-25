@@ -76,6 +76,9 @@ class RemoteControllerEdit extends AbstractController
 
         $btnRepo = $entityManager->getRepository(Entity\Button::class);
         foreach ($btnArrangement as $twigKey => $btnId) {
+            if (strpos($template->getTwig(), $twigKey) === false) {
+                throw new \Exception("Twig key {$twigKey} not found in template string:\n{$template->getTwig()}\n\n");   
+            }
             $btn = $btnRepo->find($btnId);
             $btn->setTwigKey($twigKey);
             $btn->addController($controller);

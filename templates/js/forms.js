@@ -199,9 +199,11 @@ var newPresentation = function (e) {
 	var new_pres_id = guidGenerator();
 	var new_dropzone_id = guidGenerator();
 	select_drop_zone.attr('data-controls', '#' + new_dropzone_id);
+	select_drop_zone.attr('data-arrangement', '#frame-arrangement-' + new_pres_id);
 	drop_zone.attr('data-pres', new_pres_id);
 	drop_zone.attr('id', new_dropzone_id);
 	fa_input.attr('id', 'frame-arrangement-' + new_pres_id);
+	fa_input.val('{}');
 	id_input.val('new');
 	var custom_option = select_drop_zone.children().last();
 	if (custom_option.text() === 'Custom') {
@@ -373,14 +375,18 @@ var loadFrames = function (e) {
 var displayDropdownTemplate = function (e) {
 	e.preventDefault();
 	var controls = $(this).data('controls');
+	var arrangement = $(this).data('arrangement');
 	var selected = $(this).find(":selected").data('index');
+	$(arrangement).val('{}');
 	$(controls).html(displayTemplates[selected - 1]);
 }
 
 var controllerDropdownTemplate = function (e) {
 	e.preventDefault();
 	var controls = $(this).data('controls');
+	var arrangement = $(this).data('arrangement');
 	var selected = $(this).find(":selected").data('index');
+	$(arrangement).val('{}');
 	$(controls).html(controllerTemplates[selected - 1]);
 }
 

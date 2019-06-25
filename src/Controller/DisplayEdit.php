@@ -97,13 +97,16 @@ class DisplayEdit extends AbstractController
             $entityManager->persist($presentation);
             $entityManager->persist($display);
             
-            foreach ($frameArrangement as $twig_key => $carousel_id) {
+            foreach ($frameArrangement as $twigKey => $carousel_id) {
+                if (strpos($template->getTwig(), $twigKey) === false) {
+                    throw new \Exception("Twig key {$twigKey} not found in template string:\n{$template->getTwig()}\n\n");   
+                }
                 $map = new Entity\CarouselPresentationMap();
                 $map->setPresentation($presentation);
                 // this seems inefficient- is there not a way to create map row w/o fetching carousel from db?
                 $carousel = $carouselRepo->find($carousel_id);
                 $map->setCarousel($carousel);
-                $map->setTemplateKey($twig_key);
+                $map->setTemplateKey($twigKey); // todo make sure template key is in template
                 $entityManager->persist($map);
             }
         }
