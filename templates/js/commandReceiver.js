@@ -14,29 +14,25 @@ conn.onmessage = function (e) {
 		return;
 	}
 	var target = 'frame' + frameId;
-	var j = 0;
-	for (var key in frames) {
-		if (frames.hasOwnProperty(key)) {
-			for (const carousel in frames[key]) {
-				if (frames[key].hasOwnProperty(carousel)) {
-					for (var i = 0; i < frames[key][carousel].length; i++) {
-						if (frames[key][carousel][i].id === target) {
-							clearTimers();
-							clearCurrentPres();
-							presentationIdx = j;
-							nextPres(false, target);
-							// console.log(frames[key], key, target, j, sequence[j]);
-
-							break;
+	for (var key in presentations) {
+		if (presentations.hasOwnProperty(key)) {
+			var presentation = presentations[key];
+			var carousels = presentation['carousels'];
+			for (var carouselId in carousels) {
+				if (carousels.hasOwnProperty(carouselId)) {
+					var frames = carousels[carouselId];
+					for (let i = 0; i < frames.length; i++) {
+						if (frames[i].id === target) {
+							WS_READY = true;
+							showPresentation(key, frames[i].id);
+							return;
 						}
 						
 					}
-					
 				}
 			}
 		}
-		j++;
 	}
-
 	WS_READY = true;
+	
 };

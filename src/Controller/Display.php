@@ -20,8 +20,11 @@ class Display extends AbstractController
     public function present($id, Request $request, EntityManagerInterface $entityManager)
     {
 
-        $presentations = [];
-        foreach ($entityManager->getRepository(Entity\Display::class)->find($id)->getPresentations() as $presentation) {
+        $res = [];
+        $presentations = $entityManager->getRepository(Entity\Display::class)->find($id)->getPresentations();
+        $presCount = count($presentations);
+        for ($i = 0; $i < $presCount; $i++) { // for all presentations associated with display $id
+            $presentation = $presentations[$i];
             $template = $this->get('twig')->createTemplate(
                 $presentation->getTemplate()->getTwig()
             );
@@ -29,21 +32,26 @@ class Display extends AbstractController
             $carousels = [];
             $templateParams = [];
             $map = $presentation->getCarouselPresentationMaps();
-            foreach ($map as $relation) {
+            foreach ($map as $relation) { // for all carousels associated with $presentation
                 $twigKey = $relation->getTemplateKey();
                 $carousel = $relation->getCarousel();
-                $frames = [];
-                foreach ($carousel->getFrames() as $frame) {
-
+                $processedFrames = [];
+                $frames = $carousel->getFrames();
+                $frameCount = count($frames);
+                for ($j = 0; $j < $frameCount; $j++) { // for all frames associated with $carousel
+                    $frame = $frames[$j];
+                    $nextIdx = ($j === $frameCount - 1) ? 0 : $j + 1;
+                    $nextFrame = $frames[$nextIdx];
                     $url = $frame->getUrl();
                     $parts = parse_url($url);
                     switch ($parts['host']) {
                         case 'www.youtube.com':
                             parse_str($parts['query'], $get_array);
-                            $frames[] = [
+                            $processedFrames[] = [
                                 'id' => "frame{$frame->getId()}",
                                 'url' => "https://www.youtube.com/embed/{$get_array['v']}",
                                 'dur' => $frame->getDuration(),
+                                'next' => "frame{$nextFrame->getId()}"
                             ];
                             break;
                         case 'docs.google.com':
@@ -53,47 +61,56 @@ class Display extends AbstractController
                                 $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
                                 $googleSlides = $repository->findOneBy(['presentationId' => $presId]);
                                 if ($googleSlides === null) { // uh oh, somehow presentation duration got deleted
-                                    $frames[] = [
+                                    $processedFrames[] = [
                                         'id' => "frame{$frame->getId()}",
                                         'url' => "https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal",
                                         'dur' => $frame->getDuration(),
+                                        'next' => "frame{$nextFrame->getId()}"
                                     ];
                                     break;
                                 }
-                                foreach ($googleSlides->getData() as $i => $dur) {
-                                    $id = ($i === 0) ? "frame{$frame->getId()}" : "frame{$frame->getId()}-{$i}"; // buttons trigger frames with document.getElementById('frame' + frameId), so give first slide this special id to be found
-                                    $i = $i + 1;
-                                    $frames[] = [
+                                $slides = $googleSlides->getData();
+                                $googleSlidesCount = count($slides) - 1;
+                                foreach ($slides as $k => $dur) {
+                                    $id = ($k === 0) ? "frame{$frame->getId()}" : "frame{$frame->getId()}-{$k}"; // buttons trigger frames with document.getElementById('frame' + frameId), so give first slide this special id to be found
+                                    $nextId = ($k === $googleSlidesCount) ? "frame{$nextFrame->getId()}" : "frame{$nextFrame->getId()}-" . ($k + 1);
+                                    $k++;
+                                    $processedFrames[] = [
                                         'id' => $id,
-                                        'url' => "https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal#slide={$i}",
+                                        'url' => "https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal#slide={$k}",
                                         'dur' => $dur,
+                                        'next' => $nextId
                                     ];
                                 }
                                 break;
                             }
                         default:
-                            $frames[] = [
+                            $processedFrames[] = [
                                 'id' => "frame{$frame->getId()}",
                                 'url' => $url,
                                 'dur' => $frame->getDuration(),
+                                'next' => "frame{$nextFrame->getId()}"
                             ];
                     }
                 }
-                $carousels[$twigKey] = $frames;
+
+                $carousels[$twigKey] = $processedFrames;
                 $templateParams[$twigKey] = "<iframe id='pres{$presentation->getId()}-{$twigKey}-primary' src='about:blank' frameborder='0'></iframe><iframe id='pres{$presentation->getId()}-{$twigKey}-secondary' src='about:blank' frameborder='0'></iframe>";
             }
+            
             $markup = $template->render($templateParams);
 
-            $presentations[$presentation->getId()] = [
+            $ret[$presentation->getId()] = [
                 'id' => $presentation->getId(),
                 'template' => $markup,
                 'carousels' => $carousels,
-                'duration' => $presentation->getDuration()
+                'duration' => $presentation->getDuration(),
+                'next' => ($i === $presCount - 1) ? $presentations[0]->getId() : $presentations[$i + 1]->getId()
             ];
         }
 
         return $this->render('present.html.twig', ['presentations' => 
-            $presentations
+            $ret
         ]);
 
     }
