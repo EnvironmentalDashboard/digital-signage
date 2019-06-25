@@ -1,22 +1,33 @@
 var mainProgressBar = function () {
-	var myXhr = $.ajaxSettings.xhr();
-	var progress = $('main-progress');
-	if (myXhr.upload) {
-		progress.removeClass('d-none');
-		myXhr.upload.addEventListener('progress', function (e) {
-			if (e.lengthComputable) {
-				var pct = (e.loaded/e.total) * 100;
-				progress.attr('aria-valuenow', pct);
-				progress.css('width', pct + '%');
-				if (pct === 100) {
-					setTimeout(function() {progress.addClass('d-none');}, 500);
-				}
-			}
-		}, false);
-	}
-	return myXhr;
+	var xhr = new window.XMLHttpRequest();
+	var progressBar = $('#main-progress');
+	progressBar.removeClass('d-none');
+	xhr.upload.addEventListener("progress", function (evt) { // upload
+		if (evt.lengthComputable) {
+			var pct = evt.loaded / evt.total;
+			progressBar.attr('aria-valuenow', pct);
+			progressBar.css('width', pct + '%');
+		} else {
+			progressBar.attr('aria-valuenow', 100);
+			progressBar.css('width', '100%');
+		}
+	}, false);
+
+	xhr.addEventListener("progress", function (evt) { // download
+		console.log(evt);
+		if (evt.lengthComputable) {
+			var pct = evt.loaded / evt.total;
+			progressBar.attr('aria-valuenow', pct);
+			progressBar.css('width', pct + '%');
+		} else {
+			progressBar.attr('aria-valuenow', 100);
+			progressBar.css('width', '100%');
+		}
+	}, false);
+
+	return xhr;
 };
-var deleteEntity = function(e) {
+var deleteEntity = function (e) {
 	e.preventDefault();
 	var parentTr = $(this).closest('tr');
 	$.post($(this).attr('action'), $(this).serialize()).done(function () {
@@ -50,6 +61,7 @@ var createCarousel = function (e) {
 				$('#nav-all-carousels-tab').tab('show');
 				var new_row = $('#nav-all-carousels > table > tbody > tr:last-child');
 				new_row.addClass('table-primary');
+				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 				setTimeout(function () { new_row.removeClass('table-primary'); }, 1500);
 			},
 			error: function (xhr, status, error) {
@@ -82,6 +94,10 @@ var createDisplay = function (e) {
 				$('#nav-all-displays-tab').tab('show');
 				var new_row = $('#nav-all-displays > table > tbody > tr:last-child');
 				new_row.addClass('table-primary');
+				$(".template-select-dropdown").each(function () {
+					$(this).on('change', displayDropdownTemplate);
+				});
+				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 				setTimeout(function () { new_row.removeClass('table-primary'); }, 1500);
 			},
 			error: function (xhr, status, error) {
@@ -118,6 +134,7 @@ var createController = function (e) {
 				$('#nav-all-controllers-tab').tab('show');
 				var new_row = $('#nav-all-controllers > table > tbody > tr:last-child');
 				new_row.addClass('table-primary');
+				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 				setTimeout(function () { new_row.removeClass('table-primary'); }, 1500);
 			},
 			error: function (xhr, status, error) {
@@ -142,6 +159,7 @@ var savePresentation = function (e) {
 				$("#nav-all-displays").html(data);
 				$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
 				$('form[action$="/presentations/save"]').on('submit', savePresentation);
+				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
@@ -171,6 +189,7 @@ var saveFrame = function (e) {
 				$(".carousel-add-new-frame").each(function () {
 					$(this).on('click', newFrame);
 				});
+				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
@@ -243,18 +262,18 @@ var newButton = function (ev, el) {
 		contentType: false,
 		processData: false,
 
-		success: function(res) {
+		success: function (res) {
 			console.log(res);
 			$.ajax({
 				url: '{{ path("button-list-all") }}',
 				type: "GET",
-				success: function(data) {
+				success: function (data) {
 					target.html(data);
-					setTimeout(function() {
-						progressBarContainer.css('display', 'none');	
+					setTimeout(function () {
+						progressBarContainer.css('display', 'none');
 					}, 2000);
 				},
-				error: function(xhr, status, error) {
+				error: function (xhr, status, error) {
 					console.log(xhr, status, error);
 				}
 			});
@@ -268,7 +287,7 @@ var newButton = function (ev, el) {
 				// For handling the progress of the upload
 				myXhr.upload.addEventListener('progress', function (e) {
 					if (e.lengthComputable) {
-						var pct = (e.loaded/e.total) * 100;
+						var pct = (e.loaded / e.total) * 100;
 						progressBar.attr('aria-valuenow', pct);
 						progressBar.css('width', pct + '%');
 					}
@@ -291,15 +310,15 @@ var editButton = function (ev, el) {
 		cache: false,
 		contentType: false,
 		processData: false,
-		success: function(res) {
+		success: function (res) {
 			console.log(res);
 			$.ajax({
 				url: '{{ path("button-list-all") }}',
 				type: "GET",
-				success: function(data) {
+				success: function (data) {
 					target.html(data);
 				},
-				error: function(xhr, status, error) {
+				error: function (xhr, status, error) {
 					console.log(xhr, status, error);
 				}
 			});
@@ -319,6 +338,7 @@ var saveButton = function (e) {
 				$("#nav-all-controllers").html(data);
 				$('form[action="{{ path("controller-create") }}"]').on('submit', createController);
 				$('form[action$="/frames/save"]').on('submit', saveFrame);
+				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
@@ -330,7 +350,7 @@ var saveButton = function (e) {
 	});
 };
 
-var loadCarousels = function(e) {
+var loadCarousels = function (e) {
 	var select = $(e);
 	var target = $(select.data('target'));
 	$.ajax({
@@ -347,6 +367,7 @@ var loadCarousels = function(e) {
 			}
 			markup += '</select>';
 			target.html(markup);
+			$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 		},
 		error: function (xhr, status, error) {
 			console.log(xhr, status, error);
@@ -371,6 +392,7 @@ var loadFrames = function (e) {
 			}
 			markup += '</select>';
 			target.html(markup);
+			$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 		},
 		error: function (xhr, status, error) {
 			console.log(xhr, status, error);
@@ -420,9 +442,9 @@ $(".display-add-new-pres").each(function () {
 var displayTemplates = ['{{ render(controller("App\\Controller\\Display::template",{"name": "fullscreen"})) }}',
 	'{{ render(controller("App\\Controller\\Display::template", {"name": "marquee"})) }}'];
 var controllerTemplates = ['{{ render(controller("App\\Controller\\RemoteController::template", {"name": "2 Buttons"})) }}',
-						'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "4 Buttons"})) }}',
-						'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "6 Buttons"})) }}',
-						'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "8 Buttons"})) }}'	];
+	'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "4 Buttons"})) }}',
+	'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "6 Buttons"})) }}',
+	'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "8 Buttons"})) }}'];
 /* {% endspaceless %} */
 
 $(".template-select-dropdown").each(function () {
@@ -438,7 +460,7 @@ function enablePopovers() {
 	popovers.on('shown.bs.popover', function (e) {
 		var id = $(e.target).attr('data-displayList');
 		if (id != null) {
-			loadCarousels(document.getElementById(id));	
+			loadCarousels(document.getElementById(id));
 		}
 	});
 }
