@@ -1,5 +1,9 @@
+{% if carousels is empty %}
+<p>There are no carousels</p>
+{% else %}
 <ul class="list-group list-group-flush">
     {% for carousel in carousels %}
         <li class="list-group-item draggable-item" draggable="true" ondragstart="dragstart_handler(event);" ondragend="dragend_handler(event);" id="carousel{{carousel.id}}">{{carousel.label}}</li>
     {% endfor %}
 </ul>
+{% endif %}

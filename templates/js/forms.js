@@ -14,7 +14,6 @@ var mainProgressBar = function () {
 	}, false);
 
 	xhr.addEventListener("progress", function (evt) { // download
-		console.log(evt);
 		if (evt.lengthComputable) {
 			var pct = evt.loaded / evt.total;
 			progressBar.attr('aria-valuenow', pct);
@@ -27,6 +26,7 @@ var mainProgressBar = function () {
 
 	return xhr;
 };
+
 var deleteEntity = function (e) {
 	e.preventDefault();
 	var parentTr = $(this).closest('tr');
@@ -34,7 +34,7 @@ var deleteEntity = function (e) {
 		parentTr.remove();
 	});
 }
-// Submit event to fire when carousel form submitted
+
 var createCarousel = function (e) {
 	e.preventDefault();
 	var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
@@ -72,9 +72,8 @@ var createCarousel = function (e) {
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
 	});
-};
+}
 
-// Submit event to fire when display form submitted
 var createDisplay = function (e) {
 	e.preventDefault();
 	var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
@@ -87,7 +86,6 @@ var createDisplay = function (e) {
 			type: "GET",
 			success: function (data) {
 				$("#nav-all-displays").html(data);
-				$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay); // Re-apply submit event to new forms
 				input.removeClass('is-valid');
 				input.val('');
 				submit.html('Create display');
@@ -173,31 +171,35 @@ var savePresentation = function (e) {
 
 var saveFrame = function (e) {
 	e.preventDefault();
-	var modal = $(this).closest('.modal');
+	var that = $(this);
+	var modal = that.closest('.modal');
 	modal.modal('hide');
-	$.post($(this).attr('action'), $(this).serialize()).done(function () {
-		$.ajax({
-			url: '{{ path("carousel-table") }}',
-			type: "GET",
-			success: function (data) {
-				$("#nav-all-carousels").html(data);
-				$('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
-				$('form[action$="/frames/save"]').on('submit', saveFrame);
-				$('.detect-duration').each(function () {
-					$(this).on('input', detectDuration);
-				});
-				$(".carousel-add-new-frame").each(function () {
-					$(this).on('click', newFrame);
-				});
-				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
-			},
-			error: function (xhr, status, error) {
-				console.log(xhr, status, error);
-			},
-			xhr: mainProgressBar
+	modal.on('hidden.bs.modal', function () {
+		$("#nav-all-carousels").html('<div class="p-2 d-flex align-items-center"><strong>Loading...</strong><div class="spinner-border ml-auto" role="status" aria-hidden="true"></div></div>');
+		$.post(that.attr('action'), that.serialize()).done(function () {
+			$.ajax({
+				url: '{{ path("carousel-table") }}',
+				type: "GET",
+				success: function (data) {
+					$("#nav-all-carousels").html(data);
+					$('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
+					$('form[action$="/frames/save"]').on('submit', saveFrame);
+					$('.detect-duration').each(function () {
+						$(this).on('input', detectDuration);
+					});
+					$(".carousel-add-new-frame").each(function () {
+						$(this).on('click', newFrame);
+					});
+					$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
+				},
+				error: function (xhr, status, error) {
+					console.log(xhr, status, error);
+				},
+				xhr: mainProgressBar
+			});
+		}).fail(function (xhr, status, error) {
+			console.log(xhr, status, error);
 		});
-	}).fail(function (xhr, status, error) {
-		console.log(xhr, status, error);
 	});
 };
 
