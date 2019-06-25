@@ -16,6 +16,13 @@ var mainProgressBar = function () {
 	}
 	return myXhr;
 };
+var deleteEntity = function(e) {
+	e.preventDefault();
+	var parentTr = $(this).closest('tr');
+	$.post($(this).attr('action'), $(this).serialize()).done(function () {
+		parentTr.remove();
+	});
+}
 // Submit event to fire when carousel form submitted
 var createCarousel = function (e) {
 	e.preventDefault();
@@ -397,6 +404,7 @@ $('form[action="{{ path("controller-create") }}"]').on('submit', createControlle
 $('form[action$="/presentations/save"]').on('submit', savePresentation);
 $('form[action$="/frames/save"]').on('submit', saveFrame);
 $('form[action$="/buttons/save"]').on('submit', saveButton);
+$('form[action$="/delete"]').on('submit', deleteEntity);
 $('.detect-duration').each(function () {
 	$(this).on('input', detectDuration);
 });
