@@ -55,11 +55,11 @@ class RemoteControllerEdit extends AbstractController
      */
     public function saveButtons(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory)
     {
-        $controllerId = $request->request->get('id');
-        $templateId = $request->request->get('controller-template');
+        $controllerId = (int) $request->request->get('id');
+        $templateId = (int) $request->request->get('controller-template');
         $btnArrangement = $request->request->get('button-arrangement');
-        if (empty($controllerId) || empty($templateId) || empty($btnArrangement)) {
-            throw new \Exception("Missing fields: must POST id, controller-template, button-arrangement");
+        if (!isset($controllerId) || !isset($templateId) || !isset($btnArrangement)) {
+            throw new \Exception("Missing fields: must POST id, controller-template, button-arrangement; received " . print_r($request->request->all(), true));
         }
         $btnArrangement = json_decode($btnArrangement, true);
 
@@ -71,20 +71,23 @@ class RemoteControllerEdit extends AbstractController
             // todo: set custom twig
             $entityManager->persist($template);
             $controller->setTemplate($template);
+        } else {
+            $template = $entityManager->getRepository(Entity\Template::class)->find($templateId);
         }
         $entityManager->persist($controller);
 
         $btnRepo = $entityManager->getRepository(Entity\Button::class);
+        $twig = $template->getTwig();
         foreach ($btnArrangement as $twigKey => $btnId) {
-            if (strpos($template->getTwig(), $twigKey) === false) {
-                throw new \Exception("Twig key {$twigKey} not found in template string:\n{$template->getTwig()}\n\n");   
+            if (strpos($twig, $twigKey) === false) {
+                throw new \Exception("Twig key {$twigKey} not found in template string:\n{$twig}\n\n");   
             }
             $btn = $btnRepo->find($btnId);
             $btn->setTwigKey($twigKey);
             $btn->addController($controller);
+            $entityManager->merge($btn);
         }
 
-        $entityManager->merge($btn);
         $entityManager->flush();
         return new JsonResponse(true);
     }

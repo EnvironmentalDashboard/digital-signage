@@ -85,6 +85,9 @@ class DisplayEdit extends AbstractController
                 // todo: set custom twig
                 $entityManager->persist($template);
                 $presentation->setTemplate($template);
+                $newTemplate = true;
+            } else {
+                $newTemplate = false;
             }
             $presentation->setDuration($duration);
             $presentation->setLabel("Presentation for display #{$id}");
@@ -97,23 +100,43 @@ class DisplayEdit extends AbstractController
             $entityManager->persist($presentation);
             $entityManager->persist($display);
             
+            if ($newTemplate) {
+                $twigString = $template->getTwig();
+                preg_match_all('/\{\%\s*(.*)\s*\%\}|\{\{(?!%)\s*((?:[^\s])*)\s*(?<!%)\}\}/i', $twigString, $matches);
+                $matches = $matches[2];
+            }
+
             foreach ($frameArrangement as $twigKey => $carousel_id) {
-                if (strpos($template->getTwig(), $twigKey) === false) {
-                    throw new \Exception("Twig key {$twigKey} not found in template string:\n{$template->getTwig()}\n\n");   
+                if ($newTemplate && !$this->validTwigKey($matches, $twigKey)) { // key provided which is not in template
+                    throw new \Exception("Twig key {$twigKey} not found in template string:\n{$twigString}\n\n");
                 }
                 $map = new Entity\CarouselPresentationMap();
                 $map->setPresentation($presentation);
                 // this seems inefficient- is there not a way to create map row w/o fetching carousel from db?
                 $carousel = $carouselRepo->find($carousel_id);
                 $map->setCarousel($carousel);
-                $map->setTemplateKey($twigKey); // todo make sure template key is in template
+                $map->setTemplateKey($twigKey);
                 $entityManager->persist($map);
+            }
+            if ($newTemplate && count($matches) !== 0) { // key not provided which is in template
+                throw new \Exception("The following twig keys were not provided: " . print_r($matches, true) . "\n");
             }
         }
         
         $entityManager->flush();
 
         return new JsonResponse(true);
+    }
+
+    private function validTwigKey(&$keys, $key) {
+        for ($i = 0; $i < count($keys); $i++) {
+            if (explode('|', $keys[$i])[0] === $key) { // explode twig filters away
+                unset($keys[$i]);
+                $keys = array_values($keys); // re index array so $keys[0] is always first element
+                return true;
+            }
+        }
+        return false;
     }
 
 }

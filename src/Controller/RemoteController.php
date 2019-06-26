@@ -70,17 +70,18 @@ class RemoteController extends AbstractController
             $buttons = $controller->getButtons();
             $twig = $controller->getTemplate()->getTwig();
             $template = $this->get('twig')->createTemplate($twig);
+            // todo instead of counting occurrences of {{ we should maybe get list of twig keys w regex like in DisplayEdit::savePresentations
             $buttonCount = substr_count($twig, '{{'); // the number of twig placeholders in the markup
             $counter = 1;
             $controllerButtons = [];
             // compile twig templates
             foreach ($buttons as $button) {
-                $controllerButtons["btn{$counter}"] = "<img src='/digital-signage/uploads/{$button->getImage()}' class='img-fluid' />";
-                $buttonArrangement[$controllerId]["btn{$counter}"] = $button->getId();
+                $controllerButtons[$button->getTwigKey()] = "<img src='/digital-signage/uploads/{$button->getImage()}' class='img-fluid' />";
+                $buttonArrangement[$controllerId][$button->getTwigKey()] = $button->getId();
                 $counter++;
             }
             for (; $counter <= $buttonCount; $counter++) { // if we're missing buttons create dummy ones so can still compile twig
-                $controllerButtons["btn{$counter}"] = "placeholder";
+                $controllerButtons["btn{$counter}"] = "<div style='width:100%;height:100%'>placeholder</div>";
                 $buttonArrangement[$controllerId]["btn{$counter}"] = 0;
             }
             $rendered[] = $template->render($controllerButtons);

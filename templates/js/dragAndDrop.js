@@ -22,23 +22,27 @@ function drop_handler(ev) {
 	var id = ev.dataTransfer.getData("text");
 	var text = document.getElementById(id).innerHTML;
 	ev.target.innerHTML = text;
-	var twig_key = ev.target.getAttribute('data-twig');
+	var twigKey = ev.target.getAttribute('data-twig');
 	var carousel_id = id.substring(8); // cut off 'carousel'
 	var input = document.getElementById('frame-arrangement-' + ev.target.parentNode.getAttribute('data-pres'));
 	var cur_elems = JSON.parse(input.value);
-	cur_elems[twig_key] = carousel_id;
+	cur_elems[twigKey] = carousel_id;
 	input.value = JSON.stringify(cur_elems);
 }
 function controller_drop_handler(ev) {
 	ev.preventDefault();
 	var id = ev.dataTransfer.getData("text");
 	var text = document.getElementById(id).getAttribute('src');
-	ev.target.innerHTML = "<img src='" + text + "' class='img-fluid' />";
-	var twig_key = ev.target.getAttribute('data-twig');
+	var buttonElement = ev.target.parentNode;
+	var twigKey = buttonElement.getAttribute('data-twig');
+	// console.log(ev.target);
+	buttonElement.innerHTML = "<img src='" + text + "' class='img-fluid' />";
+	// console.log(ev.target);
 	var button_id = id.substring(6); // cut off 'button'
-	var input = document.getElementById('button-arrangement-' + ev.target.parentNode.getAttribute('data-controller'));
+	var input = document.getElementById('button-arrangement-' + buttonElement.parentNode.getAttribute('data-controller'));
+	// console.log(buttonElement, buttonElement.parentNode, input)
 	var cur_elems = JSON.parse(input.value);
-	cur_elems[twig_key] = button_id;
+	cur_elems[twigKey] = button_id;
 	input.value = JSON.stringify(cur_elems);
 }
 function dragend_handler(ev) {

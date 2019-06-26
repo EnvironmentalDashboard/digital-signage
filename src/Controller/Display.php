@@ -153,7 +153,7 @@ class Display extends AbstractController
                 if (empty($rendered['tmp'])) {
                     $twig = $template->getTwig();
                     $twig_template = $this->get('twig')->createTemplate($twig);
-                    $rendered['tmp'] = $twig_template->render(['url1' => '<p class="text-center text-muted pt-4">drag carousel here</p>']);
+                    $rendered['tmp'] = $twig_template->render(['url1' => 'drag carousel here']);
                 }
             }
         }
@@ -184,7 +184,7 @@ class Display extends AbstractController
         $template = $templateFactory->getParent($template_id);
         $twig = $template->getTwig();
         $template = $this->get('twig')->createTemplate($twig);
-        return new Response($template->render(['url1' => '<p class="text-center text-muted pt-4">drag carousel here</p>', 'url2' => '<p class="text-center text-muted pt-4">drag carousel here</p>'])); // need to include all possible twig keys
+        return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here'])); // need to include all possible twig keys
     }
     
     /**

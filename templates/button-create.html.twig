@@ -18,7 +18,6 @@
   <div class="form-group" id="frameList{{controller.id}}">
   </div>
   {% if buttonFormHandler == "newButton" %}
-  <input type="hidden" name="controllerId" value="{{controller.id}}">
   <div class="form-group">
     <label for="file{{controller.id}}">Button image</label>
     <input type="file" class="form-control-file" id="file{{controller.id}}" name="file">
@@ -29,6 +28,7 @@
     </div>
   </div>
   {% endif %}
+  <input type="hidden" name="controllerId" value="{{controller.id}}">
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 

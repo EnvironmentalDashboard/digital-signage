@@ -70,6 +70,9 @@ var createDisplay = function (e) {
 				$(".template-select-dropdown").each(function () {
 					$(this).on('change', displayDropdownTemplate);
 				});
+				$(".display-add-new-pres").each(function () {
+					$(this).on('click', newPresentation);
+				});
 				$('form[action$="/delete"]').on('submit', deleteEntity);
 				$('form[action$="/presentations/save"]').on('submit', savePresentation);
 				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
@@ -98,7 +101,6 @@ var createController = function (e) {
 			type: "GET",
 			success: function (data) {
 				$("#nav-all-controllers").html(data);
-				$('form[action="{{ path("controller-create") }}"]').on('submit', createController); // Re-apply submit event to new forms
 				enablePopovers();
 				$(".controller-select-dropdown").each(function () {
 					$(this).on('change', controllerDropdownTemplate);
@@ -111,6 +113,7 @@ var createController = function (e) {
 				var new_row = $('#nav-all-controllers > table > tbody > tr:last-child');
 				new_row.addClass('table-primary');
 				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
+				$('form[action$="/buttons/save"]').on('submit', saveButton);
 				setTimeout(function () { new_row.removeClass('table-primary'); }, 1500);
 			},
 			error: function (xhr, status, error) {
@@ -124,25 +127,29 @@ var createController = function (e) {
 
 var savePresentation = function (e) {
 	e.preventDefault();
-	var modal = $(this).closest('.modal');
+	var that = $(this);
+	var modal = that.closest('.modal');
 	modal.modal('hide');
 	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
-	$.post($(this).attr('action'), $(this).serialize()).done(function () {
-		$.ajax({
-			url: '{{ path("display-table") }}',
-			type: "GET",
-			success: function (data) {
-				$("#nav-all-displays").html(data);
-				$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
-				$('form[action$="/presentations/save"]').on('submit', savePresentation);
-				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
-			},
-			error: function (xhr, status, error) {
-				console.log(xhr, status, error);
-			}
+	modal.on('hidden.bs.modal', function () {
+		$("#nav-all-displays").html('<div class="p-2 d-flex align-items-center"><strong>Loading...</strong><div class="spinner-border ml-auto" role="status" aria-hidden="true"></div></div>');
+		$.post(that.attr('action'), that.serialize()).done(function () {
+			$.ajax({
+				url: '{{ path("display-table") }}',
+				type: "GET",
+				success: function (data) {
+					$("#nav-all-displays").html(data);
+					$('form[action="{{ path("display-create") }}"]').on('submit', createDisplay);
+					$('form[action$="/presentations/save"]').on('submit', savePresentation);
+					$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
+				},
+				error: function (xhr, status, error) {
+					console.log(xhr, status, error);
+				}
+			});
+		}).fail(function (xhr, status, error) {
+			console.log(xhr, status, error);
 		});
-	}).fail(function (xhr, status, error) {
-		console.log(xhr, status, error);
 	});
 };
 
@@ -310,47 +317,57 @@ var editButton = function (ev, el) {
 
 var saveButton = function (e) {
 	e.preventDefault();
-	var modal = $(this).closest('.modal');
+	var that = $(this);
+	var modal = that.closest('.modal');
 	modal.modal('hide');
 	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
-	$.post($(this).attr('action'), $(this).serialize()).done(function () {
-		$.ajax({
-			url: '{{ path("controller-table") }}',
-			type: "GET",
-			success: function (data) {
-				$("#nav-all-controllers").html(data);
-				$('form[action="{{ path("controller-create") }}"]').on('submit', createController);
-				$('form[action$="/frames/save"]').on('submit', saveFrame);
-				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
-			},
-			error: function (xhr, status, error) {
-				console.log(xhr, status, error);
-			}
+	modal.on('hidden.bs.modal', function () {
+		$("#nav-all-controllers").html('<div class="p-2 d-flex align-items-center"><strong>Loading...</strong><div class="spinner-border ml-auto" role="status" aria-hidden="true"></div></div>');
+		$.post(that.attr('action'), that.serialize()).done(function () {
+			$.ajax({
+				url: '{{ path("controller-table") }}',
+				type: "GET",
+				success: function (data) {
+					$("#nav-all-controllers").html(data);
+					$('form[action="{{ path("controller-create") }}"]').on('submit', createController);
+					$('form[action$="/frames/save"]').on('submit', saveFrame);
+					$('form[action$="/buttons/save"]').on('submit', saveButton);
+					$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
+				},
+				error: function (xhr, status, error) {
+					console.log(xhr, status, error);
+				}
+			});
+		}).fail(function (xhr, status, error) {
+			console.log(xhr, status, error);
 		});
-	}).fail(function (xhr, status, error) {
-		console.log(xhr, status, error);
 	});
 };
 
 var loadCarousels = function (e) {
-	var select = $(e);
-	var target = $(select.data('target'));
+	var $select = $(e);
+	var $target = $($select.data('target'));
 	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	$.ajax({
-		url: '/digital-signage/display/' + select.val() + '/carousel/all',
+		url: '/digital-signage/display/' + $select.val() + '/carousel/all',
 		type: "GET",
-		data: "buttonId=" + target.attr('id').replace('carouselList', ''),
+		data: "buttonId=" + $target.attr('id').replace('carouselList', ''),
 		success: function (data) {
 			var id = guidGenerator();
-			var frameTarget = target.attr('id').replace('carouselList', 'frameList');
-			var markup = '<label for="' + id + '">Select carousel</label><select class="form-control" id="' + id + '" name="notNeeded" onchange="return loadFrames(this);" data-target="' + frameTarget + '">';
-			for (var i = 0; i < data.length; i++) {
-				var carousel = data[i];
-				markup += '<option ' + (carousel.selected ? 'selected' : '') + ' value="' + carousel.id + '">' + carousel.label + '</option>';
+			var frameTarget = $target.attr('id').replace('carouselList', 'frameList');
+			if (data.length > 0) {
+				var markup = '<label for="' + id + '">Select carousel</label><select class="form-control" id="' + id + '" name="notNeeded" onchange="return loadFrames(this);" data-target="' + frameTarget + '">';
+				for (var i = 0; i < data.length; i++) {
+					var carousel = data[i];
+					markup += '<option ' + (carousel.selected ? 'selected' : '') + ' value="' + carousel.id + '">' + carousel.label + '</option>';
+				}
+				markup += '</select>';
+				$target.html(markup);
+				loadFrames(document.getElementById(id));
+			} else {
+				var markup = '<p>There are no carousels assigned to this display</p>';
+				$target.html(markup);
 			}
-			markup += '</select>';
-			target.html(markup);
-			$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 		},
 		error: function (xhr, status, error) {
 			console.log(xhr, status, error);

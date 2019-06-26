@@ -4,7 +4,7 @@
     <select class="form-control controller-select-dropdown" id="controller-template-for-{{controller.id}}"
       name="controller-template" data-arrangement="#button-arrangement-{{controller.id}}" data-controls="#controller-drop-zone-{{controller.id}}">
       {% if controller.template.id > 0 %}
-      <option value="0" selected>Custom</option>
+      <option value="{{controller.template.id}}" selected>Custom</option>
       {% endif %}
       <option value="-3" data-index="1">2 Buttons</option>
       <option value="-4" data-index="2">4 Buttons</option>
