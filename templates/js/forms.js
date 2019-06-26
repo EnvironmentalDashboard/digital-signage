@@ -1,36 +1,9 @@
-var mainProgressBar = function () {
-	var xhr = new window.XMLHttpRequest();
-	var progressBar = $('#main-progress');
-	progressBar.removeClass('d-none');
-	xhr.upload.addEventListener("progress", function (evt) { // upload
-		if (evt.lengthComputable) {
-			var pct = evt.loaded / evt.total;
-			progressBar.attr('aria-valuenow', pct);
-			progressBar.css('width', pct + '%');
-		} else {
-			progressBar.attr('aria-valuenow', 100);
-			progressBar.css('width', '100%');
-		}
-	}, false);
-
-	xhr.addEventListener("progress", function (evt) { // download
-		if (evt.lengthComputable) {
-			var pct = evt.loaded / evt.total;
-			progressBar.attr('aria-valuenow', pct);
-			progressBar.css('width', pct + '%');
-		} else {
-			progressBar.attr('aria-valuenow', 100);
-			progressBar.css('width', '100%');
-		}
-	}, false);
-
-	return xhr;
-};
-
 var deleteEntity = function (e) {
 	e.preventDefault();
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	var parentTr = $(this).closest('tr');
 	$.post($(this).attr('action'), $(this).serialize()).done(function () {
+		$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 		parentTr.remove();
 	});
 }
@@ -40,6 +13,7 @@ var createCarousel = function (e) {
 	var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
 	input.addClass('is-valid');
 	submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class="sr-only">Loading...</span></div>');
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	// Update carousel list & modals
 	$.post($(this).attr('action'), $(this).serialize()).done(function () {
 		$.ajax({
@@ -55,6 +29,7 @@ var createCarousel = function (e) {
 					$(this).on('click', newFrame);
 				});
 				$('form[action$="/frames/save"]').on('submit', saveFrame);
+				$('form[action$="/delete"]').on('submit', deleteEntity);
 				input.removeClass('is-valid');
 				input.val('');
 				submit.html('Create carousel');
@@ -66,8 +41,7 @@ var createCarousel = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			},
-			xhr: mainProgressBar
+			}
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -79,6 +53,7 @@ var createDisplay = function (e) {
 	var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
 	input.addClass('is-valid');
 	submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class="sr-only">Loading...</span></div>');
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	// Update display list & modals
 	$.post($(this).attr('action'), $(this).serialize()).done(function () {
 		$.ajax({
@@ -95,13 +70,14 @@ var createDisplay = function (e) {
 				$(".template-select-dropdown").each(function () {
 					$(this).on('change', displayDropdownTemplate);
 				});
+				$('form[action$="/delete"]').on('submit', deleteEntity);
+				$('form[action$="/presentations/save"]').on('submit', savePresentation);
 				$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 				setTimeout(function () { new_row.removeClass('table-primary'); }, 1500);
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			},
-			xhr: mainProgressBar
+			}
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -114,6 +90,7 @@ var createController = function (e) {
 	var input = $(this).find('input[type="text"]'), submit = $(this).find('button[type="submit"]');
 	input.addClass('is-valid');
 	submit.html('<div class="spinner-border" role="status" style="height: 1.5rem;width: 1.5rem;margin: 0px 20px;"><span class="sr-only">Loading...</span></div>');
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	// Update display list & modals
 	$.post($(this).attr('action'), $(this).serialize()).done(function () {
 		$.ajax({
@@ -126,6 +103,7 @@ var createController = function (e) {
 				$(".controller-select-dropdown").each(function () {
 					$(this).on('change', controllerDropdownTemplate);
 				});
+				$('form[action$="/delete"]').on('submit', deleteEntity);
 				input.removeClass('is-valid');
 				input.val('');
 				submit.html('Create remote controller');
@@ -137,8 +115,7 @@ var createController = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			},
-			xhr: mainProgressBar
+			}
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -149,6 +126,7 @@ var savePresentation = function (e) {
 	e.preventDefault();
 	var modal = $(this).closest('.modal');
 	modal.modal('hide');
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	$.post($(this).attr('action'), $(this).serialize()).done(function () {
 		$.ajax({
 			url: '{{ path("display-table") }}',
@@ -161,8 +139,7 @@ var savePresentation = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			},
-			xhr: mainProgressBar
+			}
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -174,6 +151,7 @@ var saveFrame = function (e) {
 	var that = $(this);
 	var modal = that.closest('.modal');
 	modal.modal('hide');
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	modal.on('hidden.bs.modal', function () {
 		$("#nav-all-carousels").html('<div class="p-2 d-flex align-items-center"><strong>Loading...</strong><div class="spinner-border ml-auto" role="status" aria-hidden="true"></div></div>');
 		$.post(that.attr('action'), that.serialize()).done(function () {
@@ -194,8 +172,7 @@ var saveFrame = function (e) {
 				},
 				error: function (xhr, status, error) {
 					console.log(xhr, status, error);
-				},
-				xhr: mainProgressBar
+				}
 			});
 		}).fail(function (xhr, status, error) {
 			console.log(xhr, status, error);
@@ -250,6 +227,7 @@ var newButton = function (ev, el) {
 	var progressBarContainer = progressBar.parent();
 	progressBarContainer.css('display', '');
 	$('[data-toggle="popover"]').popover('hide');
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	$.ajax({
 		// Your server script to process the upload
 		url: $el.attr('action'),
@@ -271,6 +249,7 @@ var newButton = function (ev, el) {
 				type: "GET",
 				success: function (data) {
 					target.html(data);
+					$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 					setTimeout(function () {
 						progressBarContainer.css('display', 'none');
 					}, 2000);
@@ -284,7 +263,6 @@ var newButton = function (ev, el) {
 		// Custom XMLHttpRequest
 		xhr: function () {
 			var myXhr = $.ajaxSettings.xhr();
-			// var progress = $('progress');
 			if (myXhr.upload) {
 				// For handling the progress of the upload
 				myXhr.upload.addEventListener('progress', function (e) {
@@ -305,6 +283,7 @@ var editButton = function (ev, el) {
 	var $el = $(el);
 	var target = $('#' + $el.attr('data-buttonListItem')).parent().parent();
 	$('[data-toggle="popover"]').popover('hide');
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	$.ajax({
 		url: $el.attr('action'),
 		type: 'POST',
@@ -312,13 +291,14 @@ var editButton = function (ev, el) {
 		cache: false,
 		contentType: false,
 		processData: false,
+		xhr: mainProgressBar,
 		success: function (res) {
-			console.log(res);
 			$.ajax({
 				url: '{{ path("button-list-all") }}',
 				type: "GET",
 				success: function (data) {
 					target.html(data);
+					$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 				},
 				error: function (xhr, status, error) {
 					console.log(xhr, status, error);
@@ -332,6 +312,7 @@ var saveButton = function (e) {
 	e.preventDefault();
 	var modal = $(this).closest('.modal');
 	modal.modal('hide');
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	$.post($(this).attr('action'), $(this).serialize()).done(function () {
 		$.ajax({
 			url: '{{ path("controller-table") }}',
@@ -344,8 +325,7 @@ var saveButton = function (e) {
 			},
 			error: function (xhr, status, error) {
 				console.log(xhr, status, error);
-			},
-			xhr: mainProgressBar
+			}
 		});
 	}).fail(function (xhr, status, error) {
 		console.log(xhr, status, error);
@@ -355,6 +335,7 @@ var saveButton = function (e) {
 var loadCarousels = function (e) {
 	var select = $(e);
 	var target = $(select.data('target'));
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	$.ajax({
 		url: '/digital-signage/display/' + select.val() + '/carousel/all',
 		type: "GET",
@@ -373,14 +354,14 @@ var loadCarousels = function (e) {
 		},
 		error: function (xhr, status, error) {
 			console.log(xhr, status, error);
-		},
-		xhr: mainProgressBar
+		}
 	});
 }
 
 var loadFrames = function (e) {
 	var select = $(e);
 	var target = $('#' + select.attr('data-target'));
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	$.ajax({
 		url: '/digital-signage/carousel/' + select.val() + '/frame/all',
 		type: "GET",
@@ -398,8 +379,7 @@ var loadFrames = function (e) {
 		},
 		error: function (xhr, status, error) {
 			console.log(xhr, status, error);
-		},
-		xhr: mainProgressBar
+		}
 	});
 };
 
