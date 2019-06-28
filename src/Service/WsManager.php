@@ -15,7 +15,6 @@ use \Exception;
 class WsManager implements MessageComponentInterface
 {
     protected $displays;
-    protected $buttons;
     private $entityManager;
 
     // URLs look like this: /digital-signage/websockets/{slug}/{id}
@@ -26,7 +25,6 @@ class WsManager implements MessageComponentInterface
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->displays = [];
-        $this->buttons = [];
         $this->entityManager = $entityManager;
     }
 
@@ -57,15 +55,10 @@ class WsManager implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $button_id)
     {
         // Remote controllers will send what button was pressed to the appropriate display
-        if (isset($this->buttons[$button_id])) {
-            $button = $this->buttons[$button_id];
-        } else {
-            $buttonRepository = $this->entityManager->getRepository(Entity\Button::class);
-            $button = $buttonRepository->find($button_id);
-            if ($button === null) {
-                throw new ResourceNotFoundException(date('c') . ": Button {$button_id} not found");
-            }
-            $this->buttons[$button_id] = $button;
+        $buttonRepository = $this->entityManager->getRepository(Entity\Button::class);
+        $button = $buttonRepository->find($button_id);
+        if ($button === null) {
+            throw new ResourceNotFoundException(date('c') . ": Button {$button_id} not found");
         }
         $display_id = $button->getOnDisplay()->getId();
         $to_trigger = $button->getTriggerFrame()->getId();
