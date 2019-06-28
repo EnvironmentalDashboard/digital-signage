@@ -66,10 +66,10 @@ class ButtonEdit extends AbstractController
         if (!$button) {
             throw new Exception("Button #{$id} not found");
         }
-        $displayId = $request->request->get('buttonEditDisplaySelect');
+        $displayId = $request->request->get('buttonDisplaySelect');
         $frameId = $request->request->get('buttonFrameSelect');
         if ($displayId === null || $frameId === null) {
-            throw new Exception("Missing fields: need to POST 'buttonEditDisplaySelect', 'buttonFrameSelect'");
+            throw new Exception("Missing fields: need to POST 'buttonDisplaySelect', 'buttonFrameSelect'; received " . print_r($request->request->all(), true));
         }
         
         $display = $entityManager->getRepository(Entity\Display::class)->find($displayId);

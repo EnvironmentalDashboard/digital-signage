@@ -298,7 +298,6 @@ var editButton = function (ev, el) {
 		cache: false,
 		contentType: false,
 		processData: false,
-		xhr: mainProgressBar,
 		success: function (res) {
 			$.ajax({
 				url: '{{ path("button-list-all") }}',
