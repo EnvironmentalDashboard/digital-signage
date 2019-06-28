@@ -4,12 +4,12 @@ showPresentation(Object.keys(presentations)[0]);
 
 function showPresentation(presentationId, targetFrame = null) {
 	// console.log(presentationId, targetFrame);
+	clearTimeouts();
+	clearPresentations();
 	var presentationElement = document.getElementById('pres' + presentationId);
 	presentationElement.style.display = '';
 	animateCarousels(presentations[presentationId].carousels, 'pres' + presentationId, targetFrame);
 	var timeout = setTimeout(function() {
-		clearTimeouts();
-		clearCurrentPres(presentationId);
 		showPresentation(presentations[presentationId].next);
 	}, presentations[presentationId].duration);
 	activeTimeouts.push(timeout);
@@ -31,6 +31,7 @@ function animateCarousels(carousels, presentationId, targetFrame = null) {
 		activeTimeouts.push(timeout);
 	}
 	
+	var thisIteration = false;
 	for (var carouselId in carousels) {
 		if (carousels.hasOwnProperty(carouselId)) {
 			var frameList = carousels[carouselId];
@@ -40,8 +41,13 @@ function animateCarousels(carousels, presentationId, targetFrame = null) {
 			if (targetFrame !== null) {
 				for (curFrame = 0; curFrame < frameList.length; curFrame++) {
 					if (frameList[curFrame].id === targetFrame) {
+						thisIteration = true;
 						break;
 					}
+				}
+				if (!thisIteration) {
+					// continue;
+					curFrame = 0;
 				}
 			} else {
 				curFrame = 0;
@@ -64,14 +70,18 @@ function clearTimeouts() {
 	}
 }
 
-function clearCurrentPres(presentationId) {
-	var presentation = document.getElementById('pres' + presentationId);
-	var carousels = presentation.children;
-	for (var i = 0; i < carousels.length; i++) {
-		var frameList = carousels[i].children;
-		for (let j = 0; j < frameList.length; j++) {
-			frameList[j].src = 'about:blank';
+function clearPresentations() {
+	var presentationIds = Object.keys(presentations);
+	for (var i = 0; i < presentationIds.length; i++) {
+		var presentationId = presentationIds[i];
+		var presentation = document.getElementById('pres' + presentationId);
+		var carousels = presentation.children;
+		for (var j = 0; j < carousels.length; j++) {
+			var frameList = carousels[j].children;
+			for (var k = 0; k < frameList.length; k++) {
+				frameList[k].src = 'about:blank';
+			}
 		}
+		presentation.style.display = 'none';
 	}
-	presentation.style.display = 'none';
 }
