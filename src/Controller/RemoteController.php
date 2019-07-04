@@ -132,7 +132,7 @@ class RemoteController extends AbstractController
                     return "btn{$n}";
                 },
                 range(1, 8)
-            ), 'drag button here')
+            ), '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15">drag button here</text></svg>')
         ));
     }
 }
