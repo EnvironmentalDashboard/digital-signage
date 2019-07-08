@@ -33,14 +33,12 @@ function controller_drop_handler(ev) {
 	ev.preventDefault();
 	var id = ev.dataTransfer.getData("text");
 	var text = document.getElementById(id).getAttribute('src');
-	var buttonElement = ev.target.parentNode;
-	var twigKey = buttonElement.getAttribute('data-twig');
-	// console.log(ev.target);
-	buttonElement.innerHTML = "<img src='" + text + "' class='img-fluid' style='max-height:100%' />";
-	// console.log(ev.target);
+	var $buttonElement = $(ev.target).closest('.button');
+	var buttonContainer = ev.currentTarget;
+	var twigKey = $buttonElement.data('twig');
+	$buttonElement.html("<img src='" + text + "' class='img-fluid' style='max-height:100%' />");
 	var button_id = id.substring(6); // cut off 'button'
-	var input = document.getElementById('button-arrangement-' + buttonElement.parentNode.getAttribute('data-controller'));
-	// console.log(buttonElement, buttonElement.parentNode, input)
+	var input = document.getElementById('button-arrangement-' + buttonContainer.getAttribute('data-controller'));
 	var cur_elems = JSON.parse(input.value);
 	cur_elems[twigKey] = button_id;
 	input.value = JSON.stringify(cur_elems);
