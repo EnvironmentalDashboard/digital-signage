@@ -36,7 +36,7 @@ function controller_drop_handler(ev) {
 	var buttonElement = ev.target.parentNode;
 	var twigKey = buttonElement.getAttribute('data-twig');
 	// console.log(ev.target);
-	buttonElement.innerHTML = "<img src='" + text + "' class='img-fluid' />";
+	buttonElement.innerHTML = "<img src='" + text + "' class='img-fluid' style='max-height:100%' />";
 	// console.log(ev.target);
 	var button_id = id.substring(6); // cut off 'button'
 	var input = document.getElementById('button-arrangement-' + buttonElement.parentNode.getAttribute('data-controller'));

@@ -83,6 +83,9 @@ class RemoteControllerEdit extends AbstractController
                 throw new \Exception("Twig key {$twigKey} not found in template string:\n{$twig}\n\n");   
             }
             $btn = $btnRepo->find($btnId);
+            if ($btn === null) {
+                throw new \Exception("Tried to assign a non-existent button (with ID {$btnId}) to controller #{$controller->getId()}");
+            }
             $btn->setTwigKey($twigKey);
             $btn->addController($controller);
             $entityManager->merge($btn);
