@@ -18,6 +18,7 @@
                         title="Edit button" data-displayList="buttonDisplaySelect{{controller.id}}" data-content='
                             {% include "button-create.html.twig" %}
                             '>Edit</button>
+                    <button type="button" class="btn btn-link delete-button-btn"  data-buttonId="{{button.id}}">Delete</button>
                 </li>
                 {% if loop.index == buttonCount or loop.index + 1 == halfway %}
             </div>

@@ -85,4 +85,22 @@ class ButtonEdit extends AbstractController
 
     }
 
+    /**
+     * button-delete
+     */
+    public function delete(Request $request, EntityManagerInterface $entityManager, $id) {
+        $repository = $entityManager->getRepository(Entity\Button::class);
+        $button = $repository->find($id);
+        if (!$button) {
+            throw new Exception("Button #{$id} not found");
+        }
+        $buttonImg = $button->getImage();
+        if (file_exists($buttonImg)) {
+            unlink($button);
+        }
+        $entityManager->remove($button);
+        $entityManager->flush();
+        return new JsonResponse(true);
+    }
+
 }

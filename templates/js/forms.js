@@ -314,6 +314,22 @@ var editButton = function (ev, el) {
 	});
 };
 
+var deleteButton = function(e) {
+	e.preventDefault();
+	if (confirm("Are you sure? This action can not be undone.")) {
+		$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
+		var $btnEl = $(this).parent();
+		var url = '{{ path("button-delete", {"id": "placeholder"}) }}'; 
+		url = url.replace("placeholder", $(this).data('buttonid'));
+		$.post(url).done(function () {
+			$btnEl.remove();
+			$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
+		}).fail(function (xhr, status, error) {
+			console.log(xhr, status, error);
+		});
+	}
+};
+
 var saveButton = function (e) {
 	e.preventDefault();
 	var that = $(this);
@@ -433,6 +449,9 @@ $(".carousel-add-new-frame").each(function () {
 });
 $(".display-add-new-pres").each(function () {
 	$(this).on('click', newPresentation);
+});
+$(".delete-button-btn").each(function () {
+	$(this).on('click', deleteButton);
 });
 
 // Swap carousel placeholder when option selected

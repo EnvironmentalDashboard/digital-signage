@@ -80,9 +80,11 @@ class RemoteController extends AbstractController
                 $buttonArrangement[$controllerId][$button->getTwigKey()] = $button->getId();
                 $counter++;
             }
-            for (; $counter <= $buttonCount; $counter++) { // if we're missing buttons create dummy ones so can still compile twig
-                $controllerButtons["btn{$counter}"] = "<div style='width:100%;height:100%'><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><text x='0' y='15'>drag button here</text></svg></div>";
-                $buttonArrangement[$controllerId]["btn{$counter}"] = 0;
+            for ($counter = 1; $counter <= $buttonCount; $counter++) { // if we're missing buttons create dummy ones so can still compile twig
+                if (!array_key_exists("btn{$counter}", $controllerButtons)) {
+                    $controllerButtons["btn{$counter}"] = "<div style='width:100%;height:100%'><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><text x='0' y='15'>drag button here</text></svg></div>";
+                    $buttonArrangement[$controllerId]["btn{$counter}"] = 0;
+                }
             }
             $rendered[] = $template->render($controllerButtons);
         }

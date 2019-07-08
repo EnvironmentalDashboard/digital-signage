@@ -113,3 +113,7 @@ button-create:
 button-edit:
   path: /button/{id}/edit/
   controller: App\Controller\ButtonEdit::edit
+button-delete:
+  path: /button/{id}/delete/
+  controller: App\Controller\ButtonEdit::delete
+  methods: POST
