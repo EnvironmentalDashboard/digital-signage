@@ -1,0 +1,23 @@
+{
+  "name": "media-player",
+  "version": "1.0.0",
+  "description": "Digital signage desktop media player",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EnvironmentalDashboard/digital-signage.git"
+  },
+  "author": "Tim Robert-Fitzgerald",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EnvironmentalDashboard/digital-signage/issues"
+  },
+  "homepage": "https://github.com/EnvironmentalDashboard/digital-signage#readme",
+  "devDependencies": {
+    "electron": "^5.0.6"
+  }
+}
