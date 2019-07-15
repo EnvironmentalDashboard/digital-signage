@@ -19,7 +19,15 @@ class Display extends AbstractController
      */
     public function present($id, Request $request, EntityManagerInterface $entityManager)
     {
+        return $this->render('present.html.twig', ['presentations' => 
+            $this->getPresentations($id, $request, $entityManager, false)
+        ]);
+    }
 
+    /**
+     * display-url-json
+     */
+    public function getPresentations($id, Request $request, EntityManagerInterface $entityManager, $response = true) {
         $res = [];
         $presentations = $entityManager->getRepository(Entity\Display::class)->find($id)->getPresentations();
         $presCount = count($presentations);
@@ -108,11 +116,7 @@ class Display extends AbstractController
                 'next' => ($i === $presCount - 1) ? $presentations[0]->getId() : $presentations[$i + 1]->getId()
             ];
         }
-
-        return $this->render('present.html.twig', ['presentations' => 
-            $ret
-        ]);
-
+        return ($response) ? new JsonResponse($ret) : $ret;
     }
 
     /**

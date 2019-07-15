@@ -23,6 +23,10 @@ display-url:
   path: /display/{id}/present
   controller: App\Controller\Display::present
   methods: GET
+display-url-json:
+  path: /display/{id}/present/json
+  controller: App\Controller\Display::getPresentations
+  methods: GET
 display-template:
   path: /display/template/{name}
   controller: App\Controller\Display::template
