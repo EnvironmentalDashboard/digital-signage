@@ -19,16 +19,7 @@ class Display extends AbstractController
      */
     public function present($id, Request $request, EntityManagerInterface $entityManager)
     {
-        return $this->render('present.html.twig', ['presentations' => 
-            $this->getPresentations($id, $request, $entityManager, false)
-        ]);
-    }
-
-    /**
-     * display-url-json
-     */
-    public function getPresentations($id, Request $request, EntityManagerInterface $entityManager, $response = true) {
-        $res = [];
+        $ret = [];
         $presentations = $entityManager->getRepository(Entity\Display::class)->find($id)->getPresentations();
         $presCount = count($presentations);
         for ($i = 0; $i < $presCount; $i++) { // for all presentations associated with display $id
@@ -43,64 +34,7 @@ class Display extends AbstractController
             foreach ($map as $relation) { // for all carousels associated with $presentation
                 $twigKey = $relation->getTemplateKey();
                 $carousel = $relation->getCarousel();
-                $processedFrames = [];
-                $frames = $carousel->getFrames();
-                $frameCount = count($frames);
-                for ($j = 0; $j < $frameCount; $j++) { // for all frames associated with $carousel
-                    $frame = $frames[$j];
-                    $nextIdx = ($j === $frameCount - 1) ? 0 : $j + 1;
-                    $nextFrame = $frames[$nextIdx];
-                    $url = $frame->getUrl();
-                    $parts = parse_url($url);
-                    switch ($parts['host']) {
-                        case 'www.youtube.com':
-                            parse_str($parts['query'], $get_array);
-                            $processedFrames[] = [
-                                'id' => "frame{$frame->getId()}",
-                                'url' => "https://www.youtube.com/embed/{$get_array['v']}",
-                                'dur' => $frame->getDuration(),
-                                'next' => "frame{$nextFrame->getId()}"
-                            ];
-                            break;
-                        case 'docs.google.com':
-                            preg_match('#/presentation/d/(.*?)/edit#', $parts['path'], $matches);
-                            if (!empty($matches)) {
-                                $presId = $matches[1];
-                                $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
-                                $googleSlides = $repository->findOneBy(['presentationId' => $presId]);
-                                if ($googleSlides === null) { // uh oh, somehow presentation duration got deleted
-                                    $processedFrames[] = [
-                                        'id' => "frame{$frame->getId()}",
-                                        'url' => "https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal",
-                                        'dur' => $frame->getDuration(),
-                                        'next' => "frame{$nextFrame->getId()}"
-                                    ];
-                                    break;
-                                }
-                                $slides = $googleSlides->getData();
-                                $googleSlidesCount = count($slides) - 1;
-                                foreach ($slides as $k => $dur) {
-                                    $id = ($k === 0) ? "frame{$frame->getId()}" : "frame{$frame->getId()}-{$k}"; // buttons trigger frames with document.getElementById('frame' + frameId), so give first slide this special id to be found
-                                    $nextId = ($k === $googleSlidesCount) ? "frame{$nextFrame->getId()}" : "frame{$nextFrame->getId()}-" . ($k + 1);
-                                    $k++;
-                                    $processedFrames[] = [
-                                        'id' => $id,
-                                        'url' => "https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal#slide={$k}",
-                                        'dur' => $dur,
-                                        'next' => $nextId
-                                    ];
-                                }
-                                break;
-                            }
-                        default:
-                            $processedFrames[] = [
-                                'id' => "frame{$frame->getId()}",
-                                'url' => $url,
-                                'dur' => $frame->getDuration(),
-                                'next' => "frame{$nextFrame->getId()}"
-                            ];
-                    }
-                }
+                $processedFrames = $this->processFrames($carousel->getFrames(), $entityManager);
 
                 $carousels[$twigKey] = $processedFrames;
                 $templateParams[$twigKey] = "<iframe id='pres{$presentation->getId()}-{$twigKey}-primary' src='about:blank' frameborder='0'></iframe><iframe id='pres{$presentation->getId()}-{$twigKey}-secondary' src='about:blank' frameborder='0'></iframe>";
@@ -116,7 +50,102 @@ class Display extends AbstractController
                 'next' => ($i === $presCount - 1) ? $presentations[0]->getId() : $presentations[$i + 1]->getId()
             ];
         }
-        return ($response) ? new JsonResponse($ret) : $ret;
+        return $this->render('present.html.twig', ['presentations' => 
+            $ret
+        ]);
+    }
+
+    /**
+     * display-url-json
+     */
+    public function presentJson($id, Request $request, EntityManagerInterface $entityManager) {
+        $ret = [];
+        $presentations = $entityManager->getRepository(Entity\Display::class)->find($id)->getPresentations();
+        $presCount = count($presentations);
+        for ($i = 0; $i < $presCount; $i++) { // for all presentations associated with display $id
+            $presentation = $presentations[$i];
+            $style = $presentation->getTemplate()->getStyle();
+
+            $carousels = [];
+            $map = $presentation->getCarouselPresentationMaps();
+            foreach ($map as $relation) { // for all carousels associated with $presentation
+                $twigKey = $relation->getTemplateKey();
+                $carousel = $relation->getCarousel();
+                $processedFrames = $this->processFrames($carousel->getFrames(), $entityManager);
+
+                $carousels[$twigKey] = $processedFrames;
+            }
+
+            $ret[$presentation->getId()] = [
+                'id' => $presentation->getId(),
+                'style' => $style,
+                'carousels' => $carousels,
+                'duration' => $presentation->getDuration(),
+                'next' => ($i === $presCount - 1) ? $presentations[0]->getId() : $presentations[$i + 1]->getId()
+            ];
+        }
+        return new JsonResponse($ret);
+    }
+
+    private function processFrames($frames, $entityManager) {
+        $processedFrames = [];
+        $frameCount = count($frames);
+        for ($j = 0; $j < $frameCount; $j++) { // for all frames associated with $carousel
+            $frame = $frames[$j];
+            $nextIdx = ($j === $frameCount - 1) ? 0 : $j + 1;
+            $nextFrame = $frames[$nextIdx];
+            $url = $frame->getUrl();
+            $parts = parse_url($url);
+            switch ($parts['host']) {
+                case 'www.youtube.com':
+                    parse_str($parts['query'], $get_array);
+                    $processedFrames[] = [
+                        'id' => "frame{$frame->getId()}",
+                        'url' => "https://www.youtube.com/embed/{$get_array['v']}",
+                        'dur' => $frame->getDuration(),
+                        'next' => "frame{$nextFrame->getId()}"
+                    ];
+                    break;
+                case 'docs.google.com':
+                    preg_match('#/presentation/d/(.*?)/edit#', $parts['path'], $matches);
+                    if (!empty($matches)) {
+                        $presId = $matches[1];
+                        $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
+                        $googleSlides = $repository->findOneBy(['presentationId' => $presId]);
+                        if ($googleSlides === null) { // uh oh, somehow presentation duration got deleted
+                            $processedFrames[] = [
+                                'id' => "frame{$frame->getId()}",
+                                'url' => "https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal",
+                                'dur' => $frame->getDuration(),
+                                'next' => "frame{$nextFrame->getId()}"
+                            ];
+                            break;
+                        }
+                        $slides = $googleSlides->getData();
+                        $googleSlidesCount = count($slides) - 1;
+                        foreach ($slides as $k => $dur) {
+                            $id = ($k === 0) ? "frame{$frame->getId()}" : "frame{$frame->getId()}-{$k}"; // buttons trigger frames with document.getElementById('frame' + frameId), so give first slide this special id to be found
+                            $nextId = ($k === $googleSlidesCount) ? "frame{$nextFrame->getId()}" : "frame{$nextFrame->getId()}-" . ($k + 1);
+                            $k++;
+                            $processedFrames[] = [
+                                'id' => $id,
+                                'url' => "https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal#slide={$k}",
+                                'dur' => $dur,
+                                'next' => $nextId
+                            ];
+                        }
+                        break;
+                    }
+                default:
+                    $processedFrames[] = [
+                        'id' => "frame{$frame->getId()}",
+                        'url' => $url,
+                        'dur' => $frame->getDuration(),
+                        'next' => "frame{$nextFrame->getId()}"
+                    ];
+            }
+        }
+        return $processedFrames;
     }
 
     /**

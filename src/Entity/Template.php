@@ -21,6 +21,11 @@ class Template
      */
     private $twig;
 
+    /**
+     * @ORM\Column(type="object", nullable=true)
+     */
+    private $style;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -37,4 +42,17 @@ class Template
 
         return $this;
     }
+
+    public function getStyle()
+    {
+        return $this->style;
+    }
+
+    public function setStyle($style): self
+    {
+        $this->style = $style;
+
+        return $this;
+    }
+
 }

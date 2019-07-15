@@ -25,7 +25,7 @@ display-url:
   methods: GET
 display-url-json:
   path: /display/{id}/present/json
-  controller: App\Controller\Display::getPresentations
+  controller: App\Controller\Display::presentJson
   methods: GET
 display-template:
   path: /display/template/{name}

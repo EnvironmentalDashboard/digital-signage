@@ -1,5 +1,5 @@
 // console.log(presentations);
-activeTimeouts = [];
+var activeTimeouts = [];
 showPresentation(Object.keys(presentations)[0]);
 
 function showPresentation(presentationId, targetFrame = null) {
