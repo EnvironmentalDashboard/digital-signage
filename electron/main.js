@@ -1,13 +1,20 @@
 const electron = require('electron');
 const fetch = require('node-fetch');
+const WebSocket = require('ws')
 const { app, BrowserView, BrowserWindow } = electron;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
 
+let width;
+let height;
+let presentations;
+
 function createWindow() {
-    const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize;
+    let size = electron.screen.getPrimaryDisplay().workAreaSize;
+    width = size.width;
+    height = size.height;
     // Create the browser window.
     win = new BrowserWindow({
         width: width,
@@ -33,15 +40,17 @@ function createWindow() {
 
     fetch('https://environmentaldashboard.org/digital-signage/display/2/present/json')
         .then(res => res.json())
-        .then(presentations => {
+        .then(json => {
             win.on('resize', function () {
                 let size = win.getSize();
-                let width = size[0];
-                let height = size[1];
-                initApp(presentations, width, height);
+                width = size[0];
+                height = size[1];
+                presentations = json;
+                initApp();
             });
 
-            initApp(presentations, width, height);
+            presentations = json;
+            initApp();
 
         });
 }
@@ -74,17 +83,11 @@ app.on('activate', () => {
 
 let activeTimeouts = [];
 let activeViews = [];
-function initApp(presentations, width, height) {
-    showPresentation(presentations, Object.keys(presentations)[0], width, height);
-
-
-    // let view = new BrowserView();
-    // win.setBrowserView(view);
-    // view.setBounds({ x: 0, y: 0, width: width, height: height });
-    // view.webContents.loadURL('https://environmentaldashboard.org/digital-signage/display/2/present');
+function initApp() {
+    showPresentation(Object.keys(presentations)[0]);
 }
 
-function showPresentation(presentations, presentationId, width, height, targetFrame = null) {
+function showPresentation(presentationId, targetFrame = null) {
     let viewData = {
         frames: [],
         style: null
@@ -107,16 +110,17 @@ function showPresentation(presentations, presentationId, width, height, targetFr
     }
     clearTimeouts();
     clearPresentations();
-    drawViews(viewData, height, width);
-    var timeout = setTimeout(function () {
-        showPresentation(presentations, presentations[presentationId].next, width, height);
+    drawViews(viewData);
+    let timeout = setTimeout(function () {
+        showPresentation(presentations, presentations[presentationId].next);
         console.log(process.getCPUUsage());
     }, presentations[presentationId].duration);
-    console.log(timeout);
+    var date = new Date();
+    console.log(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(), timeout);
     activeTimeouts.push(timeout);
 }
 
-function drawViews(viewData, height, width) {
+function drawViews(viewData) {
     for (let i = 0; i < viewData.frames.length; i++) {
         const frameCollection = viewData.frames[i];
         const coords = { x: 0, y: 0 };
@@ -150,3 +154,41 @@ function clearPresentations() {
         view = null;
     }
 }
+
+// open websocket conn to receive commands from remote controllers
+let conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/2");
+let WS_READY = true;
+conn.onerror = function () {
+    app.relaunch();
+    app.exit(0);
+};
+conn.onclose = function () {
+    app.relaunch();
+    app.exit(0);
+};
+conn.onmessage = function (e) {
+    if (WS_READY === false) {
+        return;
+    } else {
+        WS_READY = false;
+    }
+    let frameId = parseInt(e.data);
+    let target = 'frame' + frameId;
+    for (let key in presentations) {
+        let presentation = presentations[key];
+        let carousels = presentation['carousels'];
+        for (let carouselId in carousels) {
+            let frames = carousels[carouselId];
+            for (let i = 0; i < frames.length; i++) {
+                if (frames[i].id === target) {
+                    WS_READY = true;
+                    showPresentation(key, frames[i].id);
+                    return;
+                }
+
+            }
+        }
+    }
+    WS_READY = true;
+
+};

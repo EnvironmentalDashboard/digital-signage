@@ -21,6 +21,7 @@
     "electron": "^5.0.6"
   },
   "dependencies": {
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "ws": "^7.1.0"
   }
 }
