@@ -112,7 +112,7 @@ function showPresentation(presentationId, targetFrame = null) {
     clearPresentations();
     drawViews(viewData);
     let timeout = setTimeout(function () {
-        showPresentation(presentations, presentations[presentationId].next);
+        showPresentation(presentations[presentationId].next);
         console.log(process.getCPUUsage());
     }, presentations[presentationId].duration);
     var date = new Date();
