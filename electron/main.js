@@ -184,7 +184,7 @@ function clearViews() {
     while (activeViews.length > 0) {
         let view = activeViews.pop();
         win.removeBrowserView(view);
-        view.destroy();
+        view.webContents.destroy();
         view = null;
     }
 }
