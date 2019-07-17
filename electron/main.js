@@ -9,7 +9,7 @@ let win;
 
 let width;
 let height;
-let presentations;
+let presentations = [];
 
 function createWindow() {
     let size = electron.screen.getPrimaryDisplay().workAreaSize;
@@ -41,15 +41,45 @@ function createWindow() {
     fetch('https://environmentaldashboard.org/digital-signage/display/2/present/json')
         .then(res => res.json())
         .then(json => {
+            for (const presentationId in json) {
+                let viewData = {
+                    carousels: [],
+                    style: null,
+                    next: null,
+                    duration: null
+                };
+                for (const key in json[presentationId]) {
+                    if (key === 'carousels') {
+                        const carousels = json[presentationId][key];
+                        for (const carouselId in carousels) {
+                            const frames = carousels[carouselId];
+                            for (let i = 0; i < frames.length; i++) {
+                                const frame = frames[i];
+                                viewData.carousels.push({ [carouselId]: frame });
+                            }
+
+                        }
+                    }
+                    if (key === 'style') {
+                        viewData.style = json[presentationId][key];
+                    }
+                    if (key === 'next') {
+                        viewData.next = json[presentationId][key];
+                    }
+                    if (key === 'duration') {
+                        viewData.duration = json[presentationId][key];
+                    }
+                }
+                presentations[presentationId] = viewData;
+            }
+
             win.on('resize', function () {
                 let size = win.getSize();
                 width = size[0];
                 height = size[1];
-                presentations = json;
                 initApp();
             });
 
-            presentations = json;
             initApp();
 
         });
@@ -82,35 +112,24 @@ app.on('activate', () => {
 
 
 let activeTimeouts = [];
-let activeViews = [];
+let activeViews = [], loadingViews = [];
 function initApp() {
-    showPresentation(Object.keys(presentations)[0]);
+    showPresentation(Object.keys(presentations)[0]); // begin by showing first presentation
 }
 
 function showPresentation(presentationId, targetFrame = null) {
-    let viewData = {
-        frames: [],
-        style: null
-    };
-    for (const key in presentations[presentationId]) {
-        if (key === 'carousels') {
-            const frameCollection = presentations[presentationId][key];
-            for (const collectionId in frameCollection) {
-                const frames = frameCollection[collectionId];
-                for (let i = 0; i < frames.length; i++) {
-                    const frame = frames[i];
-                    viewData.frames.push({ [collectionId]: frame });
-                }
-
-            }
+    if (targetFrame === null) {
+        if (loadingViews.length === 0) { // first iteration; load next view as well
+            makeViews(presentations[presentationId]); // adds views to loadingViews 
         }
-        if (key === 'style') {
-            viewData.style = presentations[presentationId][key];
-        }
+        drawViews(); // moves views from loadingViews to activeViews, adding them to win
+        makeViews(presentations[presentations[presentationId].next]);
+    } else {
+        loadingViews = [];
+        clearTimeouts();
+        makeViews(presentations[presentationId]);
+        drawViews();
     }
-    clearTimeouts();
-    clearPresentations();
-    drawViews(viewData);
     let timeout = setTimeout(function () {
         showPresentation(presentations[presentationId].next);
         console.log(process.getCPUUsage());
@@ -120,23 +139,37 @@ function showPresentation(presentationId, targetFrame = null) {
     activeTimeouts.push(timeout);
 }
 
-function drawViews(viewData) {
-    for (let i = 0; i < viewData.frames.length; i++) {
-        const frameCollection = viewData.frames[i];
+function makeViews(viewData) {
+    for (let i = 0; i < viewData.carousels.length; i++) {
+        const carousels = viewData.carousels[i];
         const coords = { x: 0, y: 0 };
-        for (const key in frameCollection) {
-            const frame = frameCollection[key];
+        for (const key in carousels) {
+            const frame = carousels[key];
             const style = viewData.style[key];
             let viewWidth = width * (style.width / 100);
             let viewHeight = height * (style.height / 100);
-            let view = new BrowserView();
-            win.setBrowserView(view);
-            view.setBounds({ x: coords.x, y: coords.y, width: viewWidth, height: viewHeight });
+            let view = new BrowserView({ webPreferences: {
+                nodeIntegration: false
+                // sandbox: true
+            }});
             view.webContents.loadURL(frame.url);
-            activeViews.push(view);
+            let viewObject = { x: coords.x, y: coords.y, width: viewWidth, height: viewHeight, view: view };
+            loadingViews.push(viewObject);
             coords.x = coords.x + viewWidth;
             coords.y = coords.y + viewHeight;
         }
+    }
+}
+
+function drawViews() {
+    clearViews();
+    while (loadingViews.length > 0) {
+        let viewObject = loadingViews.pop();
+        let view = viewObject.view;
+        win.addBrowserView(view);
+        delete viewObject.view;
+        view.setBounds(viewObject);
+        activeViews.push(view);
     }
 }
 
@@ -147,9 +180,10 @@ function clearTimeouts() {
     }
 }
 
-function clearPresentations() {
+function clearViews() {
     while (activeViews.length > 0) {
         let view = activeViews.pop();
+        win.removeBrowserView(view);
         view.destroy();
         view = null;
     }
@@ -176,16 +210,18 @@ conn.onmessage = function (e) {
     let target = 'frame' + frameId;
     for (let key in presentations) {
         let presentation = presentations[key];
-        let carousels = presentation['carousels'];
+        let carousels = presentation.carousels;
         for (let carouselId in carousels) {
-            let frames = carousels[carouselId];
-            for (let i = 0; i < frames.length; i++) {
-                if (frames[i].id === target) {
-                    WS_READY = true;
-                    showPresentation(key, frames[i].id);
-                    return;
+            let carousel = carousels[carouselId];
+            for (const twigKey in carousel) {
+                if (carousel.hasOwnProperty(twigKey)) {
+                    const frame = carousel[twigKey];
+                    if (frame.id === target) {
+                        WS_READY = true;
+                        showPresentation(key, frame.id);
+                        return;
+                    }       
                 }
-
             }
         }
     }
