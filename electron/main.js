@@ -1,6 +1,6 @@
 const electron = require('electron');
 const fetch = require('node-fetch');
-const WebSocket = require('ws')
+const WebSocket = require('ws');
 const { app, BrowserView, BrowserWindow } = electron;
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -9,13 +9,13 @@ let win;
 
 let width;
 let height;
-let presentations = [];
+let presentations = {};
 
 function createWindow() {
-    let size = electron.screen.getPrimaryDisplay().workAreaSize;
+    let size = electron.screen.getPrimaryDisplay().size;
     width = size.width;
     height = size.height;
-    // Create the browser window.
+    // Create the browser window
     win = new BrowserWindow({
         width: width,
         height: height,
@@ -24,11 +24,10 @@ function createWindow() {
         }
     });
 
-    // and load the index.html of the app.
+    // Load the index.html of the app
     win.loadFile('index.html');
 
-    // Open the DevTools.
-    // win.webContents.openDevTools();
+    win.setFullScreen(true);
 
     // Emitted when the window is closed.
     win.on('closed', () => {
@@ -43,42 +42,45 @@ function createWindow() {
         .then(json => {
             for (const presentationId in json) {
                 let viewData = {
-                    carousels: [],
-                    style: null,
+                    carousels: {},
+                    views: {},
                     next: null,
                     duration: null
                 };
                 for (const key in json[presentationId]) {
+                    let x = 0;
+                    let y = 0;
                     if (key === 'carousels') {
                         const carousels = json[presentationId][key];
                         for (const carouselId in carousels) {
+                            if (viewData.carousels[carouselId] === undefined) {
+                                viewData.carousels[carouselId] = [];
+                            }
                             const frames = carousels[carouselId];
                             for (let i = 0; i < frames.length; i++) {
                                 const frame = frames[i];
-                                viewData.carousels.push({ [carouselId]: frame });
+                                viewData.carousels[carouselId].push(frame);
                             }
-
+                            let view = new BrowserView({ webPreferences: {
+                                nodeIntegration: false
+                                // sandbox: true
+                            }});
+                            win.addBrowserView(view);
+                            let viewWidth = width * (json[presentationId]['style'][carouselId].width / 100);
+                            let viewHeight = height * (json[presentationId]['style'][carouselId].height / 100);
+                            view.setBounds({x: x, y: y, width: viewWidth, height: viewHeight });
+                            y += viewHeight;
+                            viewData.views = Object.assign({
+                                [carouselId]: view
+                            }, viewData.views);
                         }
                     }
-                    if (key === 'style') {
-                        viewData.style = json[presentationId][key];
-                    }
-                    if (key === 'next') {
-                        viewData.next = json[presentationId][key];
-                    }
-                    if (key === 'duration') {
-                        viewData.duration = json[presentationId][key];
+                    if (key === 'style' || key === 'next' || key === 'duration') {
+                        viewData[key] = json[presentationId][key];
                     }
                 }
                 presentations[presentationId] = viewData;
             }
-
-            win.on('resize', function () {
-                let size = win.getSize();
-                width = size[0];
-                height = size[1];
-                initApp();
-            });
 
             initApp();
 
@@ -108,69 +110,65 @@ app.on('activate', () => {
 });
 
 
-
-
-
 let activeTimeouts = [];
-let activeViews = [], loadingViews = [];
+let activeViews = [];
 function initApp() {
     showPresentation(Object.keys(presentations)[0]); // begin by showing first presentation
 }
 
 function showPresentation(presentationId, targetFrame = null) {
-    if (targetFrame === null) {
-        if (loadingViews.length === 0) { // first iteration; load next view as well
-            makeViews(presentations[presentationId]); // adds views to loadingViews 
-        }
-        drawViews(); // moves views from loadingViews to activeViews, adding them to win
-        makeViews(presentations[presentations[presentationId].next]);
-    } else {
-        loadingViews = [];
-        clearTimeouts();
-        makeViews(presentations[presentationId]);
-        drawViews();
-    }
-    let timeout = setTimeout(function () {
+    clearTimeouts();
+    clearViews();
+    setViews(presentations[presentationId], targetFrame);
+    let timeout = setTimeout(() => {
         showPresentation(presentations[presentationId].next);
         console.log(process.getCPUUsage());
     }, presentations[presentationId].duration);
-    var date = new Date();
+    let date = new Date();
     console.log(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(), timeout);
     activeTimeouts.push(timeout);
 }
 
-function makeViews(viewData) {
-    for (let i = 0; i < viewData.carousels.length; i++) {
-        const carousels = viewData.carousels[i];
-        const coords = { x: 0, y: 0 };
-        for (const key in carousels) {
-            const frame = carousels[key];
-            const style = viewData.style[key];
-            let viewWidth = width * (style.width / 100);
-            let viewHeight = height * (style.height / 100);
-            let view = new BrowserView({ webPreferences: {
-                nodeIntegration: false
-                // sandbox: true
-            }});
-            view.webContents.loadURL(frame.url);
-            let viewObject = { x: coords.x, y: coords.y, width: viewWidth, height: viewHeight, view: view };
-            loadingViews.push(viewObject);
-            coords.x = coords.x + viewWidth;
-            coords.y = coords.y + viewHeight;
+function setViews(viewData, targetFrame) {
+    
+    for (const key in viewData.views) {
+        const view = viewData.views[key];
+        const carousels = viewData.carousels[key];
+        let i = 0;
+        if (targetFrame === null) {
+            var firstFrame = carousels[i];   
+        } else {
+            for (; i < carousels.length; i++) {
+                if (carousels[i].id === targetFrame) {
+                    var firstFrame = carousels[i];
+                    break;
+                }   
+            }
+        }
+        view.webContents.loadURL(firstFrame.url);
+        win.addBrowserView(view);
+        activeViews.push(view);
+        if (carousels.length > 1) { // more frames to animate in this carousel
+            animateFrames(view, carousels, i);
         }
     }
 }
 
-function drawViews() {
-    clearViews();
-    while (loadingViews.length > 0) {
-        let viewObject = loadingViews.pop();
-        let view = viewObject.view;
-        win.addBrowserView(view);
-        delete viewObject.view;
-        view.setBounds(viewObject);
-        activeViews.push(view);
+function animateFrames(view, carousel, current) {
+    // assumes first frame already shown
+    for (let i = 0; i < carousel.length; i++) {
+        const frame = carousel[i];
+        if (frame.id === carousel[current].next) {
+            let timeout = setTimeout(() => {
+                view.webContents.loadURL(frame.url);
+                win.addBrowserView(view);
+                animateFrames(view, carousel, (current === (carousel.length-1)) ? 0 : current + 1);
+            }, carousel[current].dur);
+            activeTimeouts.push(timeout);
+            break;
+        }
     }
+
 }
 
 function clearTimeouts() {
@@ -183,22 +181,23 @@ function clearTimeouts() {
 function clearViews() {
     while (activeViews.length > 0) {
         let view = activeViews.pop();
+        // view.webContents.destroy();
+        view.webContents.loadURL('about:blank');
         win.removeBrowserView(view);
-        view.webContents.destroy();
-        view = null;
+        
     }
 }
 
 // open websocket conn to receive commands from remote controllers
-let conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/2");
+const conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/2");
 let WS_READY = true;
 conn.onerror = function () {
-    app.relaunch();
-    app.exit(0);
+    console.log('Connection error');
+    app.quit();
 };
 conn.onclose = function () {
-    app.relaunch();
-    app.exit(0);
+    console.log('Connection close');
+    app.quit();
 };
 conn.onmessage = function (e) {
     if (WS_READY === false) {
@@ -206,13 +205,13 @@ conn.onmessage = function (e) {
     } else {
         WS_READY = false;
     }
-    let frameId = parseInt(e.data);
-    let target = 'frame' + frameId;
-    for (let key in presentations) {
-        let presentation = presentations[key];
-        let carousels = presentation.carousels;
-        for (let carouselId in carousels) {
-            let carousel = carousels[carouselId];
+    const frameId = parseInt(e.data);
+    const target = 'frame' + frameId;
+    for (const key in presentations) {
+        const presentation = presentations[key];
+        const carousels = presentation.carousels;
+        for (const carouselId in carousels) {
+            const carousel = carousels[carouselId];
             for (const twigKey in carousel) {
                 if (carousel.hasOwnProperty(twigKey)) {
                     const frame = carousel[twigKey];
