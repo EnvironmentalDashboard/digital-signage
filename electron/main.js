@@ -37,7 +37,7 @@ function createWindow() {
         win = null;
     });
 
-    fetch('https://environmentaldashboard.org/digital-signage/display/2/present/json')
+    fetch('https://environmentaldashboard.org/digital-signage/display/3/present/json')
         .then(res => res.json())
         .then(json => {
             for (const presentationId in json) {
@@ -122,10 +122,10 @@ function showPresentation(presentationId, targetFrame = null) {
     setViews(presentations[presentationId], targetFrame);
     let timeout = setTimeout(() => {
         showPresentation(presentations[presentationId].next);
-        console.log(process.getCPUUsage());
+        // console.log(process.getCPUUsage());
     }, presentations[presentationId].duration);
-    let date = new Date();
-    console.log(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(), timeout);
+    // let date = new Date();
+    // console.log(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(), timeout);
     activeTimeouts.push(timeout);
 }
 
@@ -189,7 +189,7 @@ function clearViews() {
 }
 
 // open websocket conn to receive commands from remote controllers
-const conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/2");
+const conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/3");
 let WS_READY = true;
 conn.onerror = function () {
     console.log('Connection error');
