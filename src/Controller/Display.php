@@ -226,16 +226,6 @@ class Display extends AbstractController
     public function carouselListByDisplay(Request $request, EntityManagerInterface $entityManager, $id)
     {
         $carousels = [];
-        $buttonId = $request->query->get('buttonId');
-        $selectedCarouselId = false;
-        if ($buttonId !== null) {
-            $button = $entityManager->getRepository(Entity\Button::class)->find($buttonId);
-            if ($button !== null) {
-                $frame = $button->getTriggerFrame();
-                $carousel = $frame->getCarousel();
-                $selectedCarouselId = $carousel->getId();
-            }
-        }
         $display = $entityManager->getRepository(Entity\Display::class)->find($id);
         foreach ($display->getPresentations() as $pres) {
             foreach ($pres->getCarouselPresentationMaps() as $map) {
@@ -243,8 +233,7 @@ class Display extends AbstractController
                 // todo don't fetch duplicates from db
                 $carousels[$carousel->getId()] = [
                     'id' => $carousel->getId(),
-                    'label' => $carousel->getLabel(),
-                    'selected' => ($selectedCarouselId === $carousel->getId()) ? true : false];
+                    'label' => $carousel->getLabel()];
             }
         }
         // var_dump($button);die;

@@ -19,11 +19,11 @@
             <td>{{carousel.label}}</td>
             <td>{{carousel.length}}</td>
             <td class="form-inline" style="min-width:160px;">
-                <button class="btn btn-primary mr-2" data-toggle="modal"
+                <button class="btn btn-primary shadow mr-2" data-toggle="modal"
                     data-target="#carousel-{{carousel.id}}-createFormModal">Edit</button>
 
                 <form action="{{ path('carousel-delete', {'id': carousel.id}) }}" method="POST">
-                    <input type="submit" class="btn btn-danger" value="Delete">
+                    <input type="submit" class="btn btn-danger shadow" value="Delete">
                 </form>
             </td>
         </tr>
@@ -67,7 +67,7 @@
 
                 <div class="modal-body">
                     <div class="form-group">
-                        <input type="button" class="btn btn-primary carousel-add-new-frame"
+                        <input type="button" class="btn btn-primary shadow carousel-add-new-frame"
                             data-carousel-for="{{carousel.id}}" value="Add frame">
                     </div>
                 </div>
@@ -75,7 +75,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <input type="submit" class="btn btn-primary" value="Save carousel">
+                    <input type="submit" class="btn btn-primary shadow" value="Save carousel">
                 </div>
             </form>
         </div>

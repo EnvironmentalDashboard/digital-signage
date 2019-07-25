@@ -32,6 +32,7 @@ class Button extends AbstractController
     {
         $displays = $entityManager->getRepository(Entity\Display::class)->findAll();
         $buttons = $entityManager->getRepository(Entity\Button::class)->findAll();
+        $controllers = $entityManager->getRepository(Entity\RemoteController::class)->findAll();
         $frames = [];
         
         foreach ($entityManager->getRepository(Entity\Frame::class)->findAll() as $frame) {
@@ -50,7 +51,8 @@ class Button extends AbstractController
         return $this->render('button-list.html.twig', [
             'displays' => $displays,
             'buttons' => $buttons,
-            'frames' => $frames
+            'frames' => $frames,
+            'controllers' => $controllers
         ]);
     }
 

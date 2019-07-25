@@ -36,7 +36,7 @@ class Button
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Display")
-     * @ORM\JoinColumn(nullable=true)
+     * @ORM\JoinColumn(nullable=false)
      */
     private $on_display;
 

@@ -13,9 +13,11 @@
                 <img style="width: 100%" draggable="true" ondragstart="dragstart_handler(event);"
                     ondragend="dragend_handler(event);" id="button{{button.id}}"
                     src="{{ path('index') }}uploads/{{button.image}}" alt="Button image" class="bg-secondary">
+                    {#
+                        todo: implement w diff types
                 Trigger
                 {{ button.triggerFrame.url|length > 50 ? button.triggerFrame.url|slice(0, 50) ~ '...' : button.triggerFrame.url  }}
-                on {{button.onDisplay.label}}
+                on {{button.onDisplay.label}} #}
                 <button type="button" class="btn btn-link" data-toggle="popover" data-placement="top"
                     title="Edit button" data-content='
                             {% include "button-create.html.twig" %}

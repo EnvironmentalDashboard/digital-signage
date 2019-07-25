@@ -25,17 +25,20 @@ class ButtonEdit extends AbstractController
         $button = new Entity\Button;
         $button->setTwigKey('btn1'); // tmp value to be set later
         $type = (int) $request->request->get('buttonTypeSelect');
+        $display = $entityManager->getRepository(Entity\Display::class)->find($request->request->get('buttonDisplaySelect'));
+        if ($display === null) {
+            throw new Exception('Display ' . $request->request->get('buttonDisplaySelect') . ' does not exist');
+        }
+
         if ($type === Entity\Button::TRIGGER_FRAME) {
-            $displayId = $request->request->get('buttonDisplaySelect');
             $frameId = $request->request->get('buttonFrameSelect');
             $controllerId = $request->request->get('controllerId');
             $image = $request->files->get('file');
-            if ($displayId === null || $frameId === null || $controllerId === null || $image === null) {
-                throw new Exception("Missing fields: need to POST 'buttonDisplaySelect', 'buttonFrameSelect', 'controllerId', 'file'; received " . print_r($request->request->all(), true));
+            if ($frameId === null || $controllerId === null || $image === null) {
+                throw new Exception("Missing fields: need to POST 'buttonFrameSelect', 'controllerId', 'file'; received " . print_r($request->request->all(), true));
             }
-            $this->saveImage($image);
+            $imageName = $this->saveImage($image);
 
-            $display = $entityManager->getRepository(Entity\Display::class)->find($displayId);
             $frame = $entityManager->getRepository(Entity\Frame::class)->find($frameId);
             $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
             $url = null;
@@ -44,23 +47,24 @@ class ButtonEdit extends AbstractController
             if ($controllerId === null) {
                 throw new Exception("Missing fields: need to POST 'controllerId'; received " . print_r($request->request->all(), true));
             }
+            $imageName = 'play.svg';
 
-            $display = null;
             $frame = null;
             $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
             $url = null;
         } elseif ($type === Entity\Button::TRIGGER_URL) {
             $url = $request->request->get('UrlSelect');
             $controllerId = $request->request->get('controllerId');
+            $image = $request->files->get('file');
             if ($controllerId === null) {
-                throw new Exception("Missing fields: need to POST 'controllerId', 'UrlSelect; received " . print_r($request->request->all(), true));
+                throw new Exception("Missing fields: need to POST 'controllerId', 'UrlSelect', 'file'; received " . print_r($request->request->all(), true));
             }
+            $imageName = $this->saveImage($image);
 
-            $display = null;
             $frame = null;
             $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
         } else {
-            return new JsonResponse(false);
+            throw new Exception("Unknown button type {$type}");
         }
 
         $button->setOnDisplay($display);
@@ -68,6 +72,7 @@ class ButtonEdit extends AbstractController
         $button->addController($controller);
         $button->setType($type);
         $button->setTriggerUrl($url);
+        $button->setImage($imageName);
 
         $entityManager->persist($button);
         $entityManager->flush();
@@ -84,7 +89,7 @@ class ButtonEdit extends AbstractController
                 $name = uniqid() . '.' . $image->guessClientExtension();
             }
             $image->move($path, $name);
-            $button->setImage($name);
+            return $name;
         }
     }
 
@@ -98,19 +103,41 @@ class ButtonEdit extends AbstractController
         if (!$button) {
             throw new Exception("Button #{$id} not found");
         }
-        $displayId = $request->request->get('buttonDisplaySelect');
-        $frameId = $request->request->get('buttonFrameSelect');
-        if ($displayId === null || $frameId === null) {
-            throw new Exception("Missing fields: need to POST 'buttonDisplaySelect', 'buttonFrameSelect'; received " . print_r($request->request->all(), true));
+
+        $type = (int) $request->request->get('buttonTypeSelect');
+        $display = $entityManager->getRepository(Entity\Display::class)->find($request->request->get('buttonDisplaySelect'));
+        if ($display === null) {
+            throw new Exception('Display ' . $request->request->get('buttonDisplaySelect') . ' does not exist');
         }
-        
-        $display = $entityManager->getRepository(Entity\Display::class)->find($displayId);
-        $frame = $entityManager->getRepository(Entity\Frame::class)->find($frameId);
+
+        if ($type === Entity\Button::TRIGGER_FRAME) {
+            $frameId = $request->request->get('buttonFrameSelect');
+            if ($frameId === null) {
+                throw new Exception("Missing fields: need to POST 'buttonFrameSelect'; received " . print_r($request->request->all(), true));
+            }
+
+            $frame = $entityManager->getRepository(Entity\Frame::class)->find($frameId);
+            $url = null;
+        } elseif ($type === Entity\Button::PLAY) {
+            $frame = null;
+            $url = null;
+        } elseif ($type === Entity\Button::TRIGGER_URL) {
+            $url = $request->request->get('UrlSelect');
+            if ($url === null) {
+                throw new Exception("Missing fields: need to POST 'UrlSelect'; received " . print_r($request->request->all(), true));
+            }
+
+            $frame = null;
+        } else {
+            throw new Exception("Unknown button type {$type}");
+        }
 
         $button->setOnDisplay($display);
         $button->setTriggerFrame($frame);
+        $button->setType($type);
+        $button->setTriggerUrl($url);
 
-        $entityManager->persist($button);
+        $entityManager->merge($button);
         $entityManager->flush();
 
         return new JsonResponse(true);
@@ -126,9 +153,9 @@ class ButtonEdit extends AbstractController
         if (!$button) {
             throw new Exception("Button #{$id} not found");
         }
-        $buttonImg = $button->getImage();
+        $buttonImg = '/var/www/html/public/uploads/' . $button->getImage();
         if (file_exists($buttonImg)) {
-            unlink($button);
+            unlink($buttonImg);
         }
         $entityManager->remove($button);
         $entityManager->flush();

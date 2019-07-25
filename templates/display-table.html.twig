@@ -23,11 +23,11 @@
           target="_blank">{{ path('display-url', {'id': display.id}) }}</a></td>
       <td><a href="communityhub://{{display.id }}" class="btn btn-outline-secondary btn-block">Open</a></td>
       <td class="form-inline" style="min-width:160px;">
-        <button class="btn btn-primary mr-2" data-toggle="modal"
+        <button class="btn btn-primary shadow mr-2" data-toggle="modal"
           data-target="#display-{{display.id}}-createFormModal">Edit</button>
 
         <form action="{{ path('display-delete', {'id': display.id}) }}" method="POST">
-          <input type="submit" class="btn btn-danger" value="Delete">
+          <input type="submit" class="btn btn-danger shadow" value="Delete">
         </form>
       </td>
     </tr>
@@ -60,14 +60,14 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <button class="btn btn-primary display-add-new-pres" data-display="{{display.id}}">Add presentation</button>
+            <button class="btn btn-primary shadow display-add-new-pres" data-display="{{display.id}}">Add presentation</button>
           </div>
         </div>
 
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <input type="submit" class="btn btn-primary" value="Save display">
+          <input type="submit" class="btn btn-primary shadow" value="Save display">
         </div>
       </form>
     </div>

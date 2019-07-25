@@ -370,18 +370,21 @@ var selectButtonType = function (e) {
 		$('#triggerFrame' + controllerId).css('display', '');
 		loadCarousels(document.getElementById('buttonDisplaySelect' + controllerId));
 	} else if (val === '3') {
+		// console.log($("#triggerController" + controllerId));
 		$("#triggerController" + controllerId).css('display', '');
 	}
 }
 
 var loadCarousels = function (e) {
 	var $select = $(e);
+	if ($('#' + $select.data('type')).val() !== '1') {
+		return;
+	}
 	var $target = $($select.data('target'));
 	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 	$.ajax({
 		url: '/digital-signage/display/' + $select.val() + '/carousel/all',
 		type: "GET",
-		data: "buttonId=" + $target.attr('id').replace('carouselList', ''),
 		success: function (data) {
 			var id = guidGenerator();
 			var frameTarget = $target.attr('id').replace('carouselList', 'frameList');

@@ -26,16 +26,21 @@
     {% endblock %}
   </main>
   <footer class="footer mt-auto py-3 bg-dark">
-    <div class="container text-right">
-      <div class="btn-group dropup">
-        <button type="button" class="btn btn-outline-light btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false">
-          Download desktop player
-        </button>
-        <div class="dropdown-menu">
-          <a class="dropdown-item" href="{{ path('index') }}dist/Community Hub Digital Display-1.0.0.dmg">macOS</a>
-          <a class="dropdown-item" href="{{ path('index') }}dist/Community Hub Digital Display Setup 1.0.0.exe">Windows</a>
-          <a class="dropdown-item" href="{{ path('index') }}dist/Community Hub Digital Display-1.0.0.AppImage">Linux</a>
+    <div class="container text-left">
+      <span class="text-light">&copy; CommunityHub {{"now"|date("Y")}}</span>
+      <div class="float-right">
+        <div class="btn-group dropup">
+          <button type="button" class="btn btn-outline-light btn-sm dropdown-toggle" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Download desktop player
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="{{ path('index') }}dist/Community Hub Digital Display-1.0.0.dmg">macOS</a>
+            <a class="dropdown-item"
+              href="{{ path('index') }}dist/Community Hub Digital Display Setup 1.0.0.exe">Windows</a>
+            <a class="dropdown-item"
+              href="{{ path('index') }}dist/Community Hub Digital Display-1.0.0.AppImage">Linux</a>
+          </div>
         </div>
       </div>
     </div>

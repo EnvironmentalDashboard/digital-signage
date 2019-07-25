@@ -9,15 +9,15 @@
       <option value="3">Show another controller</option>
     </select>
   </div>
+  <div class="form-group">
+    <label for="buttonDisplaySelect{{controller.id}}">Select display</label>
+    <select class="form-control" id="buttonDisplaySelect{{controller.id}}" name="buttonDisplaySelect" onchange="return loadCarousels(this)" data-target="#carouselList{{controller.id}}" data-type="buttonTypeSelect{{controller.id}}">
+      {% for display in displays %}
+      <option value="{{display.id}}" {% if button is defined and display.id == button.onDisplay.id %}selected{% endif %}>{{display.label}}</option>
+      {% endfor %}
+    </select>
+  </div>
   <div id="triggerFrame{{controller.id}}" style="display: none">
-    <div class="form-group">
-      <label for="buttonDisplaySelect{{controller.id}}">Select display</label>
-      <select class="form-control" id="buttonDisplaySelect{{controller.id}}" name="buttonDisplaySelect" onchange="return loadCarousels(this)" data-target="#carouselList{{controller.id}}">
-        {% for display in displays %}
-        <option value="{{display.id}}" {% if button is defined and display.id == button.onDisplay.id %}selected{% endif %}>{{display.label}}</option>
-        {% endfor %}
-      </select>
-    </div>
     <div class="form-group" id="carouselList{{controller.id}}">
       <div class="d-flex justify-content-center">
         <div class="spinner-border" role="status">
@@ -33,7 +33,7 @@
       <label for="triggerUrl{{controller.id}}">Select controller</label>
       <select class="form-control" name="UrlSelect" id="triggerUrl{{controller.id}}">
         {% for controller in controllers %}
-        <option value="{{ app.request.uri }}{{path('index')}}{{controller.id}}">{{controller.label}}</option>
+        <option value="{{ app.request.getSchemeAndHttpHost }}{{path('controller-url', {id: controller.id})}}">{{controller.label}}</option>
         {% endfor %}
       </select>
     </div>
@@ -50,6 +50,6 @@
   </div>
   {% endif %}
   <input type="hidden" name="controllerId" value="{{controller.id}}">
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <button type="submit" class="btn btn-primary shadow">Submit</button>
 </form>
 
