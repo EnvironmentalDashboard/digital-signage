@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-100">
 
 <head>
   {% block head %}
@@ -14,15 +14,32 @@
   <link rel="mask-icon" href="/safari-pinned-tab.svg?v=9ByOqqx0o3" color="#00a300">
   <link rel="shortcut icon" href="/favicon.ico?v=9ByOqqx0o3">
   <meta name="theme-color" content="#000000">
-  <title>{% block title %}Environmental Dashboard{% endblock %}</title>
+  <title>{% block title %}Community Hub{% endblock %}</title>
   {% endblock %}
   {% block styles %}
   {% endblock %}
 </head>
 
-<body>
-  {% block body %}
-  {% endblock %}
+<body class="d-flex flex-column h-100">
+  <main class="flex-shrink-0">
+    {% block body %}
+    {% endblock %}
+  </main>
+  <footer class="footer mt-auto py-3 bg-dark">
+    <div class="container text-right">
+      <div class="btn-group dropup">
+        <button type="button" class="btn btn-outline-light btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+          aria-expanded="false">
+          Download desktop player
+        </button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="{{ path('index') }}build/Community Hub Digital Display-1.0.0.dmg">macOS</a>
+          <a class="dropdown-item" href="{{ path('index') }}">Windows</a>
+          <a class="dropdown-item" href="{{ path('index') }}">Linux</a>
+        </div>
+      </div>
+    </div>
+  </footer>
   {% block javascript %}
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"
     integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
