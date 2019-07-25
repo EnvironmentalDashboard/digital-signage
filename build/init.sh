@@ -25,6 +25,8 @@ php bin/console cache:warmup
 a2enmod rewrite headers
 mv /var/www/html/apache/000-default.conf /etc/apache2/sites-available/000-default.conf
 
+ln -s /var/www/html/electron/dist /var/www/html/public/dist
+
 chown -R www-data:www-data /var/www/
 find /var/www/ -type d -exec chmod 775 "{}" \;
 find /var/www/ -type f -exec chmod 664 "{}" \;
