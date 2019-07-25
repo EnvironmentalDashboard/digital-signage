@@ -24,14 +24,59 @@ class ButtonEdit extends AbstractController
     {
         $button = new Entity\Button;
         $button->setTwigKey('btn1'); // tmp value to be set later
+        $type = (int) $request->request->get('buttonTypeSelect');
+        if ($type === Entity\Button::TRIGGER_FRAME) {
+            $displayId = $request->request->get('buttonDisplaySelect');
+            $frameId = $request->request->get('buttonFrameSelect');
+            $controllerId = $request->request->get('controllerId');
+            $image = $request->files->get('file');
+            if ($displayId === null || $frameId === null || $controllerId === null || $image === null) {
+                throw new Exception("Missing fields: need to POST 'buttonDisplaySelect', 'buttonFrameSelect', 'controllerId', 'file'; received " . print_r($request->request->all(), true));
+            }
+            $this->saveImage($image);
 
-        $displayId = $request->request->get('buttonDisplaySelect');
-        $frameId = $request->request->get('buttonFrameSelect');
-        $controllerId = $request->request->get('controllerId');
-        $image = $request->files->get('file');
-        if ($displayId === null || $frameId === null || $controllerId === null || $image === null) {
-            throw new Exception("Missing fields: need to POST 'buttonDisplaySelect', 'buttonFrameSelect', 'controllerId', 'file'; received " . print_r($request->request->all(), true));
+            $display = $entityManager->getRepository(Entity\Display::class)->find($displayId);
+            $frame = $entityManager->getRepository(Entity\Frame::class)->find($frameId);
+            $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
+            $url = null;
+        } elseif ($type === Entity\Button::PLAY) {
+            $controllerId = $request->request->get('controllerId');
+            if ($controllerId === null) {
+                throw new Exception("Missing fields: need to POST 'controllerId'; received " . print_r($request->request->all(), true));
+            }
+
+            $display = null;
+            $frame = null;
+            $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
+            $url = null;
+        } elseif ($type === Entity\Button::TRIGGER_URL) {
+            $url = $request->request->get('UrlSelect');
+            $controllerId = $request->request->get('controllerId');
+            if ($controllerId === null) {
+                throw new Exception("Missing fields: need to POST 'controllerId', 'UrlSelect; received " . print_r($request->request->all(), true));
+            }
+
+            $display = null;
+            $frame = null;
+            $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
+        } else {
+            return new JsonResponse(false);
         }
+
+        $button->setOnDisplay($display);
+        $button->setTriggerFrame($frame);
+        $button->addController($controller);
+        $button->setType($type);
+        $button->setTriggerUrl($url);
+
+        $entityManager->persist($button);
+        $entityManager->flush();
+
+        return new JsonResponse(true);
+    }
+
+    private function saveImage($image)
+    {
         if ($image->isValid()) {
             $path = '/var/www/html/public/uploads/';
             $name = $image->getClientOriginalName();
@@ -41,19 +86,6 @@ class ButtonEdit extends AbstractController
             $image->move($path, $name);
             $button->setImage($name);
         }
-
-        $display = $entityManager->getRepository(Entity\Display::class)->find($displayId);
-        $frame = $entityManager->getRepository(Entity\Frame::class)->find($frameId);
-        $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
-
-        $button->setOnDisplay($display);
-        $button->setTriggerFrame($frame);
-        $button->addController($controller);
-
-        $entityManager->persist($button);
-        $entityManager->flush();
-
-        return new JsonResponse(true);
     }
 
     /**
