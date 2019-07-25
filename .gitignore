@@ -1,5 +1,6 @@
 /config/secrets.yaml
 /public/uploads/
+/electron/dist/
 .DS_Store
 composer.phar
 ###> symfony/framework-bundle ###

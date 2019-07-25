@@ -1,23 +1,53 @@
 {
   "name": "media-player",
+  "productName": "Community Hub Digital Display",
   "version": "1.0.0",
   "description": "Digital signage desktop media player",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
   },
   "build": {
     "appId": "cloud.communityhub.digital-signage",
     "mac": {
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
     },
     "protocols": {
       "name": "communityhub-protocol",
       "schemes": [
         "communityhub"
       ]
+    },
+    "dmg": {
+      "backgroundColor": "#333333",
+      "icon": "build/icon.icns",
+      "iconSize": 100,
+      "contents": [
+        {
+          "x": 380,
+          "y": 280,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 110,
+          "y": 280,
+          "type": "file"
+        }
+      ],
+      "window": {
+        "width": 648,
+        "height": 648
+      }
     }
+  },
+  "win": {
+    "target": "NSIS",
+    "icon": "build/icon.ico",
+    "artifactName": "${productName}-Web-Setup-${version}.${ext}"
   },
   "repository": {
     "type": "git",
@@ -30,7 +60,8 @@
   },
   "homepage": "https://github.com/EnvironmentalDashboard/digital-signage#readme",
   "devDependencies": {
-    "electron": "^5.0.6"
+    "electron": "^5.0.6",
+    "electron-builder": "^21.1.5"
   },
   "dependencies": {
     "node-fetch": "^2.6.0",
