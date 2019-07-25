@@ -10,8 +10,9 @@ let win;
 let width;
 let height;
 let presentations = {};
+let conn;
 
-function createWindow() {
+function createWindow(displayId) {
     let size = electron.screen.getPrimaryDisplay().size;
     width = size.width;
     height = size.height;
@@ -37,7 +38,7 @@ function createWindow() {
         win = null;
     });
 
-    fetch('https://environmentaldashboard.org/digital-signage/display/3/present/json')
+    fetch('https://environmentaldashboard.org/digital-signage/display/' + displayId + '/present/json')
         .then(res => res.json())
         .then(json => {
             for (const presentationId in json) {
@@ -61,14 +62,16 @@ function createWindow() {
                                 const frame = frames[i];
                                 viewData.carousels[carouselId].push(frame);
                             }
-                            let view = new BrowserView({ webPreferences: {
-                                nodeIntegration: false
-                                // sandbox: true
-                            }});
+                            let view = new BrowserView({
+                                webPreferences: {
+                                    nodeIntegration: false
+                                    // sandbox: true
+                                }
+                            });
                             win.addBrowserView(view);
                             let viewWidth = width * (json[presentationId]['style'][carouselId].width / 100);
                             let viewHeight = height * (json[presentationId]['style'][carouselId].height / 100);
-                            view.setBounds({x: x, y: y, width: viewWidth, height: viewHeight });
+                            view.setBounds({ x: x, y: y, width: viewWidth, height: viewHeight });
                             y += viewHeight;
                             viewData.views = Object.assign({
                                 [carouselId]: view
@@ -82,6 +85,46 @@ function createWindow() {
                 presentations[presentationId] = viewData;
             }
 
+            // open websocket conn to receive commands from remote controllers
+            conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/" + displayId);
+            let WS_READY = true;
+            conn.onerror = function () {
+                console.log('Connection error');
+                app.quit();
+            };
+            conn.onclose = function () {
+                console.log('Connection close');
+                app.quit();
+            };
+            conn.onmessage = function (e) {
+                if (WS_READY === false) {
+                    return;
+                } else {
+                    WS_READY = false;
+                }
+                const frameId = parseInt(e.data);
+                const target = 'frame' + frameId;
+                for (const key in presentations) {
+                    const presentation = presentations[key];
+                    const carousels = presentation.carousels;
+                    for (const carouselId in carousels) {
+                        const carousel = carousels[carouselId];
+                        for (const twigKey in carousel) {
+                            if (carousel.hasOwnProperty(twigKey)) {
+                                const frame = carousel[twigKey];
+                                if (frame.id === target) {
+                                    WS_READY = true;
+                                    showPresentation(key, frame.id);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+                WS_READY = true;
+
+            };
+
             initApp();
 
         });
@@ -90,7 +133,15 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+// app.on('ready', createWindow);
+
+// This will catch clicks on links such as <a href="communityhub://3">open in display 3</a>
+app.on('open-url', function (event, data) {
+    event.preventDefault();
+    createWindow(new URL(data).host);
+});
+
+app.setAsDefaultProtocolClient('communityhub');
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -130,19 +181,19 @@ function showPresentation(presentationId, targetFrame = null) {
 }
 
 function setViews(viewData, targetFrame) {
-    
+
     for (const key in viewData.views) {
         const view = viewData.views[key];
         const carousels = viewData.carousels[key];
         let i = 0;
         if (targetFrame === null) {
-            var firstFrame = carousels[i];   
+            var firstFrame = carousels[i];
         } else {
             for (; i < carousels.length; i++) {
                 if (carousels[i].id === targetFrame) {
                     var firstFrame = carousels[i];
                     break;
-                }   
+                }
             }
         }
         view.webContents.loadURL(firstFrame.url);
@@ -162,7 +213,7 @@ function animateFrames(view, carousel, current) {
             let timeout = setTimeout(() => {
                 view.webContents.loadURL(frame.url);
                 win.addBrowserView(view);
-                animateFrames(view, carousel, (current === (carousel.length-1)) ? 0 : current + 1);
+                animateFrames(view, carousel, (current === (carousel.length - 1)) ? 0 : current + 1);
             }, carousel[current].dur);
             activeTimeouts.push(timeout);
             break;
@@ -184,46 +235,7 @@ function clearViews() {
         // view.webContents.destroy();
         view.webContents.loadURL('about:blank');
         win.removeBrowserView(view);
-        
+
     }
 }
 
-// open websocket conn to receive commands from remote controllers
-const conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/3");
-let WS_READY = true;
-conn.onerror = function () {
-    console.log('Connection error');
-    app.quit();
-};
-conn.onclose = function () {
-    console.log('Connection close');
-    app.quit();
-};
-conn.onmessage = function (e) {
-    if (WS_READY === false) {
-        return;
-    } else {
-        WS_READY = false;
-    }
-    const frameId = parseInt(e.data);
-    const target = 'frame' + frameId;
-    for (const key in presentations) {
-        const presentation = presentations[key];
-        const carousels = presentation.carousels;
-        for (const carouselId in carousels) {
-            const carousel = carousels[carouselId];
-            for (const twigKey in carousel) {
-                if (carousel.hasOwnProperty(twigKey)) {
-                    const frame = carousel[twigKey];
-                    if (frame.id === target) {
-                        WS_READY = true;
-                        showPresentation(key, frame.id);
-                        return;
-                    }       
-                }
-            }
-        }
-    }
-    WS_READY = true;
-
-};

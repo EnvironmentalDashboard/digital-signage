@@ -7,6 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron ."
   },
+  "build": {
+    "appId": "cloud.communityhub.digital-signage",
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "protocols": {
+      "name": "communityhub-protocol",
+      "schemes": [
+        "communityhub"
+      ]
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/EnvironmentalDashboard/digital-signage.git"
