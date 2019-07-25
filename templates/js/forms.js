@@ -359,6 +359,21 @@ var saveButton = function (e) {
 	});
 };
 
+var selectButtonType = function (e) {
+	var val = $(e).val(), controllerId = $(e).data('controllerid');
+	if (val === '') {
+		return;
+	}
+	$('#triggerFrame' + controllerId).css('display', 'none');
+	$("#triggerController" + controllerId).css('display', 'none');
+	if (val === '1') {
+		$('#triggerFrame' + controllerId).css('display', '');
+		loadCarousels(document.getElementById('buttonDisplaySelect' + controllerId));
+	} else if (val === '3') {
+		$("#triggerController" + controllerId).css('display', '');
+	}
+}
+
 var loadCarousels = function (e) {
 	var $select = $(e);
 	var $target = $($select.data('target'));
@@ -474,12 +489,12 @@ $(".controller-select-dropdown").each(function () {
 function enablePopovers() {
 	var popovers = $('[data-toggle="popover"]');
 	popovers.popover({ html: true });
-	popovers.on('shown.bs.popover', function (e) {
-		var id = $(e.target).attr('data-displayList');
-		if (id != null) {
-			loadCarousels(document.getElementById(id));
-		}
-	});
+	// popovers.on('shown.bs.popover', function (e) {
+	// 	var id = $(e.target).attr('data-displayList');
+	// 	if (id != null) {
+	// 		loadCarousels(document.getElementById(id));
+	// 	}
+	// });
 }
 enablePopovers();
 
