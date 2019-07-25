@@ -61,12 +61,29 @@ class WsManager implements MessageComponentInterface
             throw new ResourceNotFoundException(date('c') . ": Button {$button_id} not found");
         }
         $display_id = $button->getOnDisplay()->getId();
-        $to_trigger = $button->getTriggerFrame()->getId();
         if (!isset($this->displays[$display_id])) {
-            throw new Exception(date('c') . ": Display {$display_id} not connected; button {$button_id} failed to trigger frame {$to_trigger}\n");
+            throw new Exception(date('c') . ": Display {$display_id} not connected\n");
+        }
+        $type = $button->getType();
+        if ($type === Entity\Button::TRIGGER_FRAME) {
+            $to_trigger = $button->getTriggerFrame()->getId();
+            $response = json_encode([
+                'type' => $type,
+                'trigger' => $to_trigger
+            ]);
+        } elseif ($type === Entity\Button::PLAY) {
+            $response = json_encode(['type' => $type]);
+        } elseif ($type === Entity\Button::TRIGGER_URL) {
+            $to_trigger = $button->getTriggerUrl();
+            $response = json_encode([
+                'type' => $type,
+                'trigger' => $to_trigger
+            ]);
+        } else {
+            throw new Exception(date('c') . "Unknown button type {$type}\n");
         }
         foreach ($this->displays[$display_id] as $display) {
-            $display->send($to_trigger);
+            $display->send($response);
         }
     }
 
