@@ -25,9 +25,14 @@ class Button
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Frame")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $trigger_frame;
+
+    /**
+     * @ORM\Column(type="string", length=2000, nullable=true)
+     */
+    private $trigger_url;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Display")
@@ -44,6 +49,15 @@ class Button
      * @ORM\Column(type="string", length=255)
      */
     private $image;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $type;
+
+    public const TRIGGER_FRAME = 1;
+    public const PLAY = 2;
+    public const TRIGGER_URL = 3;
 
     public function __construct()
     {
@@ -90,6 +104,18 @@ class Button
         return $this;
     }
 
+    public function getTriggerUrl(): ?string
+    {
+        return $this->trigger_url;
+    }
+
+    public function setTriggerUrl(?string $trigger_url): self
+    {
+        $this->trigger_url = $trigger_url;
+
+        return $this;
+    }
+
     public function getOnDisplay(): ?Display
     {
         return $this->on_display;
@@ -122,6 +148,18 @@ class Button
     public function setImage(string $image): self
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getType(): ?int
+    {
+        return $this->type;
+    }
+
+    public function setType(int $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }
