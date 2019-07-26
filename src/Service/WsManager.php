@@ -85,6 +85,7 @@ class WsManager implements MessageComponentInterface
         foreach ($this->displays[$display_id] as $display) {
             $display->send($response);
         }
+        $this->entityManager->detach($button); // don't cache $button bc it could be updated through admin interface
     }
 
     public function onClose(ConnectionInterface $conn)

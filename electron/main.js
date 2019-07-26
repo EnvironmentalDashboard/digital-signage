@@ -1,16 +1,34 @@
+/**
+ * Imports
+ */
 const electron = require('electron');
 const fetch = require('node-fetch');
 const WebSocket = require('ws');
 const { app, BrowserView, BrowserWindow } = electron;
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let win;
 
+/**
+ * Global variables
+ */
+const baseHttp = 'http://localhost:5000'; //'https://environmentaldashboard.org';
+const baseWs = 'ws://localhost:5001'; //'wss://environmentaldashboard.org';
+let win; // window will be closed automatically when the JavaScript object is garbage collected if no global reference kept
 let width;
 let height;
 let presentations = {};
-let conn;
+let conn; // websocket connection
+let paused = false;
+let currentPres = null;
+
+
+/**
+ * Initialize app
+ */
+app.on('open-url', function (event, data) { // this will catch clicks on links such as <a href="communityhub://3">open in display 3</a>
+    event.preventDefault();
+    createWindow(new URL(data).host);
+});
+app.setAsDefaultProtocolClient('communityhub');
 
 function createWindow(displayId) {
     let size = electron.screen.getPrimaryDisplay().size;
@@ -38,7 +56,7 @@ function createWindow(displayId) {
         win = null;
     });
 
-    fetch('https://environmentaldashboard.org/digital-signage/display/' + displayId + '/present/json')
+    fetch(baseHttp + '/digital-signage/display/' + displayId + '/present/json')
         .then(res => res.json())
         .then(json => {
             for (const presentationId in json) {
@@ -86,8 +104,7 @@ function createWindow(displayId) {
             }
 
             // open websocket conn to receive commands from remote controllers
-            conn = new WebSocket("wss://environmentaldashboard.org/digital-signage/websockets/display/" + displayId);
-            let WS_READY = true;
+            conn = new WebSocket(baseWs + "/digital-signage/websockets/display/" + displayId);
             conn.onerror = function () {
                 console.log('Connection error');
                 app.quit();
@@ -96,71 +113,17 @@ function createWindow(displayId) {
                 console.log('Connection close');
                 app.quit();
             };
-            conn.onmessage = function (e) {
-                if (WS_READY === false) {
-                    return;
-                } else {
-                    WS_READY = false;
-                }
-                const frameId = parseInt(e.data);
-                const target = 'frame' + frameId;
-                for (const key in presentations) {
-                    const presentation = presentations[key];
-                    const carousels = presentation.carousels;
-                    for (const carouselId in carousels) {
-                        const carousel = carousels[carouselId];
-                        for (const twigKey in carousel) {
-                            if (carousel.hasOwnProperty(twigKey)) {
-                                const frame = carousel[twigKey];
-                                if (frame.id === target) {
-                                    WS_READY = true;
-                                    showPresentation(key, frame.id);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-                WS_READY = true;
-
-            };
+            conn.onmessage = commandReceiver;
 
             initApp();
 
         });
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-// app.on('ready', createWindow);
 
-// This will catch clicks on links such as <a href="communityhub://3">open in display 3</a>
-app.on('open-url', function (event, data) {
-    event.preventDefault();
-    createWindow(new URL(data).host);
-});
-
-app.setAsDefaultProtocolClient('communityhub');
-
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-    // On macOS it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
-});
-
-app.on('activate', () => {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (win === null) {
-        createWindow();
-    }
-});
-
-
+/**
+ * Application code; rotates frames in carousels in a cycle of presentations
+ */
 let activeTimeouts = [];
 let activeViews = [];
 function initApp() {
@@ -168,6 +131,7 @@ function initApp() {
 }
 
 function showPresentation(presentationId, targetFrame = null) {
+    currentPres = presentationId;
     clearTimeouts();
     clearViews();
     setViews(presentations[presentationId], targetFrame);
@@ -239,3 +203,46 @@ function clearViews() {
     }
 }
 
+function commandReceiver(e) {
+    let ws_ready = true;
+    if (ws_ready === false) {
+        return;
+    } else {
+        ws_ready = false;
+    }
+    var button = JSON.parse(e.data);
+    if (button.type === 1) {
+        const target = 'frame' + button.trigger;
+        for (const key in presentations) {
+            const presentation = presentations[key];
+            const carousels = presentation.carousels;
+            for (const carouselId in carousels) {
+                const carousel = carousels[carouselId];
+                for (const twigKey in carousel) {
+                    if (carousel.hasOwnProperty(twigKey)) {
+                        const frame = carousel[twigKey];
+                        if (frame.id === target) {
+                            ws_ready = true;
+                            showPresentation(key, frame.id);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    } else if (button.type === 2) { // pause
+        ws_ready = true;
+        if (!paused) {
+            clearTimeouts();
+            paused = true;
+        } else {
+            showPresentation(currentPres);
+            paused = false;
+        }
+        return;
+    } else {
+        console.log('Unrecognized button type ' + button.type);
+    }
+    ws_ready = true;
+
+}
