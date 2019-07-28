@@ -10,8 +10,8 @@ const { app, BrowserView, BrowserWindow } = electron;
 /**
  * Global variables
  */
-const baseHttp = 'http://localhost:5000'; //'https://environmentaldashboard.org';
-const baseWs = 'ws://localhost:5001'; //'wss://environmentaldashboard.org';
+const baseHttp = (process.env.APP_ENV === 'dev') ? 'http://localhost:5000' : 'https://environmentaldashboard.org';
+const baseWs = (process.env.APP_ENV === 'dev') ? 'ws://localhost:5001' : 'wss://environmentaldashboard.org';
 let win; // window will be closed automatically when the JavaScript object is garbage collected if no global reference kept
 let width;
 let height;
