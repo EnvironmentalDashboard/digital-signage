@@ -1,9 +1,9 @@
 /config/secrets.yaml
 /public/uploads/
-/electron/dist/
-!/electron/dist/Community Hub Digital Display-1.0.0.dmg
-!/electron/dist/Community Hub Digital Display-1.0.0.AppImage
-!/electron/dist/Community Hub Digital Display Setup 1.0.0.exe
+/electron/dist/.icon-set
+/electron/dist/linux-unpacked
+/electron/dist/mac
+/electron/dist/win-unpacked
 .DS_Store
 composer.phar
 ###> symfony/framework-bundle ###

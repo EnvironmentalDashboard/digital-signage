@@ -1,0 +1,9 @@
+version: 1.0.0
+files:
+  - url: Community-Hub-Digital-Display-1.0.0.AppImage
+    sha512: AZBb8xDPloilXYtESVvoGKTcL6gO2Rdwm/1KVJNtTVALm7rB3cTINy9hV7hJRLapoCZ5mAIyl6wY1nLsfJyILA==
+    size: 64986802
+    blockMapSize: 69318
+path: Community-Hub-Digital-Display-1.0.0.AppImage
+sha512: AZBb8xDPloilXYtESVvoGKTcL6gO2Rdwm/1KVJNtTVALm7rB3cTINy9hV7hJRLapoCZ5mAIyl6wY1nLsfJyILA==
+releaseDate: '2019-07-30T15:36:43.980Z'
