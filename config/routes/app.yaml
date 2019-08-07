@@ -19,13 +19,9 @@ display-save-presentations:
   path: /display/{id}/presentations/save
   controller: App\Controller\DisplayEdit::savePresentations
   methods: POST
-display-url:
+display-present:
   path: /display/{id}/present
   controller: App\Controller\Display::present
-  methods: GET
-display-url-json:
-  path: /display/{id}/present/json
-  controller: App\Controller\Display::presentJson
   methods: GET
 display-template:
   path: /display/template/{name}

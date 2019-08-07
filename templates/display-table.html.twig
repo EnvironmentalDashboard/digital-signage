@@ -7,7 +7,6 @@
     <tr>
       <th scope="col" style="border-top:none">#</th>
       <th scope="col" style="border-top:none">Label</th>
-      <th scope="col" style="border-top:none">Web media player</th>
       <th scope="col" style="border-top:none">Desktop media player</th>
       <th scope="col" style="border-top:none">&nbsp;</th>
     </tr>
@@ -19,9 +18,7 @@
     <tr>
       <th scope="row">{{loop.index}}</th>
       <td>{{display.label}}</td>
-      <td><a href="{{ path('display-url', {'id': display.id}) }}"
-          target="_blank">{{ path('display-url', {'id': display.id}) }}</a></td>
-      <td><a href="communityhub://{{display.id }}" class="btn btn-outline-secondary btn-block">Open</a></td>
+      <td><a href="communityhub://{{ display.id }}" class="btn btn-outline-secondary btn-block">Open</a></td>
       <td class="form-inline" style="min-width:160px;">
         <button class="btn btn-primary shadow mr-2" data-toggle="modal"
           data-target="#display-{{display.id}}-createFormModal">Edit</button>

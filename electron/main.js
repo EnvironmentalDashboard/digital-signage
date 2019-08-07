@@ -57,7 +57,7 @@ function createWindow(displayId) {
         win = null;
     });
 
-    fetch(baseHttp + '/digital-signage/display/' + displayId + '/present/json')
+    fetch(baseHttp + '/digital-signage/display/' + displayId + '/present')
         .then(res => res.json())
         .then(json => {
             for (const presentationId in json) {

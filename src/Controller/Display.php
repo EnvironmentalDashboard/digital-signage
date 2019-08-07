@@ -15,50 +15,9 @@ class Display extends AbstractController
 {
 
     /**
-     * display-url
+     * display-present
      */
-    public function present($id, Request $request, EntityManagerInterface $entityManager)
-    {
-        $ret = [];
-        $presentations = $entityManager->getRepository(Entity\Display::class)->find($id)->getPresentations();
-        $presCount = count($presentations);
-        for ($i = 0; $i < $presCount; $i++) { // for all presentations associated with display $id
-            $presentation = $presentations[$i];
-            $template = $this->get('twig')->createTemplate(
-                $presentation->getTemplate()->getTwig()
-            );
-
-            $carousels = [];
-            $templateParams = [];
-            $map = $presentation->getCarouselPresentationMaps();
-            foreach ($map as $relation) { // for all carousels associated with $presentation
-                $twigKey = $relation->getTemplateKey();
-                $carousel = $relation->getCarousel();
-                $processedFrames = $this->processFrames($carousel->getFrames(), $entityManager);
-
-                $carousels[$twigKey] = $processedFrames;
-                $templateParams[$twigKey] = "<iframe id='pres{$presentation->getId()}-{$twigKey}-primary' src='about:blank' frameborder='0'></iframe><iframe id='pres{$presentation->getId()}-{$twigKey}-secondary' src='about:blank' frameborder='0'></iframe>";
-            }
-            
-            $markup = $template->render($templateParams);
-
-            $ret[$presentation->getId()] = [
-                'id' => $presentation->getId(),
-                'template' => $markup,
-                'carousels' => $carousels,
-                'duration' => $presentation->getDuration(),
-                'next' => ($i === $presCount - 1) ? $presentations[0]->getId() : $presentations[$i + 1]->getId()
-            ];
-        }
-        return $this->render('present.html.twig', ['presentations' => 
-            $ret
-        ]);
-    }
-
-    /**
-     * display-url-json
-     */
-    public function presentJson($id, Request $request, EntityManagerInterface $entityManager) {
+    public function present($id, Request $request, EntityManagerInterface $entityManager) {
         $ret = [];
         $presentations = $entityManager->getRepository(Entity\Display::class)->find($id)->getPresentations();
         $presCount = count($presentations);
