@@ -1,6 +1,9 @@
 directories:
   output: dist
   buildResources: build
+publish:
+  - provider: generic
+    url: 'https://releases.communityhub.cloud/'
 appId: cloud.communityhub.digital-signage
 mac:
   category: public.app-category.utilities

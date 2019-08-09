@@ -1,12 +1,12 @@
-version: 1.0.0
+version: 0.0.1
 files:
-  - url: Community-Hub-Digital-Display-1.0.0.zip
-    sha512: gQxddO6+eKLcsVwyNcOPQP4Qq16p/aZaXV+M6MV88cLz0kShOR0HVykzoyvdnt4061Lh618eQv7ltmb+AWH1qw==
-    size: 56077260
-    blockMapSize: 59193
-  - url: Community-Hub-Digital-Display-1.0.0.dmg
-    sha512: orc/iSfR4lxa8/hFz06l4WZUvlCc+otPKXK/3qpm8y8itAhUb6N2f4+P98wkcTzK9oegX+6nRP3SvhfKhmvF2w==
-    size: 57966978
-path: Community-Hub-Digital-Display-1.0.0.zip
-sha512: gQxddO6+eKLcsVwyNcOPQP4Qq16p/aZaXV+M6MV88cLz0kShOR0HVykzoyvdnt4061Lh618eQv7ltmb+AWH1qw==
-releaseDate: '2019-07-30T15:36:43.980Z'
+  - url: Community Hub Digital Display-0.0.1.zip
+    sha512: 5EHOZrYT2oTP+EsEwk7ZeyNDYuvyNHVSzo/vOcwDUrKD/6Wm4FGnKwXY/0Obw9ziENNN7nJ+wf2gB2bchpAIww==
+    size: 56077321
+    blockMapSize: 59242
+  - url: Community Hub Digital Display-0.0.1.dmg
+    sha512: 0A5FpbhEazK9Kkj+y13XcbphPYfTJ0aNgdssrHh5W74GOuUVfKxq/dcsOGWDrx2LtKJAdYAqGklD+Efsc/iCjQ==
+    size: 57967264
+path: Community Hub Digital Display-0.0.1.zip
+sha512: 5EHOZrYT2oTP+EsEwk7ZeyNDYuvyNHVSzo/vOcwDUrKD/6Wm4FGnKwXY/0Obw9ziENNN7nJ+wf2gB2bchpAIww==
+releaseDate: '2019-08-09T21:30:40.159Z'
