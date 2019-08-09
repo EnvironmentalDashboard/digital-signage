@@ -1,7 +1,7 @@
 {
   "name": "media-player",
   "productName": "Community Hub Digital Display",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Digital signage desktop media player",
   "main": "main.js",
   "scripts": {
@@ -11,6 +11,12 @@
     "dist": "electron-builder -mwl"
   },
   "build": {
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://releases.communityhub.cloud/"
+      }
+    ],
     "appId": "cloud.communityhub.digital-signage",
     "mac": {
       "category": "public.app-category.utilities",

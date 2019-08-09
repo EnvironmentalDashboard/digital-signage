@@ -252,19 +252,30 @@ function commandReceiver(e) {
 /**
  * Auto update
  */
-// app.on('ready', function()  {
-//   autoUpdater.checkForUpdates();
-// });
-// autoUpdater.on('checking-for-update', () => {
-// })
-// autoUpdater.on('update-available', (info) => {
-// })
-// autoUpdater.on('update-not-available', (info) => {
-// })
-// autoUpdater.on('error', (err) => {
-// })
-// autoUpdater.on('download-progress', (progressObj) => {
-// })
-// autoUpdater.on('update-downloaded', (info) => {
-//   autoUpdater.quitAndInstall();  
-// })
+if (process.platform === 'linux') {
+    console.log('Checking for updates');
+    app.on('ready', function () {
+        autoUpdater.checkForUpdates();
+    });
+    setInterval(() => {
+        autoUpdater.checkForUpdates();
+    }, 7200000); // every 2 hrs
+    autoUpdater.on('checking-for-update', () => {
+        console.log('checking-for-update');
+    });
+    autoUpdater.on('update-available', (info) => {
+        console.log('checking-available');
+    });
+    autoUpdater.on('update-not-available', (info) => {
+        console.log('checking-not-available');
+    });
+    autoUpdater.on('error', (err) => {
+        console.log('error', err);
+    });
+    autoUpdater.on('download-progress', (progressObj) => {
+        console.log('download-progress');
+    });
+    autoUpdater.on('update-downloaded', (info) => {
+        autoUpdater.quitAndInstall();
+    });
+}
