@@ -3,13 +3,12 @@
 namespace App\Controller;
 
 use App\Entity;
-
+use App\Service\ButtonManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Doctrine\ORM\EntityManagerInterface;
 
 class GoogleSlides extends AbstractController
@@ -17,45 +16,90 @@ class GoogleSlides extends AbstractController
     /**
      * google-slides-save
      */
-    public function save(Request $request, EntityManagerInterface $entityManager, $presentationId)
+    public function save(Request $request, EntityManagerInterface $entityManager, ButtonManager $buttonManager, $presentationId)
     {
-        $filtered = [];
-        $data = json_decode($request->request->get('durations'), true);
-        if (!is_array($data)) {
-            throw new \Exception('Invalid durations payload');
+        $data = json_decode($request->request->get('notes'), true);
+        $carouselId = $request->request->get('carousel');
+        if (!is_array($data) || $carouselId === null) {
+            throw new \Exception('Invalid payload');
         }
-        foreach ($data as $key => $value) {
-            preg_match("/duration:[\s]?(\d*)/i", $value, $matches);
+        $response = [];
+        // need to save buttons to remote controller if defined in presenter notes
+        $remoteController = null;
+        $buttons = [];
+        $carousel = $entityManager->getRepository(Entity\Carousel::class)->find($carouselId);
+        $repository = $entityManager->getRepository(Entity\Display::class);
+
+        foreach ($data as $i => $value) {
+            $response[$i] = [];
+
+            preg_match("/duration:(\s*)(\d*)/i", $value, $matches);
             if ($matches) {
-                $value = round($matches[1] * 1000);
-                if ($value < 0 || $value > 1000000) {
-                    $value = 7000;
+                $dur = round($matches[2] * 1000);
+                if ($dur < 0 || $dur > 1000000) {
+                    $dur = 7000;
                 }
             } else {
-                $value = 7000;
+                $dur = 7000;
             }
-            $filtered[$key] = $value;
+            $response[$i]['dur'] = $dur;
+
+            preg_match("/url:(\s*)(.*)/i", $value, $matches);
+            if ($matches) {
+                $url = $matches[2];
+            } else {
+                $url = "https://docs.google.com/presentation/d/{$presentationId}/preview?rm=minimal#slide=" . ($i + 1);
+            }
+            $response[$i]['url'] = $url;
+
+            // create frame to link to buttons
+            $frame = new Entity\Frame;
+            $frame->setCarousel($carousel);
+            $frame->setDuration($dur);
+            $frame->setUrl($url);
+            $entityManager->persist($frame);
+            $entityManager->flush();
+            $response[$i]['frame'] = $frame->getId();
+
+            preg_match("/button:(\s*)(.*)/i", $value, $matches);
+            preg_match("/display:(\s*)(.*)/i", $value, $matches2);
+            if ($matches && $matches2) {
+                $buttonText = $matches[2];
+                $displayLabel = $matches2[2];
+                $display = $repository->findOneBy(['label' => $displayLabel]);
+                if ($display !== null) {
+                    if ($remoteController === null) {
+                        $remoteController = new Entity\RemoteController;
+                        $remoteController->setLabel("Controller for {$presentationId}");
+                    }
+                    $buttons[$i] = ['display' => $display, 'button' => $buttonText, 'frame' => $frame];
+                }
+            }
         }
 
-        $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
-        $toDelete = $repository->findOneBy(['presentationId' => $presentationId]);
-        if ($toDelete) {
-            $entityManager->remove($toDelete);
-            $entityManager->flush(); // DELETE query isn't actually executed until flush() called
+        foreach ($buttons as $button) {
+            $fn = uniqid() . '.svg';
+            $size = file_put_contents("/tmp/{$fn}", '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="100%" height="100%" viewBox="0 0 1920 1080"><text x="'.(strlen($button['button']) * 0.2).'%" y="50%" style="font-size:10rem;font-family:sans-serif">'.$button['button'].'</text></svg>');
+            $image = new UploadedFile("/tmp/{$fn}", $fn, 'image/svg', $size, null, true);
+            $button = $buttonManager->create(Entity\Button::TRIGGER_FRAME, $button['display'], $button['frame'], $remoteController, $image, null);
+            $entityManager->persist($button);
         }
-        $entity = (new Entity\GoogleSlides())->setPresentationId($presentationId)->setData($filtered);
-        $entityManager->persist($entity);
+
+        if ($remoteController !== null) {
+            $template = new Entity\Template;
+            $twig = '';
+            for ($i = 0; $i < count($buttons); $i++) { 
+                $twig .= '<div class="button" data-twig="btn'.($i+1).'" style="height:50%;width:25%;">{{ btn'.($i+1).'|raw }}</div>';
+            }
+            $template->setTwig($twig);
+            $remoteController->setTemplate($template);
+            $entityManager->persist($template);
+            $entityManager->persist($remoteController);
+        }
+
         $entityManager->flush();
-        return new JsonResponse($filtered);
+
+        return new JsonResponse($response);
     }
 
-    /**
-     * google-slides-exists
-     */
-    public function exists(Request $request, EntityManagerInterface $entityManager, $presentationId)
-    {
-        $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
-        $res = ($repository->findOneBy(['presentationId' => $presentationId]) == null) ? false : true;
-        return new JsonResponse($res);
-    }
 }

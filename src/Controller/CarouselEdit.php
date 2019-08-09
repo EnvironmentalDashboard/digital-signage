@@ -62,25 +62,40 @@ class CarouselEdit extends AbstractController
         $frameRepo = $entityManager->getRepository(Entity\Frame::class);
 
         $carousel = $carouselRepo->find($id);
+        $currentFrames = $carousel->getFrames();
+        $newFrames = [];
 
         $urls = $request->request->get('frame_url');
         $durations = $request->request->get('frame_duration');
         $ids = $request->request->get('id');
 
+        // add/update frames from form inputs
         foreach ($urls as $key => $value) {
             $frameExists = is_numeric($ids[$key]);
-            $frame = ($frameExists) ?
-                $frameRepo->find($ids[$key])
-                    ->setUrl($urls[$key])
-                    ->setDuration(round($durations[$key] * 1000)) :
-                (new Entity\Frame())
-                    ->setUrl($urls[$key])
-                    ->setDuration(round($durations[$key] * 1000));
+            if ($frameExists) {
+                $frame = $frameRepo->find($ids[$key]);
+                if ($frame === null) {
+                    $frameExists = false;
+                    $frame = new Entity\Frame;
+                }
+            } else {
+                $frame = new Entity\Frame;
+            }
+            $frame->setUrl($urls[$key])->setDuration(round($durations[$key] * 1000));
                     
             if (!$frameExists) {
                 $carousel->addFrame($frame);
             }
             $entityManager->persist($frame);
+            $newFrames[] = (int) $frame->getId();
+        }
+
+        // make sure we have no frames on this carousel that didn't come as form input data
+        foreach ($currentFrames as $currentFrame) {
+            if (!in_array($currentFrame->getId(), $newFrames)) {
+                $carousel->removeFrame($currentFrame);
+                $entityManager->remove($currentFrame);
+            }
         }
         
         $entityManager->persist($carousel);

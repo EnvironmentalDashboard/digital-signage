@@ -3,15 +3,12 @@
 namespace App\Controller;
 
 use App\Entity;
-
+use App\Service\ButtonManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
 use Doctrine\ORM\EntityManagerInterface;
-
 use \Exception;
 
 class ButtonEdit extends AbstractController
@@ -20,77 +17,34 @@ class ButtonEdit extends AbstractController
     /**
      * button-create
      */
-    public function create(Request $request, EntityManagerInterface $entityManager)
+    public function create(Request $request, EntityManagerInterface $entityManager, ButtonManager $buttonManager)
     {
-        $button = new Entity\Button;
-        $button->setTwigKey('btn1'); // tmp value to be set later
         $type = (int) $request->request->get('buttonTypeSelect');
         $display = $entityManager->getRepository(Entity\Display::class)->find($request->request->get('buttonDisplaySelect'));
         if ($display === null) {
             throw new Exception('Display ' . $request->request->get('buttonDisplaySelect') . ' does not exist');
         }
-
-        if ($type === Entity\Button::TRIGGER_FRAME) {
-            $frameId = $request->request->get('buttonFrameSelect');
-            $controllerId = $request->request->get('controllerId');
-            $image = $request->files->get('file');
-            if ($frameId === null || $controllerId === null || $image === null) {
-                throw new Exception("Missing fields: need to POST 'buttonFrameSelect', 'controllerId', 'file'; received " . print_r($request->request->all(), true));
-            }
-            $imageName = $this->saveImage($image);
-
+        $frameId = $request->request->get('buttonFrameSelect');
+        if ($frameId !== null) {
             $frame = $entityManager->getRepository(Entity\Frame::class)->find($frameId);
-            $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
-            $url = null;
-        } elseif ($type === Entity\Button::PLAY) {
-            $controllerId = $request->request->get('controllerId');
-            if ($controllerId === null) {
-                throw new Exception("Missing fields: need to POST 'controllerId'; received " . print_r($request->request->all(), true));
-            }
-            $imageName = 'play.svg';
-
+        } else {
             $frame = null;
-            $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
-            $url = null;
-        } elseif ($type === Entity\Button::TRIGGER_URL) {
-            $url = $request->request->get('UrlSelect');
-            $controllerId = $request->request->get('controllerId');
-            $image = $request->files->get('file');
-            if ($controllerId === null) {
-                throw new Exception("Missing fields: need to POST 'controllerId', 'UrlSelect', 'file'; received " . print_r($request->request->all(), true));
-            }
-            $imageName = $this->saveImage($image);
-
-            $frame = null;
+        }
+        $controllerId = $request->request->get('controllerId');
+        if ($controllerId !== null) {
             $controller = $entityManager->getRepository(Entity\RemoteController::class)->find($controllerId);
         } else {
-            throw new Exception("Unknown button type {$type}");
+            $controller = null;
         }
+        $image = $request->files->get('file');
+        $url = $request->request->get('UrlSelect');
 
-        $button->setOnDisplay($display);
-        $button->setTriggerFrame($frame);
-        $button->addController($controller);
-        $button->setType($type);
-        $button->setTriggerUrl($url);
-        $button->setImage($imageName);
+        $button = $buttonManager->create($type, $display, $frame, $controller, $image, $url);
 
         $entityManager->persist($button);
         $entityManager->flush();
 
         return new JsonResponse(true);
-    }
-
-    private function saveImage($image)
-    {
-        if ($image->isValid()) {
-            $path = '/var/www/html/public/uploads/';
-            $name = $image->getClientOriginalName();
-            if (file_exists($path . $name)) {
-                $name = uniqid() . '.' . $image->guessClientExtension();
-            }
-            $image->move($path, $name);
-            return $name;
-        }
     }
 
     /**

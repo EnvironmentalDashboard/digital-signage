@@ -1,5 +1,5 @@
-// Fetch google slides durations in presenter notes if given such a url
-function detectDuration() {
+//
+function specialUrl() {
 	var input = $(this);
 	var originalId = input.attr('id');
 	var url = input.val();
@@ -11,20 +11,16 @@ function detectDuration() {
 		});
 	}
 	id = getSlidesId(url);
-	if (id !== false) {
-		if (confirm('We have detected a Google Slides URL. Would you like to read the presenter notes to set slide durations? You will need to authenticate with Google.')) {
-			$.post("{{ path('index') }}google-slides/" + id + "/exists", function(res) {
-				if (res === false || confirm('Presenter notes for these slides have already been imported. Would you like to delete existing durations and re-import?')) {
-					$('#' + originalId.replace('url', 'duration')).attr('id', 'dur' + id);
-					input.attr('id', id); // give input a useful id to find later
-					var tag = document.createElement('script');
-					tag.src = "https://apis.google.com/js/api.js";
-					tag.onload = function() { handleClientLoad() };
-					window.google_slide = id;
-					var firstScriptTag = document.getElementsByTagName('script')[0];
-					firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-				}
-			}, "json");
+	if (id !== false) { // fetch google slides durations in presenter notes if given such a url
+		if (confirm('We have detected a Google Slides URL. Would you like to read the presenter notes to create a remote controller, set frame URLs, and set frame durations? You will need to authenticate with Google.')) {
+			$('#' + originalId.replace('url', 'duration')).attr('id', 'dur' + id);
+			input.attr('id', id); // give input a useful id to find later
+			var tag = document.createElement('script');
+			tag.src = "https://apis.google.com/js/api.js";
+			tag.onload = function() { handleClientLoad() };
+			window.google_slide = id;
+			var firstScriptTag = document.getElementsByTagName('script')[0];
+			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 		}
 	}
 }
@@ -102,21 +98,22 @@ function getPresenterNotes() {
 			}
 			notes.push(full_note);
 		}
-		save_durations(notes, window.google_slide);
+		save_slide_data(notes, window.google_slide);
 	}, function (response) {
 		console.log(response.result.error.message);
 	});
 }
 
-function save_durations(arr, id) {
+function save_slide_data(arr, id) {
 	// console.log('notes', arr);
-	$.post("{{ path('index') }}google-slides/" + id + "/save", { durations: JSON.stringify(arr) }, function(data, textStatus) {
-		// console.log(data);
-		var frameInput = $('#' + id);
-		var durInput = $('#dur' + id);
-		frameInput.addClass('is-valid');
-		var sum = data.reduce(function(a, b) { return a + b; }, 0);
-		durInput.val(Math.round(sum/1000));
-		frameInput.after('<small class="form-text text-muted">Slides 1 through '+(data.length)+' will have the durations '+(data.join(', '))+'</small>');
+	var frameInput = $('#' + id);
+	$.post("{{ path('index') }}google-slides/" + id + "/save", { notes: JSON.stringify(arr), carousel: frameInput.data('carousel-for') }, function(data, textStatus) {
+		for (var i = 0; i < data.length; i++) {
+			var el = newFrame({target: frameInput});
+			el.find("input[type='hidden']").val(data[i].frame);
+			el.find("input[type='number']").val(data[i].dur);
+			el.find("input[type='url']").val(data[i].url);
+		}
+		frameInput.parent().parent().remove();
 	}, "json");
 }

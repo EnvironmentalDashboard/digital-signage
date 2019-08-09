@@ -7,8 +7,9 @@
     <h5>Frame #{{loop.index}}</h5>
     <div class="form-group">
         <label for="create_frame_url_{{frame_id}}">URL</label>
-        <input type="url" class="form-control detect-duration" id="create_frame_url_{{frame_id}}" name="frame_url[]" value="{{frame.url}}"
-            placeholder="URL">
+        <!-- in addition to detecting duration, create additional frames based on presenter notes with new input field specifying their frame range, create remote controller as well -->
+        <input type="url" class="form-control detect-special-url" id="create_frame_url_{{frame_id}}" name="frame_url[]" value="{{frame.url}}"
+            placeholder="URL" data-carousel-for="{{carousel.id}}">
     </div>
     <input type="hidden" name="id[]" value="{{frame.id}}">
     <div class="form-group">

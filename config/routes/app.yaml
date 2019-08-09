@@ -67,10 +67,6 @@ google-slides-save:
   path: /google-slides/{presentationId}/save
   controller: App\Controller\GoogleSlides::save
   methods: POST
-google-slides-exists:
-  path: /google-slides/{presentationId}/exists
-  controller: App\Controller\GoogleSlides::exists
-  methods: POST
 
 controller-create:
   path: /remote/create

@@ -65,36 +65,6 @@ class Display extends AbstractController
                         'next' => "frame{$nextFrame->getId()}"
                     ];
                     break;
-                case 'docs.google.com':
-                    preg_match('#/presentation/d/(.*?)/edit#', $parts['path'], $matches);
-                    if (!empty($matches)) {
-                        $presId = $matches[1];
-                        $repository = $entityManager->getRepository(Entity\GoogleSlides::class);
-                        $googleSlides = $repository->findOneBy(['presentationId' => $presId]);
-                        if ($googleSlides === null) { // uh oh, somehow presentation duration got deleted
-                            $processedFrames[] = [
-                                'id' => "frame{$frame->getId()}",
-                                'url' => "https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal",
-                                'dur' => $frame->getDuration(),
-                                'next' => "frame{$nextFrame->getId()}"
-                            ];
-                            break;
-                        }
-                        $slides = $googleSlides->getData();
-                        $googleSlidesCount = count($slides) - 1;
-                        foreach ($slides as $k => $dur) {
-                            $id = ($k === 0) ? "frame{$frame->getId()}" : "frame{$frame->getId()}-{$k}"; // buttons trigger frames with document.getElementById('frame' + frameId), so give first slide this special id to be found
-                            $nextId = ($k === $googleSlidesCount) ? "frame{$nextFrame->getId()}" : "frame{$nextFrame->getId()}-" . ($k + 1);
-                            $k++;
-                            $processedFrames[] = [
-                                'id' => $id,
-                                'url' => "https://docs.google.com/presentation/d/{$presId}/preview?rm=minimal#slide={$k}",
-                                'dur' => $dur,
-                                'next' => $nextId
-                            ];
-                        }
-                        break;
-                    }
                 default:
                     $processedFrames[] = [
                         'id' => "frame{$frame->getId()}",

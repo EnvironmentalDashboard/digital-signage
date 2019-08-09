@@ -22,8 +22,8 @@ var createCarousel = function (e) {
 			success: function (data) {
 				$("#nav-all-carousels").html(data);
 				// Re-apply submit event to new forms
-				$('.detect-duration').each(function () {
-					$(this).on('input', detectDuration);
+				$('.detect-special-url').each(function () {
+					$(this).on('input', specialUrl);
 				});
 				$(".carousel-add-new-frame").each(function () {
 					$(this).on('click', newFrame);
@@ -169,8 +169,8 @@ var saveFrame = function (e) {
 					$("#nav-all-carousels").html(data);
 					$('form[action="{{ path("carousel-create") }}"]').on('submit', createCarousel);
 					$('form[action$="/frames/save"]').on('submit', saveFrame);
-					$('.detect-duration').each(function () {
-						$(this).on('input', detectDuration);
+					$('.detect-special-url').each(function () {
+						$(this).on('input', specialUrl);
 					});
 					$(".carousel-add-new-frame").each(function () {
 						$(this).on('click', newFrame);
@@ -188,7 +188,7 @@ var saveFrame = function (e) {
 };
 
 var newFrame = function (e) {
-	var carousel = $(this).data('carousel-for');
+	var carousel = $(e.target).data('carousel-for');
 	var clone = $('#new-frame' + carousel).clone();
 	randomize_ids(clone);
 	clone[0].firstElementChild.innerHTML = 'New frame';
@@ -197,8 +197,9 @@ var newFrame = function (e) {
 	var url = clone.find("input[type='url']");
 	url.val('');
 	url.removeClass('is-valid');
-	url.on('input', detectDuration);
+	url.on('input', specialUrl);
 	$("#carousel-" + carousel + "-frame-edit").append(clone);
+	return clone;
 }
 
 var newPresentation = function (e) {
@@ -459,8 +460,8 @@ $('form[action$="/presentations/save"]').on('submit', savePresentation);
 $('form[action$="/frames/save"]').on('submit', saveFrame);
 $('form[action$="/buttons/save"]').on('submit', saveButton);
 $('form[action$="/delete"]').on('submit', deleteEntity);
-$('.detect-duration').each(function () {
-	$(this).on('input', detectDuration);
+$('.detect-special-url').each(function () {
+	$(this).on('input', specialUrl);
 });
 $(".carousel-add-new-frame").each(function () {
 	$(this).on('click', newFrame);
