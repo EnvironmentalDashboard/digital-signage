@@ -1,9 +1,5 @@
 /config/secrets.yaml
 /public/uploads/
-/electron/dist/.icon-set
-/electron/dist/linux-unpacked
-/electron/dist/mac
-/electron/dist/win-unpacked
 .DS_Store
 composer.phar
 ###> symfony/framework-bundle ###
