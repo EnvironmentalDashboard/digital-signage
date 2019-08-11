@@ -27,12 +27,6 @@ display-present:
   path: /display/{id}/present
   controller: App\Controller\Display::present
   methods: GET
-display-template:
-  path: /display/template/{name}
-  controller: App\Controller\Display::template
-  methods: GET
-  requirements:
-    name: "fullscreen|marquee"
 # frame-list-by-display:
 #   path: /display/{id}/frame/all
 #   controller: App\Controller\Frame::listByDisplay
@@ -92,12 +86,6 @@ controller-url:
   path: /remote/{id}
   controller: App\Controller\RemoteController::show
   methods: GET
-controller-template:
-  path: /remote/template/{name}
-  controller: App\Controller\RemoteController::template
-  methods: GET
-  requirements:
-    name: "2 Buttons|4 Buttons|8 Buttons"
 
 button-list-by-controller:
   path: /remote/{id}/button/all

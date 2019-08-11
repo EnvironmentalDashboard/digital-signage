@@ -19,22 +19,32 @@ class TemplateRepository extends ServiceEntityRepository
         parent::__construct($registry, Template::class);
     }
 
-    // /**
-    //  * @return Template[] Returns an array of Template objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Template[] Returns an array of Template objects
+     * @todo this and the below method have brittle checks to sort controller vs presentation templates- add extra db column?
+     */
+    public function findControllerTemplates()
     {
         return $this->createQueryBuilder('t')
-            ->andWhere('t.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('t.style IS NULL')
             ->orderBy('t.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+
+    /**
+     * @return Template[] Returns an array of Template objects
+     */
+    public function findPresentationTemplates()
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.style IS NOT NULL')
+            ->orderBy('t.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
     /*
     public function findOneBySomeField($value): ?Template

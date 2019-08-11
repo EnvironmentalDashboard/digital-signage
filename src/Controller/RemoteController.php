@@ -89,7 +89,13 @@ class RemoteController extends AbstractController
             $rendered[] = $template->render($controllerButtons);
         }
 
-        return $this->render('remote-controller-table.html.twig', ['controllers' => $entities, 'markup' => $rendered, 'button_arrangements' => $buttonArrangement, 'displays' => $entityManager->getRepository(Entity\Display::class)->findAll()]);
+        return $this->render('remote-controller-table.html.twig', [
+            'controllers' => $entities,
+            'markup' => $rendered,
+            'button_arrangements' => $buttonArrangement,
+            'displays' => $entityManager->getRepository(Entity\Display::class)->findAll(),
+            'templates' => $entityManager->getRepository(Entity\Template::class)->findControllerTemplates()
+        ]);
     }
 
     /**
@@ -102,39 +108,4 @@ class RemoteController extends AbstractController
         return $this->render('remote-controller-list.html.twig', ['controllers' => $entities]);
     }
 
-    /**
-     * controller-template
-     */
-    public function template(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory, $name)
-    {
-        switch ($name) {
-            case '2 Buttons':
-                $templateId = -3;
-                break;
-            case '4 Buttons':
-                $templateId = -4;
-                break;
-            case '6 Buttons':
-                $templateId = -5;
-                break;
-            case '8 Buttons':
-                $templateId = -6;
-                break;
-            default:
-                $templateId = -3;
-                break;
-        }
-
-        $template = $templateFactory->getParent($templateId);
-        $twig = $template->getTwig();
-        $template = $this->get('twig')->createTemplate($twig);
-        return new Response($template->render(
-            array_fill_keys(array_map( // need to include all possible twig keys
-                function ($n) {
-                    return "btn{$n}";
-                },
-                range(1, 8)
-            ), '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15">drag button here</text></svg>')
-        ));
-    }
 }

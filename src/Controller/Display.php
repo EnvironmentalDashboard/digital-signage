@@ -120,33 +120,12 @@ class Display extends AbstractController
             }
         }
 
-        return $this->render('display-table.html.twig', ['displays' => $entities,
-                                                        'carousels' => $rendered,
-                                                        'frame_arrangements' => $frame_arrangements]);
-    }
-
-    /**
-     * display-template
-     */
-    public function template(Request $request, EntityManagerInterface $entityManager, Factory\TemplateFactory $templateFactory, $name)
-    {
-        switch ($name) {
-            case 'fullscreen':
-                $template_id = -1;
-                break;
-            
-            case 'marquee':
-                $template_id = -2;
-                break;
-            
-            default:
-                $template_id = -1;
-                break;
-        }
-        $template = $templateFactory->getParent($template_id);
-        $twig = $template->getTwig();
-        $template = $this->get('twig')->createTemplate($twig);
-        return new Response($template->render(['url1' => 'drag carousel here', 'url2' => 'drag carousel here'])); // need to include all possible twig keys
+        return $this->render('display-table.html.twig', [
+            'displays' => $entities,
+            'carousels' => $rendered,
+            'frame_arrangements' => $frame_arrangements,
+            'templates' => $entityManager->getRepository(Entity\Template::class)->findPresentationTemplates()
+        ]);
     }
     
     /**

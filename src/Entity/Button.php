@@ -163,4 +163,16 @@ class Button
 
         return $this;
     }
+
+    public function getTypeString()
+    {
+        switch ($this->type) {
+            case self::TRIGGER_FRAME:
+                return "Trigger frame";
+            case self::PLAY:
+                return "Play/pause";
+            case self::TRIGGER_URL:
+                return "Trigger subsection";
+        }
+    }
 }

@@ -11,10 +11,11 @@
     <label for="pres_template_for_{{presentation_id}}">Select template</label>
     <select class="form-control template-select-dropdown" id="pres_template_for_{{presentation_id}}"
       name="pres_template[]" data-arrangement="#frame-arrangement-{{presentation_id}}" data-controls="#drop-zone-{{presentation_id}}">
-      <option value="-1" data-index="1">Fullscreen</option>
-      <option value="-2" data-index="2">Fullscreen with marquee</option>
+      {% for template in templates %}
+      <option value="{{template.id}}" data-markup="{{template.twig}}">{{template.label}}</option>
+      {% endfor %}
       {% if is_new == false %}
-      <option selected value="0">Custom</option>
+      <option selected data-markup="{{presentation.template.twig}}" value="0">Custom</option>
       {% endif %}
     </select>
   </div>

@@ -2,7 +2,8 @@
 // https://mdn.github.io/dom-examples/drag-and-drop/copy-move-DataTransfer.html
 function dragstart_handler(ev) {
 	// Change the source element's background color to signify drag has started
-	ev.currentTarget.style.background = "var(--light)";
+	ev.currentTarget.parentNode.classList.add('border-primary');
+	ev.currentTarget.parentNode.classList.add('shadow');
 	// Add the id of the drag source element to the drag data payload so
 	// it is available when the drop event is fired
 	ev.dataTransfer.setData("text", ev.target.id);

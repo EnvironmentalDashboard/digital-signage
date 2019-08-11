@@ -68,7 +68,7 @@ var createDisplay = function (e) {
 				var new_row = $('#nav-all-displays > table > tbody > tr:last-child');
 				new_row.addClass('table-primary');
 				$(".template-select-dropdown").each(function () {
-					$(this).on('change', displayDropdownTemplate);
+					$(this).on('change', dropdownTemplate);
 				});
 				$(".display-add-new-pres").each(function () {
 					$(this).on('click', newPresentation);
@@ -103,7 +103,7 @@ var createController = function (e) {
 				$("#nav-all-controllers").html(data);
 				enablePopovers();
 				$(".controller-select-dropdown").each(function () {
-					$(this).on('change', controllerDropdownTemplate);
+					$(this).on('change', dropdownTemplate);
 				});
 				$('form[action$="/delete"]').on('submit', deleteEntity);
 				input.removeClass('is-valid');
@@ -374,6 +374,7 @@ var selectButtonType = function (e) {
 		// console.log($("#triggerController" + controllerId));
 		$("#triggerController" + controllerId).css('display', '');
 	}
+	$('[data-toggle="popover"]').popover('update');
 }
 
 var loadCarousels = function (e) {
@@ -426,6 +427,7 @@ var loadFrames = function (e) {
 			}
 			markup += '</select>';
 			target.html(markup);
+			$('[data-toggle="popover"]').popover('update');
 			$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
 		},
 		error: function (xhr, status, error) {
@@ -434,22 +436,14 @@ var loadFrames = function (e) {
 	});
 };
 
-var displayDropdownTemplate = function (e) {
+var dropdownTemplate = function (e) {
 	e.preventDefault();
 	var controls = $(this).data('controls');
 	var arrangement = $(this).data('arrangement');
-	var selected = $(this).find(":selected").data('index');
+	var markup = $(this).find(":selected").data('markup');
 	$(arrangement).val('{}');
-	$(controls).html(displayTemplates[selected - 1]);
-}
-
-var controllerDropdownTemplate = function (e) {
-	e.preventDefault();
-	var controls = $(this).data('controls');
-	var arrangement = $(this).data('arrangement');
-	var selected = $(this).find(":selected").data('index');
-	$(arrangement).val('{}');
-	$(controls).html(controllerTemplates[selected - 1]);
+	var compiledTwig = markup.replace(new RegExp(/\{\%\s*(.*)\s*\%\}|\{\{(?!%)\s*((?:[^\s])*)\s*(?<!%)\}\}/gi), "<div style='width:100%;height:100%'><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><text x='15' y='15'>Drop zone</text></svg></div>");
+	$(controls).html(compiledTwig);
 }
 
 
@@ -474,20 +468,11 @@ $(".delete-button-btn").each(function () {
 });
 
 // Swap carousel placeholder when option selected
-/* {% spaceless %} */
-var displayTemplates = ['{{ render(controller("App\\Controller\\Display::template",{"name": "fullscreen"})) }}',
-	'{{ render(controller("App\\Controller\\Display::template", {"name": "marquee"})) }}'];
-var controllerTemplates = ['{{ render(controller("App\\Controller\\RemoteController::template", {"name": "2 Buttons"})) }}',
-	'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "4 Buttons"})) }}',
-	'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "6 Buttons"})) }}',
-	'{{ render(controller("App\\Controller\\RemoteController::template", {"name": "8 Buttons"})) }}'];
-/* {% endspaceless %} */
-
 $(".template-select-dropdown").each(function () {
-	$(this).on('change', displayDropdownTemplate);
+	$(this).on('change', dropdownTemplate);
 });
 $(".controller-select-dropdown").each(function () {
-	$(this).on('change', controllerDropdownTemplate);
+	$(this).on('change', dropdownTemplate);
 });
 
 function enablePopovers() {
@@ -516,7 +501,7 @@ function randomize_ids(container_div) {
 				descendants[j].setAttribute('id', cur_id);
 			} else if (descendants[j].tagName === 'SELECT') {
 				descendants[j].setAttribute('id', cur_id);
-				$(descendants[j]).on('change', displayDropdownTemplate);
+				$(descendants[j]).on('change', dropdownTemplate);
 			}
 		}
 
