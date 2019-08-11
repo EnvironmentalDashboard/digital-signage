@@ -49,26 +49,29 @@
         "width": 648,
         "height": 648
       }
+    },
+    "win": {
+      "target": "NSIS",
+      "icon": "build/icon.ico",
+      "artifactName": "${productName}-Web-Setup-${version}.${ext}"
+    },
+    "linux": {
+      "target": "deb"
     }
-  },
-  "win": {
-    "target": "NSIS",
-    "icon": "build/icon.ico",
-    "artifactName": "${productName}-Web-Setup-${version}.${ext}"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/EnvironmentalDashboard/digital-signage.git"
+    "url": "git+https://github.com/Terf/digital-signage.git"
   },
-  "author": "Tim Robert-Fitzgerald",
+  "author": "Tim Robert-Fitzgerald <tim@communityhub.cloud>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/EnvironmentalDashboard/digital-signage/issues"
+    "url": "https://github.com/Terf/digital-signage/issues"
   },
-  "homepage": "https://github.com/EnvironmentalDashboard/digital-signage#readme",
+  "homepage": "https://github.com/Terf/digital-signage#readme",
   "devDependencies": {
-    "electron": "^5.0.8",
-    "electron-builder": "^21.1.5"
+    "electron": "^5.0.9",
+    "electron-builder": "^21.2.0"
   },
   "dependencies": {
     "electron-updater": "^4.1.2",

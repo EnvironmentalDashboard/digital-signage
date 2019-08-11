@@ -4,7 +4,6 @@
 const electron = require('electron');
 const fetch = require('node-fetch');
 const WebSocket = require('ws');
-// const { autoUpdater } = require("electron-updater");
 const { app, BrowserView, BrowserWindow } = electron;
 
 
@@ -27,9 +26,27 @@ let currentPres = null;
  */
 app.on('open-url', function (event, data) { // this will catch clicks on links such as <a href="communityhub://3">open in display 3</a>
     event.preventDefault();
+    win = null;
     createWindow(new URL(data).host);
 });
 app.setAsDefaultProtocolClient('communityhub');
+app.on('ready', () => {
+    win = null;
+    createLandingWindow();
+});
+
+function createLandingWindow() {
+    let size = electron.screen.getPrimaryDisplay().size;
+    // Create the browser window
+    win = new BrowserWindow({
+        width: size.width,
+        height: size.height,
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
+    win.loadFile('setup.html');
+}
 
 function createWindow(displayId) {
     let size = electron.screen.getPrimaryDisplay().size;
@@ -246,36 +263,4 @@ function commandReceiver(e) {
     }
     ws_ready = true;
 
-}
-
-
-/**
- * Auto update
- */
-if (process.platform === 'linux') {
-    console.log('Checking for updates');
-    app.on('ready', function () {
-        autoUpdater.checkForUpdates();
-    });
-    setInterval(() => {
-        autoUpdater.checkForUpdates();
-    }, 7200000); // every 2 hrs
-    autoUpdater.on('checking-for-update', () => {
-        console.log('checking-for-update');
-    });
-    autoUpdater.on('update-available', (info) => {
-        console.log('checking-available');
-    });
-    autoUpdater.on('update-not-available', (info) => {
-        console.log('checking-not-available');
-    });
-    autoUpdater.on('error', (err) => {
-        console.log('error', err);
-    });
-    autoUpdater.on('download-progress', (progressObj) => {
-        console.log('download-progress');
-    });
-    autoUpdater.on('update-downloaded', (info) => {
-        autoUpdater.quitAndInstall();
-    });
 }
