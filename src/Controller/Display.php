@@ -169,4 +169,17 @@ class Display extends AbstractController
 
         return new JsonResponse(array_values($carousels));
     }
+
+    /**
+     * display-labels
+     */
+    public function listLabels(EntityManagerInterface $entityManager)
+    {
+        $response = [];
+        foreach ($entityManager->getRepository(Entity\Display::class)->findAll() as $display) {
+            $response[$display->getId()] = $display->getLabel();
+        }
+
+        return new JsonResponse($response);
+    }
 }

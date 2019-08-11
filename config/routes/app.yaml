@@ -7,6 +7,10 @@ display-table:
   path: /display/table
   controller: App\Controller\Display::table
   methods: GET
+display-labels:
+  path: /display/labels
+  controller: App\Controller\Display::listLabels
+  methods: GET
 display-create:
   path: /display/create
   controller: App\Controller\DisplayEdit::create

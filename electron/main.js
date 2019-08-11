@@ -4,7 +4,7 @@
 const electron = require('electron');
 const fetch = require('node-fetch');
 const WebSocket = require('ws');
-const { app, BrowserView, BrowserWindow } = electron;
+const { app, BrowserView, BrowserWindow, ipcMain } = electron;
 
 
 /**
@@ -24,15 +24,19 @@ let currentPres = null;
 /**
  * Initialize app
  */
+app.on('ready', () => {
+    createLandingWindow();
+});
 app.on('open-url', function (event, data) { // this will catch clicks on links such as <a href="communityhub://3">open in display 3</a>
     event.preventDefault();
-    win = null;
     createWindow(new URL(data).host);
 });
 app.setAsDefaultProtocolClient('communityhub');
-app.on('ready', () => {
-    win = null;
-    createLandingWindow();
+ipcMain.on('asynchronous-message', (event, arg) => {
+    let id = parseInt(arg);
+    if (id > 0) {
+        createWindow(id);
+    }
 });
 
 function createLandingWindow() {
