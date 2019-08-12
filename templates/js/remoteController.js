@@ -8,10 +8,17 @@ var clicked = function() {
 	var that = this;
 	that.style.top = '15px';
 	setTimeout(function() { that.style.top = ''; }, 150);
+	if (button_type === "{{constant('App\\Entity\\Button::PLAY')}}") {
+		var fn = that.getAttribute('src').replace(/^.*[\\\/]/, '');
+		if (fn === 'play.svg') {
+			that.setAttribute('src', "{{path('index')}}images/pause.svg");
+		} else {
+			that.setAttribute('src', "{{path('index')}}images/play.svg");
+		}
+	}
 	if (button_type === "{{constant('App\\Entity\\Button::TRIGGER_URL')}}") {
 		location.href = that.getAttribute("data-url");
 	} else {
-		console.log(button_type);
 		conn.send(button_id);
 	}
 }

@@ -369,10 +369,14 @@ var selectButtonType = function (e) {
 	$("#triggerController" + controllerId).css('display', 'none');
 	if (val === '1') {
 		$('#triggerFrame' + controllerId).css('display', '');
+		$('.image-upload').css('display', '');
 		loadCarousels(document.getElementById('buttonDisplaySelect' + controllerId));
+	} else if (val === '2') {
+		$('.image-upload').css('display', 'none');
 	} else if (val === '3') {
 		// console.log($("#triggerController" + controllerId));
 		$("#triggerController" + controllerId).css('display', '');
+		$('.image-upload').css('display', '');
 	}
 	$('[data-toggle="popover"]').popover('update');
 }

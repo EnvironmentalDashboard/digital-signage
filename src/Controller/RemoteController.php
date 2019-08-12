@@ -29,7 +29,8 @@ class RemoteController extends AbstractController
 
         $twigKeys = [];
         foreach ($controller->getButtons() as $button) {
-            $twigKeys[$button->getTwigKey()] = "<img data-type='{$button->getType()}' data-url='{$button->getTriggerUrl()}' data-id='{$button->getId()}' src='{$this->generateUrl('index')}uploads/{$button->getImage()}' />";
+            $buttonSrc = ($button->getType() === Entity\Button::PLAY) ? "{$this->generateUrl('index')}images/play.svg" : "{$this->generateUrl('index')}uploads/{$button->getImage()}";
+            $twigKeys[$button->getTwigKey()] = "<img data-type='{$button->getType()}' data-url='{$button->getTriggerUrl()}' data-id='{$button->getId()}' src='{$buttonSrc}' />";
         }
         $twigKeys['controllerId'] = $id;
         $twig = '{% include "remote-controller-top.html.twig" %}' . $controller->getTemplate()->getTwig() . '{% include "remote-controller-bottom.html.twig" %}';
