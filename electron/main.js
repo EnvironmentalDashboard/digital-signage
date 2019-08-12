@@ -86,7 +86,8 @@ function createWindow(displayId) {
                     carousels: {},
                     views: {},
                     next: null,
-                    duration: null
+                    duration: null,
+                    skip: false
                 };
                 for (const key in json[presentationId]) {
                     let x = 0;
@@ -118,7 +119,7 @@ function createWindow(displayId) {
                             }, viewData.views);
                         }
                     }
-                    if (key === 'style' || key === 'next' || key === 'duration') {
+                    if (key === 'style' || key === 'next' || key === 'duration' || key === 'skip') {
                         viewData[key] = json[presentationId][key];
                     }
                 }
@@ -152,13 +153,21 @@ function initApp() {
     showPresentation(Object.keys(presentations)[0]); // begin by showing first presentation
 }
 
-function showPresentation(presentationId, targetFrame = null) {
+function showPresentation(presentationId, skip = true, targetFrame = null) {
     currentPres = presentationId;
     clearTimeouts();
     clearViews();
     setViews(presentations[presentationId], targetFrame);
     let timeout = setTimeout(() => {
-        showPresentation(presentations[presentationId].next);
+        if (skip === true) {
+            let next = presentations[presentationId].next;
+            while (presentations[next].skip) {
+                next = presentations[next].next;
+            }
+            showPresentation(next);
+        } else {
+            showPresentation(presentations[presentationId].next);
+        }
         // console.log(process.getCPUUsage());
     }, presentations[presentationId].duration);
     // let date = new Date();
@@ -245,7 +254,7 @@ function commandReceiver(e) {
                         const frame = carousel[twigKey];
                         if (frame.id === target) {
                             ws_ready = true;
-                            showPresentation(key, frame.id);
+                            showPresentation(key, false, frame.id);
                             return;
                         }
                     }

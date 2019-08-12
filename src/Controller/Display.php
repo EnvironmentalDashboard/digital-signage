@@ -40,6 +40,7 @@ class Display extends AbstractController
                 'style' => $style,
                 'carousels' => $carousels,
                 'duration' => $presentation->getDuration(),
+                'skip' => $presentation->getSkip(),
                 'next' => ($i === $presCount - 1) ? $presentations[0]->getId() : $presentations[$i + 1]->getId()
             ];
         }

@@ -22,10 +22,12 @@ function drop_handler(ev) {
 	// payload by the dragstart event handler)
 	var id = ev.dataTransfer.getData("text");
 	var text = document.getElementById(id).innerHTML;
-	ev.target.innerHTML = text;
-	var twigKey = ev.target.getAttribute('data-twig');
+	var $carouselElement = $(ev.target).closest('.carousel');
+	var carouselContainer = ev.currentTarget;
+	var twigKey = $carouselElement.data('twig');
+	$carouselElement.html(text);
 	var carousel_id = id.substring(8); // cut off 'carousel'
-	var input = document.getElementById('frame-arrangement-' + ev.target.parentNode.getAttribute('data-pres'));
+	var input = document.getElementById('frame-arrangement-' + carouselContainer.getAttribute('data-pres'));
 	var cur_elems = JSON.parse(input.value);
 	cur_elems[twigKey] = carousel_id;
 	input.value = JSON.stringify(cur_elems);
