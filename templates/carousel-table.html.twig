@@ -42,22 +42,14 @@
         <div class="modal-content">
             <form action="{{ path('carousel-save-frames', {'id': carousel.id}) }}" method="POST">
 
-                {% if carousel.frames is empty %}
                 <div class="modal-header">
-                    <h4 class="modal-title" id="carousel-{{carousel.id}}-createFormModal-Label">No frames</h4>
+                    <h4 class="modal-title form-inline" id="carousel-{{carousel.id}}-createFormModal-Label">Edit Frames
+                        for <input type="text" class="form-control ml-2" name="carousel-label"
+                            placeholder="Carousel label" value="{{carousel.label}}"></h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                {% else %}
-                <div class="modal-header">
-                    <h4 class="modal-title" id="carousel-{{carousel.id}}-createFormModal-Label">Edit Frames for
-                        {{carousel.label}}</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                {% endif %}
 
                 <div id="carousel-{{carousel.id}}-frame-edit">
                     {% for frame in carousel.frames %}

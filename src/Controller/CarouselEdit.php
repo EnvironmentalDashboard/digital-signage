@@ -62,6 +62,7 @@ class CarouselEdit extends AbstractController
         $frameRepo = $entityManager->getRepository(Entity\Frame::class);
 
         $carousel = $carouselRepo->find($id);
+        $carousel->setLabel($request->request->get('carousel-label'));
         $currentFrames = $carousel->getFrames();
         $newFrames = [];
 
