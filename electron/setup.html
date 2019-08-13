@@ -8,215 +8,36 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-    <style type="text/css">
-        * {
-            box-sizing: border-box;
-        }
-
-        /* basic stylings ------------------------------------------ */
-        body {
-            font-family: "Roboto", sans-serif;
-            font-weight: 400;
-            color: #555;
-            background-color: #eeeeee;
-        }
-
-        .container {
-            font-family: 'Roboto';
-            width: 600px;
-            margin: 30px auto 0;
-            display: block;
-            padding: 10px 50px 50px;
-            background: #fff;
-            border-radius: 3px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        h2 small {
-            font-weight: normal;
-            color: #888;
-            display: block;
-        }
-
-        .footer {
-            text-align: center;
-        }
-
-        .footer a {
-            color: #53B2C8;
-        }
-
-        /* form starting stylings ------------------------------- */
-        .group {
-            position: relative;
-            margin-bottom: 45px;
-        }
-
-        input {
-            font-size: 18px;
-            padding: 10px 10px 10px 5px;
-            display: block;
-            width: 300px;
-            border: none;
-            border-bottom: 1px solid #757575;
-        }
-
-        input:focus {
-            outline: none;
-        }
-
-        /* LABEL ======================================= */
-        label {
-            color: #999;
-            font-size: 18px;
-            font-weight: normal;
-            position: absolute;
-            pointer-events: none;
-            left: 5px;
-            top: 10px;
-            transition: 0.2s ease all;
-            -moz-transition: 0.2s ease all;
-            -webkit-transition: 0.2s ease all;
-        }
-
-        /* active state */
-        input:focus~label,
-        input:valid~label {
-            top: -20px;
-            font-size: 14px;
-            color: #5264AE;
-        }
-
-        /* BOTTOM BARS ================================= */
-        .bar {
-            position: relative;
-            display: block;
-            width: 500px;
-        }
-
-        .bar:before,
-        .bar:after {
-            content: '';
-            height: 2px;
-            width: 0;
-            bottom: 1px;
-            position: absolute;
-            background: #5264AE;
-            transition: 0.2s ease all;
-            -moz-transition: 0.2s ease all;
-            -webkit-transition: 0.2s ease all;
-        }
-
-        .bar:before {
-            left: 50%;
-        }
-
-        .bar:after {
-            right: 50%;
-        }
-
-        /* active state */
-        input:focus~.bar:before,
-        input:focus~.bar:after {
-            width: 50%;
-        }
-
-        /* HIGHLIGHTER ================================== */
-        .highlight {
-            position: absolute;
-            height: 60%;
-            width: 100px;
-            top: 25%;
-            left: 0;
-            pointer-events: none;
-            opacity: 0.5;
-        }
-
-        /* active state */
-        input:focus~.highlight {
-            -webkit-animation: inputHighlighter 0.3s ease;
-            -moz-animation: inputHighlighter 0.3s ease;
-            animation: inputHighlighter 0.3s ease;
-        }
-
-        /* ANIMATIONS ================ */
-        @-webkit-keyframes inputHighlighter {
-            from {
-                background: #5264AE;
-            }
-
-            to {
-                width: 0;
-                background: transparent;
-            }
-        }
-
-        @-moz-keyframes inputHighlighter {
-            from {
-                background: #5264AE;
-            }
-
-            to {
-                width: 0;
-                background: transparent;
-            }
-        }
-
-        @keyframes inputHighlighter {
-            from {
-                background: #5264AE;
-            }
-
-            to {
-                width: 0;
-                background: transparent;
-            }
-        }
-
-        a {
-            color: #5264AE;
-        }
-
-        button {
-            color: #fff;
-            background: #5264AE;
-            padding: 10px 25px;
-            border: none;
-            font: 'Roboto', sans-serif;
-            font-size: 20px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-    </style>
+    <link href="css/wtf-forms.css" rel="stylesheet">
+    <link href="css/setup.css" rel="stylesheet">
 </head>
 
 <body>
     <div class="container">
         <h1>Display setup</h1>
-        <p>Enter a display name here or create them at <a
-                href="https://environmentaldashboard.org/digital-signage">admin panel</a>.</p>
+        <p>Enter a display name here or create them at <a href="https://environmentaldashboard.org/digital-signage">admin panel</a>.</p>
         <form style="margin-top:50px;">
             <div class="group">
-                <input type="text" name="name" id="name" required style="width: 100%;">
-                <span class="highlight"></span>
-                <span class="bar"></span>
-                <label>Display name</label>
+                <label style="margin-bottom: 5px">Display name</label>
+                <input type="text" name="name" id="name" required autofocus>
             </div>
+            <label class="control checkbox">
+                <input type="checkbox" id="remember">
+                <span class="control-indicator"></span>
+                Remember this display on next start
+            </label>
             <div class="group">
-                <button type="button" id="submit">Submit</button>
+                <button type="button" class="button" id="submit">Submit</button>
             </div>
         </form>
     </div>
     <script>
+        const baseHttp = window.process.argv[window.process.argv.length - 1];
         let displays;
         let xhr = new XMLHttpRequest();
-        xhr.open('GET', "http://localhost:5000/digital-signage/display/labels", true);
+        xhr.open('GET', baseHttp + "/digital-signage/display/labels", true);
         xhr.responseType = 'json';
-        xhr.onload = function () {
+        xhr.onload = function() {
             let status = xhr.status;
             if (status === 200) {
                 displays = xhr.response;
@@ -226,14 +47,15 @@
         };
         xhr.send();
 
-        document.querySelector('#submit').addEventListener('click', function () {
+        document.querySelector('#submit').addEventListener('click', function() {
             let name = document.getElementById("name").value;
+            let shouldSave = document.getElementById("remember").checked;
             for (const id in displays) {
                 if (displays.hasOwnProperty(id)) {
                     const display = displays[id];
                     if (display === name) {
                         const { ipcRenderer } = require('electron');
-                        ipcRenderer.send('asynchronous-message', id);
+                        ipcRenderer.send('asynchronous-message', JSON.stringify({id: id, save: shouldSave}));
                     }
                 }
             }

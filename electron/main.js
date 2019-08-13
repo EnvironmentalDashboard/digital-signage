@@ -4,6 +4,7 @@
 const electron = require('electron');
 const fetch = require('node-fetch');
 const WebSocket = require('ws');
+const fs = require('fs');
 const { app, BrowserView, BrowserWindow, ipcMain } = electron;
 
 
@@ -24,18 +25,35 @@ let currentPres = null;
 /**
  * Initialize app
  */
-app.on('ready', () => {
-    createLandingWindow();
-});
 app.on('open-url', function (event, data) { // this will catch clicks on links such as <a href="communityhub://3">open in display 3</a>
     event.preventDefault();
     createWindow(new URL(data).host);
 });
 app.setAsDefaultProtocolClient('communityhub');
+app.on('ready', () => {
+    fs.readFile('/tmp/communityhub-media-player-display', (err, data) => {
+        if (err) { // file doesn't exist
+            createLandingWindow();
+        } else {
+            createWindow(data);
+        }
+    });
+});
 ipcMain.on('asynchronous-message', (event, arg) => {
-    let id = parseInt(arg);
-    if (id > 0) {
-        createWindow(id);
+    let json = JSON.parse(arg);
+    if (json.save) {
+        fs.writeFile("/tmp/communityhub-media-player-display", json.id, function (err) {
+            if (err) {
+                return console.log(err);
+            }
+            if (json.id > 0) {
+                createWindow(json.id);
+            }
+        });
+    } else {
+        if (json.id > 0) {
+            createWindow(json.id);
+        }
     }
 });
 
@@ -43,10 +61,11 @@ function createLandingWindow() {
     let size = electron.screen.getPrimaryDisplay().size;
     // Create the browser window
     win = new BrowserWindow({
-        width: size.width,
-        height: size.height,
+        width: (size.width > 800) ? 800 : size.width,
+        height: (size.height > 600) ? 600 : size.height,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            additionalArguments: [baseHttp]
         }
     });
     win.loadFile('setup.html');
