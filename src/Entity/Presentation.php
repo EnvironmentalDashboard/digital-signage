@@ -50,6 +50,11 @@ class Presentation
      */
     private $carouselPresentationMaps;
 
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $position;
+
     public function __construct()
     {
         $this->carouselPresentationMaps = new ArrayCollection();
@@ -147,6 +152,18 @@ class Presentation
                 $carouselPresentationMap->setPresentation(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): self
+    {
+        $this->position = $position;
 
         return $this;
     }

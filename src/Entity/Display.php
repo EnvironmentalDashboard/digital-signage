@@ -25,6 +25,7 @@ class Display
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Presentation", mappedBy="display", orphanRemoval=true)
+     * @ORM\OrderBy({"position" = "ASC", "id" = "ASC"})
      */
     private $presentations;
 

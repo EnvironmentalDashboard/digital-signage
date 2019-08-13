@@ -54,4 +54,12 @@
 		<input type="hidden" name="skip[]" {% if presentation.skip %}value="1"{% else %}value="0"{% endif %}><input type="checkbox" class="form-check-input" id="skip_{{presentation_id}}" {% if presentation.skip %}checked{% endif %} onclick="this.previousSibling.value=1-this.previousSibling.value">
     <label class="form-check-label" for="skip_{{presentation_id}}">Skip in main loop</label>
   </div>
+  <input type="hidden" name="position[]" value="{{loop.index}}">
+  <div class="form-group">
+    <div class="btn-group" role="group" aria-label="Move presentation position">
+      <button type="button" class="btn btn-outline-secondary" onclick="movePosition(-1, this.parentNode.parentNode.parentNode, this)" {% if loop.index == 1 %}disabled{% endif %}>Move earlier</button>
+      <button type="button" class="btn btn-outline-secondary" onclick="movePosition(1, this.parentNode.parentNode.parentNode, this)" {% if loop.last %}disabled{% endif %}>Move later</button>
+    </div>
+    <button type="button" class="btn btn-outline-danger" onclick="alert('Not yet implemented')">Delete presentation</button>
+  </div>
 </div>

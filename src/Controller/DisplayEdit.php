@@ -69,6 +69,7 @@ class DisplayEdit extends AbstractController
         $durations = $request->request->get('pres_duration');
         $frameArrangements = $request->request->get('frame-arrangement');
         $skips = $request->request->get('skip');
+        $positions = $request->request->get('position');
         $ids = $request->request->get('id');
         // they're all the same length ^^^
         for ($i = 0; $i < count($templates); $i++) {
@@ -76,6 +77,7 @@ class DisplayEdit extends AbstractController
             $duration = round($durations[$i] * 1000);
             $frameArrangement = json_decode($frameArrangements[$i], true);
             $skip = ($skips[$i] === '1') ? true : false;
+            $position = $positions[$i];
 
             $presentationExists = is_numeric($ids[$i]);
             $presentation = ($presentationExists) ? $presentationRepo->find($ids[$i]) : new Entity\Presentation();
@@ -92,6 +94,7 @@ class DisplayEdit extends AbstractController
             $presentation->setDuration($duration);
             $presentation->setLabel("Presentation for display #{$id}");
             $presentation->setSkip($skip);
+            $presentation->setPosition($position);
             
             if (!$presentationExists) {
                 $display->addPresentation($presentation);

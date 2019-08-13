@@ -208,7 +208,8 @@ var newPresentation = function (e) {
 	var clone = $('#new-pres' + display).clone();
 	randomize_ids(clone);
 	clone[0].firstElementChild.innerHTML = 'New presentation';
-	var drop_zone = clone.find('.drop-zone'), select_drop_zone = clone.find('select'), fa_input = clone.find('.hidden-frame-arrangement'), id_input = clone.find('.hidden-id');
+	var drop_zone = clone.find('.drop-zone'), select_drop_zone = clone.find('select'), fa_input = clone.find('.hidden-frame-arrangement'), id_input = clone.find('.hidden-id'), position_input = clone.find('input[name="position[]"]');
+	position_input.val(parseInt(position_input.val()) + 1);
 	var new_pres_id = guidGenerator();
 	var new_dropzone_id = guidGenerator();
 	select_drop_zone.attr('data-controls', '#' + new_dropzone_id);
@@ -448,6 +449,36 @@ var dropdownTemplate = function (e) {
 	$(arrangement).val('{}');
 	var compiledTwig = markup.replace(new RegExp(/\{\%\s*(.*)\s*\%\}|\{\{(?!%)\s*((?:[^\s])*)\s*(?<!%)\}\}/gi), "<div style='width:100%;height:100%'><svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><text x='15' y='15'>Drop zone</text></svg></div>");
 	$(controls).html(compiledTwig);
+}
+
+var movePosition = function(direction, presEl, buttonEl) {
+	var $presEl = $(presEl);
+	var $buttonEl = $(buttonEl);
+	var input = $presEl.find('input[name="position[]"]')[0];
+	input.value = parseInt(input.value) + direction;
+	if (direction === 1) {
+		var $nextEl = $presEl.next();
+		var nextInput = $nextEl.find('input[name="position[]"]')[0];
+		nextInput.value = parseInt(nextInput.value) - direction;
+		$nextEl.after($presEl);
+		$nextEl = $presEl.next();
+		$buttonEl.siblings().prop('disabled', false);
+		if ($nextEl[0] === undefined) {
+			$buttonEl.prop('disabled', true);
+		}
+	} else if (direction === -1) {
+		var $prevEl = $presEl.prev();
+		var prevInput = $prevEl.find('input[name="position[]"]')[0];
+		prevInput.value = parseInt(prevInput.value) - direction;
+		$prevEl.before($presEl);
+		$prevEl = $presEl.prev();
+		$buttonEl.siblings().prop('disabled', false);
+		if ($prevEl[0] === undefined) {
+			$buttonEl.prop('disabled', true);
+		}
+	} else {
+		console.log('Error: unrecognized direction ' + direction);
+	}
 }
 
 
