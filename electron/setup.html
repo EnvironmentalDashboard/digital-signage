@@ -56,9 +56,11 @@
                     if (display === name) {
                         const { ipcRenderer } = require('electron');
                         ipcRenderer.send('asynchronous-message', JSON.stringify({id: id, save: shouldSave}));
+                        return;
                     }
                 }
             }
+            alert('There is no display labelled ' + name);
         });
     </script>
 </body>

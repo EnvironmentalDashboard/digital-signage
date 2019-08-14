@@ -13,6 +13,7 @@ const { app, BrowserView, BrowserWindow, ipcMain } = electron;
  */
 const baseHttp = (process.env.APP_ENV === 'dev') ? 'http://localhost:5000' : 'https://environmentaldashboard.org';
 const baseWs = (process.env.APP_ENV === 'dev') ? 'ws://localhost:5001' : 'wss://environmentaldashboard.org';
+const gotTheLock = app.requestSingleInstanceLock(); // this will prevent multiple instances from being open
 let win; // window will be closed automatically when the JavaScript object is garbage collected if no global reference kept
 let width;
 let height;
@@ -25,20 +26,35 @@ let currentPres = null;
 /**
  * Initialize app
  */
+if (!gotTheLock) {
+    app.quit()
+} else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // Someone tried to run a second instance, we should focus our window.
+        if (win) {
+            if (win.isMinimized()) {
+                win.restore();
+            }
+            win.focus();
+        }
+    });
+
+    app.on('ready', () => {
+        fs.readFile('/tmp/communityhub-media-player-display', (err, data) => {
+            if (err) { // file doesn't exist
+                createLandingWindow();
+            } else {
+                createWindow(data);
+            }
+        });
+    });
+}
+
 app.on('open-url', function (event, data) { // this will catch clicks on links such as <a href="communityhub://3">open in display 3</a>
     event.preventDefault();
     createWindow(new URL(data).host);
 });
 app.setAsDefaultProtocolClient('communityhub');
-app.on('ready', () => {
-    fs.readFile('/tmp/communityhub-media-player-display', (err, data) => {
-        if (err) { // file doesn't exist
-            createLandingWindow();
-        } else {
-            createWindow(data);
-        }
-    });
-});
 ipcMain.on('asynchronous-message', (event, arg) => {
     let json = JSON.parse(arg);
     if (json.save) {
@@ -72,6 +88,7 @@ function createLandingWindow() {
 }
 
 function createWindow(displayId) {
+    win = null;
     let size = electron.screen.getPrimaryDisplay().size;
     width = size.width;
     height = size.height;
@@ -149,11 +166,13 @@ function createWindow(displayId) {
             conn = new WebSocket(baseWs + "/digital-signage/websockets/display/" + displayId);
             conn.onerror = function () {
                 console.log('Connection error');
-                app.quit();
             };
             conn.onclose = function () {
-                console.log('Connection close');
-                app.quit();
+                console.log('Connection close'); // if onerror fires onclose will too, so only relaunch on one of the events to prevent fork bomb
+                setTimeout(() => {
+                    app.relaunch();
+                    app.quit();
+                }, 10000);
             };
             conn.onmessage = commandReceiver;
 
