@@ -2,6 +2,7 @@
 /public/uploads/
 .DS_Store
 composer.phar
+dump.sql
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
