@@ -25,7 +25,7 @@ class Carousel extends AbstractController
     }
 
     /**
-     * carousel-table-all
+     * carousel-table
      */
     public function table(Request $request, EntityManagerInterface $entityManager)
     {

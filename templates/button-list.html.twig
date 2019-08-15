@@ -1,4 +1,4 @@
-<div class="card-columns" style="max-height: 350px;overflow:scroll">
+<div class="card-columns">
     {% for button in buttons %}
     {% set buttonFormHandler = "editButton" %}
     {% set buttonFormAction = path("button-edit", {id: button.id}) %}

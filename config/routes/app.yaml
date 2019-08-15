@@ -105,3 +105,16 @@ button-delete:
   path: /button/{id}/delete/
   controller: App\Controller\ButtonEdit::delete
   methods: POST
+
+template-table:
+  path: /template/table
+  controller: App\Controller\Template::table
+  methods: GET
+template-create:
+  path: /template/create
+  controller: App\Controller\TemplateEdit::create
+  methods: POST
+template-delete:
+  path: /template/{id}/delete
+  controller: App\Controller\TemplateEdit::delete
+  methods: POST

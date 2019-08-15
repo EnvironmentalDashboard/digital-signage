@@ -1,0 +1,71 @@
+{% if templates is empty %}
+<p class="text-muted text-center">You have no configured templates.</p>
+{% else %}
+<table class="table-responsive-sm table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col" style="border-top:none">#</th>
+            <th scope="col" style="border-top:none">Label</th>
+            <th scope="col" style="border-top:none">Preview</th>
+            <th scope="col" style="border-top:none">&nbsp;</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for template in templates %}
+        <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{template.label}}</td>
+            <td>{{template.twig|raw}}</td>
+            <td class="form-inline" style="min-width:160px;">
+                <button class="btn btn-primary shadow mr-2" data-toggle="modal"
+                    data-target="#template-{{template.id}}-createFormModal">Edit</button>
+
+                <form action="{{ path('template-delete', {'id': template.id}) }}" method="POST">
+                    <input type="submit" class="btn btn-danger shadow" value="Delete">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+
+
+    </tbody>
+
+</table>
+{% endif %}
+
+{% for template in templates %}
+<div class="modal fade" id="template-{{template.id}}-createFormModal" tabindex="-1" role="dialog"
+    aria-labelledby="template-{{template.id}}-createFormModal-Label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="" method="POST">
+
+                <div class="modal-header">
+                    <h4 class="modal-title form-inline" id="template-{{template.id}}-createFormModal-Label">Edit
+                        template <input type="text" class="form-control ml-2" name="template-label"
+                            placeholder="template label" value="{{template.label}}"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+
+
+                <div class="modal-body">
+                    <div id="template-{{template.id}}-frame-edit">
+                        <p>todo</p>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary shadow" value="Save template">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}

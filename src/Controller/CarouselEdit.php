@@ -45,7 +45,7 @@ class CarouselEdit extends AbstractController
         $repository = $entityManager->getRepository(Entity\Carousel::class);
 
         // Delete carousel
-        $carousel = $repository->findOneBy(['id' => $id]);
+        $carousel = $repository->find($id);
 
         $entityManager->remove($carousel);
         $entityManager->flush();

@@ -22,18 +22,21 @@
 
 {% block styles %}
 <style>
-.drop-zone {
-  background: #ecf0f1;
-}
-.drop-zone > div {
-  border: 3px dashed #2c3e50;
-}
+  .drop-zone {
+    background: #ecf0f1;
+  }
+
+  .drop-zone>div {
+    border: 3px dashed #2c3e50;
+  }
 </style>
 {% endblock %}
 
 {% block body %}
-<div class="progress bg-dark" style="height: 10px;width: 100%;position: fixed;top: 0px;z-index: 1030;border-radius: 0px">
-  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="main-progress"></div>
+<div class="progress bg-dark"
+  style="height: 10px;width: 100%;position: fixed;top: 0px;z-index: 1030;border-radius: 0px">
+  <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;"
+    aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="main-progress"></div>
 </div>
 <div style="clear: both;height: 20px"></div>
 <div class="container">
@@ -44,16 +47,17 @@
       <div class="nav flex-column nav-pills" id="tab" role="tablist" aria-orientation="vertical">
         <a class="nav-link active" id="display-tab" data-toggle="pill" href="#displays" role="tab"
           aria-controls="displays" aria-selected="true">Displays</a>
-        <a class="nav-link" id="carousels-tab" data-toggle="pill" href="#carousels" role="tab"
-          aria-controls="carousels" aria-selected="false">Carousels</a>
+        <a class="nav-link" id="carousels-tab" data-toggle="pill" href="#carousels" role="tab" aria-controls="carousels"
+          aria-selected="false">Carousels</a>
         <a class="nav-link" id="remote-controllers-tab" data-toggle="pill" href="#controllers" role="tab"
           aria-controls="controllers" aria-selected="false">Remote Controllers</a>
+        <a class="nav-link" id="templates-tab" data-toggle="pill" href="#templates" role="tab" aria-controls="templates"
+          aria-selected="false">Templates</a>
       </div>
     </div>
     <div class="col-sm-9">
       <div class="tab-content" id="tabContent">
-        <div class="tab-pane fade show active" id="displays" role="tabpanel"
-          aria-labelledby="display-tab">
+        <div class="tab-pane fade show active" id="displays" role="tabpanel" aria-labelledby="display-tab">
           <nav>
             <div class="nav nav-tabs justify-content-end" id="nav-tab-display" role="tablist">
               <a class="nav-item nav-link active" id="nav-all-displays-tab" data-toggle="tab" href="#nav-all-displays"
@@ -121,8 +125,7 @@
             </div>
           </div>
         </div>
-        <div class="tab-pane fade" id="controllers" role="tabpanel"
-          aria-labelledby="remote-controllers-tab">
+        <div class="tab-pane fade" id="controllers" role="tabpanel" aria-labelledby="remote-controllers-tab">
           <nav>
             <div class="nav nav-tabs justify-content-end" id="nav-tab-remote-controller" role="tablist">
               <a class="nav-item nav-link active" id="nav-all-controllers-tab" data-toggle="tab"
@@ -154,6 +157,41 @@
                 <div class="form-group row">
                   <div class="col-sm-10">
                     <button type="submit" class="btn btn-primary shadow">Create remote controller</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="templates" role="tabpanel" aria-labelledby="templates-tab">
+          <nav>
+            <div class="nav nav-tabs justify-content-end" id="nav-tab-template" role="tablist">
+              <a class="nav-item nav-link active" id="nav-all-templates-tab" data-toggle="tab" href="#nav-all-templates"
+                role="tab" aria-controls="nav-all-templates" aria-selected="true">View all</a>
+              <a class="nav-item nav-link" id="nav-create-template-tab" data-toggle="tab" href="#nav-create-template"
+                role="tab" aria-controls="nav-create-template" aria-selected="false">Create new</a>
+            </div>
+          </nav>
+          <div class="tab-content shadow p-3" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-all-templates" role="tabpanel"
+              aria-labelledby="nav-all-templates-tab">
+
+              {{ render(controller('App\\Controller\\Template::table')) }}
+
+            </div>
+            <div class="tab-pane fade" id="nav-create-template" role="tabpanel"
+              aria-labelledby="nav-create-template-tab">
+              <form id="create-template-form" action="{{ path('template-create') }}" method="POST" class="mt-3">
+                <div class="form-group row">
+                  <label for="template-label" class="col-sm-2 col-form-label">Label</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control" id="template-label" name="template-label"
+                      placeholder="Label">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary shadow">Create template</button>
                   </div>
                 </div>
               </form>
