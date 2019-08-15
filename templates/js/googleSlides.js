@@ -115,5 +115,6 @@ function save_slide_data(arr, id) {
 			el.find("input[type='url']").val(data[i].url);
 		}
 		frameInput.parent().parent().remove();
+		// todo: reload controller table to show newly created controller
 	}, "json");
 }

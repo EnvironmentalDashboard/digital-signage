@@ -34,14 +34,7 @@ class GoogleSlides extends AbstractController
             $response[$i] = [];
 
             preg_match("/duration:(\s*)(\d*)/i", $value, $matches);
-            if ($matches) {
-                $dur = round($matches[2] * 1000);
-                if ($dur < 0 || $dur > 1000000) {
-                    $dur = 7000;
-                }
-            } else {
-                $dur = 7000;
-            }
+            $dur = ($matches) ? round($matches[2]) : 7;
             $response[$i]['dur'] = $dur;
 
             preg_match("/url:(\s*)(.*)/i", $value, $matches);
@@ -55,7 +48,7 @@ class GoogleSlides extends AbstractController
             // create frame to link to buttons
             $frame = new Entity\Frame;
             $frame->setCarousel($carousel);
-            $frame->setDuration($dur);
+            $frame->setDuration($dur * 1000);
             $frame->setUrl($url);
             $entityManager->persist($frame);
             $entityManager->flush();
@@ -77,21 +70,24 @@ class GoogleSlides extends AbstractController
             }
         }
 
-        foreach ($buttons as $button) {
+        foreach ($buttons as $i => $button) {
             $fn = uniqid() . '.svg';
             $size = file_put_contents("/tmp/{$fn}", '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="100%" height="100%" viewBox="0 0 1920 1080"><text x="'.(strlen($button['button']) * 0.2).'%" y="50%" style="font-size:10rem;font-family:sans-serif">'.$button['button'].'</text></svg>');
             $image = new UploadedFile("/tmp/{$fn}", $fn, 'image/svg', $size, null, true);
             $button = $buttonManager->create(Entity\Button::TRIGGER_FRAME, $button['display'], $button['frame'], $remoteController, $image, null);
+            $button->setTwigKey('btn' . ($i + 1));
             $entityManager->persist($button);
         }
 
         if ($remoteController !== null) {
             $template = new Entity\Template;
             $twig = '';
-            for ($i = 0; $i < count($buttons); $i++) { 
+            $buttonCount = count($buttons);
+            for ($i = 0; $i < $buttonCount; $i++) { 
                 $twig .= '<div class="button" data-twig="btn'.($i+1).'" style="height:50%;width:25%;">{{ btn'.($i+1).'|raw }}</div>';
             }
             $template->setTwig($twig);
+            $template->setLabel("Auto-generated {$buttonCount} button template");
             $remoteController->setTemplate($template);
             $entityManager->persist($template);
             $entityManager->persist($remoteController);
