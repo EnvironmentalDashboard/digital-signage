@@ -118,3 +118,7 @@ template-delete:
   path: /template/{id}/delete
   controller: App\Controller\TemplateEdit::delete
   methods: POST
+template-save-placeholders:
+  path: /template/{id}/placeholders/save
+  controller: App\Controller\TemplateEdit::save
+  methods: POST

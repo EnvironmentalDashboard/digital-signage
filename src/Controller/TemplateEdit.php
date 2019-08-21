@@ -47,5 +47,21 @@ class TemplateEdit extends AbstractController
         return new JsonResponse(true);
     }
 
+    /**
+     * template-save-placeholders
+     */
+    public function save($id, EntityManagerInterface $entityManager)
+    {
+        $repository = $entityManager->getRepository(Entity\Template::class);
+
+        $template = $repository->find($id);
+        $template->setTwig();
+
+        $entityManager->merge($template);
+        $entityManager->flush();
+
+        return new JsonResponse(true);
+    }
+
     
 }

@@ -17,6 +17,8 @@
   {% include 'js/forms.js' %}
 
   {% include 'js/dragAndDrop.js' %}
+
+  {% include 'js/templateEdit.js' %}
 </script>
 {% endblock %}
 
@@ -28,6 +30,13 @@
 
   .drop-zone>div {
     border: 3px dashed #2c3e50;
+  }
+
+  .editable-template > .button {
+    cursor: initial;
+    background: #2c3e50;
+    touch-action: none;
+    user-select: none;
   }
 </style>
 {% endblock %}

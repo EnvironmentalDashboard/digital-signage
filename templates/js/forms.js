@@ -316,12 +316,12 @@ var editButton = function (ev, el) {
 	});
 };
 
-var deleteButton = function(e) {
+var deleteButton = function (e) {
 	e.preventDefault();
 	if (confirm("Are you sure? This action can not be undone.")) {
 		$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
 		var $btnEl = $(this).parent();
-		var url = '{{ path("button-delete", {"id": "placeholder"}) }}'; 
+		var url = '{{ path("button-delete", {"id": "placeholder"}) }}';
 		url = url.replace("placeholder", $(this).data('buttonid'));
 		$.post(url).done(function () {
 			$btnEl.remove();
@@ -360,6 +360,37 @@ var saveButton = function (e) {
 		});
 	});
 };
+
+var saveTemplate = function (e) {
+	e.preventDefault();
+	var that = $(this);
+	var modal = that.closest('.modal');
+	var children = modal.find('.editable-template').children();
+	var styles = []; // todo: will have to refactor templates to contain style info via serialized obj only, not markup
+	for (var i = 0; i < children.length; i++) {
+		styles.push(children[i].dataset);
+	}
+	modal.modal('hide');
+	$('#main-progress').attr('aria-valuenow', 100).css('width', '100%');
+	modal.on('hidden.bs.modal', function () {
+		$.post(that.attr('action'), styles).done(function () {
+			$.ajax({
+				url: '{{ path("template-table") }}',
+				type: "GET",
+				success: function (data) {
+					$("#nav-all-templates").html(data);
+					$('form[action$="/placeholders/save"]').on('submit', saveTemplate);
+					$('#main-progress').attr('aria-valuenow', 0).css('width', '0%');
+				},
+				error: function (xhr, status, error) {
+					console.log(xhr, status, error);
+				}
+			});
+		}).fail(function (xhr, status, error) {
+			console.log(xhr, status, error);
+		});
+	});
+}
 
 var selectButtonType = function (e) {
 	var val = $(e).val(), controllerId = $(e).data('controllerid');
@@ -451,7 +482,7 @@ var dropdownTemplate = function (e) {
 	$(controls).html(compiledTwig);
 }
 
-var movePosition = function(direction, presEl, buttonEl) {
+var movePosition = function (direction, presEl, buttonEl) {
 	var $presEl = $(presEl);
 	var $buttonEl = $(buttonEl);
 	var input = $presEl.find('input[name="position[]"]')[0];
@@ -489,6 +520,7 @@ $('form[action$="/presentations/save"]').on('submit', savePresentation);
 $('form[action$="/frames/save"]').on('submit', saveFrame);
 $('form[action$="/buttons/save"]').on('submit', saveButton);
 $('form[action$="/delete"]').on('submit', deleteEntity);
+$('form[action$="/placeholders/save"]').on('submit', saveTemplate);
 $('.detect-special-url').each(function () {
 	$(this).on('input', specialUrl);
 });

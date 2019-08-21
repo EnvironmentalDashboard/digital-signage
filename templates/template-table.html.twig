@@ -38,9 +38,9 @@
 {% for template in templates %}
 <div class="modal fade" id="template-{{template.id}}-createFormModal" tabindex="-1" role="dialog"
     aria-labelledby="template-{{template.id}}-createFormModal-Label" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
-            <form action="" method="POST">
+            <form action="{{ path('template-save-placeholders', {'id': template.id}) }}" method="POST">
 
                 <div class="modal-header">
                     <h4 class="modal-title form-inline" id="template-{{template.id}}-createFormModal-Label">Edit
@@ -54,8 +54,8 @@
 
 
                 <div class="modal-body">
-                    <div id="template-{{template.id}}-frame-edit">
-                        <p>todo</p>
+                    <div id="template-{{template.id}}-edit" class="editable-template" style="max-height: 100%;">
+                        {{template.twig|raw}}
                     </div>
                 </div>
 
